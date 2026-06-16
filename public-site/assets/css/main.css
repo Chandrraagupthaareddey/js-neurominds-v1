@@ -1,0 +1,142 @@
+/* =====================================================================
+   JS Neurominds V1 — main.css  (design tokens + base)
+   Premium healthcare design system. Calm, trustworthy, mental-health
+   appropriate. Built for a professional psychiatry & diagnostic clinic.
+
+   Token layers:  color · type · space · radius · shadow · z-index · motion
+   Visual direction: deep ink navy (trust) + soft healthcare blue +
+   teal/sage care accents on a warm off-white canvas, with a restrained
+   lavender used only for gentle mental-health softness.
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,600&family=Inter:wght@400;450;500;600;700&display=swap');
+
+:root {
+  /* ---------- color: brand ---------- */
+  --ink-900:#0e1b2a;   /* deep navy — primary trust color */
+  --ink-800:#16273a;
+  --ink-700:#22384f;
+  --ink-600:#3a5066;
+  --ink-500:#5a7088;
+  --ink-400:#8295a8;
+  --ink-300:#aebccb;
+
+  --blue-600:#1f6feb;  /* healthcare blue */
+  --blue-500:#3b82f6;
+  --blue-100:#e6f0fe;
+  --blue-50:#f1f6fe;
+
+  --teal-700:#0f6f6a;  /* care accent (calm green-teal) */
+  --teal-600:#138a82;
+  --teal-500:#1ba39a;
+  --teal-100:#d8f0ed;
+  --teal-50:#eef8f6;
+
+  --sage-500:#5b9279;  /* secondary care accent */
+  --lavender-300:#cdc8f0; /* mental-health softness, used sparingly */
+  --lavender-50:#f4f2fb;
+
+  /* ---------- color: canvas + surface ---------- */
+  --canvas:#f7f5f1;        /* warm off-white background */
+  --canvas-2:#fbfaf7;
+  --surface:#ffffff;
+  --surface-2:#fafcfe;     /* faint blue-white panel */
+  --line:#e9e6df;          /* warm hairline */
+  --line-cool:#e3e9f0;     /* cool hairline for blue contexts */
+
+  /* ---------- color: semantic ---------- */
+  --text:var(--ink-800);
+  --text-soft:var(--ink-600);
+  --text-faint:var(--ink-400);
+  --brand:var(--ink-900);
+  --primary:var(--teal-700);
+  --primary-hover:var(--teal-600);
+  --accent:#e08a4b;        /* warm clay — single emphasis accent, rare */
+
+  --ok:#1f8a5b; --ok-bg:#e6f4ec;
+  --warn:#b9791f; --warn-bg:#fbf0db;
+  --err:#c0492f; --err-bg:#fbe6e0;
+  --info:#1f6feb; --info-bg:var(--blue-100);
+
+  /* ---------- typography ---------- */
+  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+
+  --fs-xs:0.78rem; --fs-sm:0.875rem; --fs-base:1rem; --fs-md:1.0625rem;
+  --fs-lg:1.1875rem; --fs-xl:1.5rem; --fs-2xl:2rem; --fs-3xl:2.65rem;
+  --fs-4xl:3.4rem; --fs-5xl:4.2rem;
+
+  --lh-tight:1.12; --lh-snug:1.3; --lh-normal:1.6; --lh-relaxed:1.75;
+  --tracking-tight:-0.02em; --tracking-wide:0.14em;
+
+  /* ---------- spacing (4px base) ---------- */
+  --sp-1:0.25rem; --sp-2:0.5rem; --sp-3:0.75rem; --sp-4:1rem; --sp-5:1.5rem;
+  --sp-6:2rem; --sp-7:3rem; --sp-8:4rem; --sp-9:6rem; --sp-10:8rem;
+
+  /* ---------- radius ---------- */
+  --r-xs:6px; --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:28px; --r-pill:999px;
+
+  /* ---------- shadow (soft, layered, never harsh) ---------- */
+  --shadow-xs:0 1px 2px rgba(14,27,42,.06);
+  --shadow-sm:0 2px 8px rgba(14,27,42,.06), 0 1px 2px rgba(14,27,42,.05);
+  --shadow-md:0 8px 24px rgba(14,27,42,.08), 0 2px 6px rgba(14,27,42,.05);
+  --shadow-lg:0 20px 50px rgba(14,27,42,.12), 0 6px 16px rgba(14,27,42,.06);
+  --shadow-glow:0 0 0 4px rgba(27,163,154,.14);
+
+  /* ---------- z-index scale ---------- */
+  --z-base:1; --z-raised:10; --z-sticky:50; --z-header:60; --z-fab:70;
+  --z-overlay:80; --z-modal:90; --z-toast:100;
+
+  /* ---------- motion ---------- */
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --dur-fast:.15s; --dur:.25s; --dur-slow:.5s;
+
+  /* ---------- layout ---------- */
+  --maxw:1180px; --maxw-prose:720px; --header-h:72px;
+}
+
+/* ---------- reset ---------- */
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{
+  margin:0; background:var(--canvas); color:var(--text);
+  font-family:var(--font-body); font-size:var(--fs-base); line-height:var(--lh-normal);
+  font-weight:450; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+img,svg{max-width:100%; height:auto; display:block;}
+a{color:var(--primary); text-decoration:none; transition:color var(--dur-fast) var(--ease);}
+a:hover{color:var(--primary-hover);}
+button{font-family:inherit;}
+h1,h2,h3,h4{font-family:var(--font-display); font-weight:500; line-height:var(--lh-tight); color:var(--ink-900); margin:0 0 var(--sp-3); letter-spacing:var(--tracking-tight);}
+h1{font-size:var(--fs-3xl);} h2{font-size:var(--fs-2xl);} h3{font-size:var(--fs-xl);} h4{font-size:var(--fs-lg);}
+p{margin:0 0 var(--sp-4); color:var(--text-soft); line-height:var(--lh-relaxed);}
+ul,ol{color:var(--text-soft); line-height:var(--lh-relaxed);}
+strong{color:var(--ink-800); font-weight:600;}
+
+/* ---------- focus (accessible, visible) ---------- */
+:focus-visible{outline:3px solid var(--teal-500); outline-offset:2px; border-radius:4px;}
+.skip-link{position:absolute; left:-999px; top:0; background:var(--surface); padding:var(--sp-3) var(--sp-4); z-index:var(--z-toast); border-radius:0 0 var(--r-sm) 0; box-shadow:var(--shadow-md);}
+.skip-link:focus{left:0;}
+
+/* ---------- layout primitives ---------- */
+.container{width:100%; max-width:var(--maxw); margin-inline:auto; padding-inline:var(--sp-5);}
+.container--prose{max-width:var(--maxw-prose);}
+.section{padding-block:var(--sp-8);}
+.section--tight{padding-block:var(--sp-7);}
+.section--alt{background:linear-gradient(180deg,var(--canvas-2),var(--canvas));}
+.section-head{max-width:62ch; margin-bottom:var(--sp-6);}
+.section-head--center{margin-inline:auto; text-align:center;}
+
+.eyebrow{display:inline-flex; align-items:center; gap:var(--sp-2); font-family:var(--font-body); font-size:var(--fs-xs); font-weight:600; text-transform:uppercase; letter-spacing:var(--tracking-wide); color:var(--teal-700); margin-bottom:var(--sp-3);}
+.eyebrow::before{content:""; width:18px; height:1.5px; background:var(--teal-500); display:inline-block;}
+.eyebrow--center{justify-content:center;}
+.lede{font-size:var(--fs-lg); color:var(--text-soft); max-width:60ch; line-height:var(--lh-relaxed);}
+
+.text-center{text-align:center;} .mt-0{margin-top:0;} .mb-0{margin-bottom:0;}
+.stack>*+*{margin-top:var(--sp-4);} .hide{display:none !important;}
+.grid{display:grid; gap:var(--sp-5);}
+.grid--2{grid-template-columns:1fr;} .grid--3{grid-template-columns:1fr;} .grid--4{grid-template-columns:1fr;}
+
+@media(min-width:680px){ .grid--2{grid-template-columns:repeat(2,1fr);} .grid--4{grid-template-columns:repeat(2,1fr);} }
+@media(min-width:920px){ .grid--3{grid-template-columns:repeat(3,1fr);} .grid--4{grid-template-columns:repeat(4,1fr);} }

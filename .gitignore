@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist/
+dist-admin/
+dist-test/
+.build/
+.cache/
+.vite/
+
+# Generated SEO stubs (built by Cloudflare at deploy time, never committed)
+public-site/p/
+public-site/sitemap.xml
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Google Apps Script / clasp
+.clasp.json
+.clasprc.json
+*.clasp.json
+!.clasp.example.json
+
+# Secrets / credentials
+credentials.json
+token.json
+service-account.json
+service_account.json
+*.service-account.json
+*.credentials.json
+*.secret.json
+*.key
+*.pem
+*.p12
+
+# Cloudflare / Wrangler local files
+.wrangler/
+wrangler.toml
+!wrangler.toml.example
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Patient/user data exports
+exports/
+backups/
+*.csv
+*.xlsx
+*.xls
+*.ods

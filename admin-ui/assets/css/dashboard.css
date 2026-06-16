@@ -1,0 +1,11 @@
+/* JS Neurominds V1 — dashboard.css (dashboard-specific layering on admin.css) */
+.chart-row .panel{margin-bottom:0;}
+@media(min-width:1000px){
+  .chart-row{grid-template-columns:1.7fr 1fr;}
+  .chart-row.even{grid-template-columns:1fr 1fr;}
+}
+.welcome{background:linear-gradient(135deg, var(--ink-900), var(--ink-700)); color:#fff; border-radius:var(--r-lg); padding:1.5rem 1.75rem; margin-bottom:1.5rem; position:relative; overflow:hidden;}
+.welcome::before{content:""; position:absolute; inset:0; background:radial-gradient(40% 80% at 90% 10%, rgba(27,163,154,.25), transparent 60%); pointer-events:none;}
+.welcome>*{position:relative; z-index:1;}
+.welcome h2{color:#fff; margin-bottom:.25rem; font-size:1.35rem;}
+.welcome p{color:rgba(255,255,255,.75); margin:0; font-size:13.5px;}

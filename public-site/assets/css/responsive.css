@@ -1,0 +1,39 @@
+/* =====================================================================
+   JS Neurominds V1 — responsive.css
+   Breakpoints + reduced-motion. Mobile-first; these layer up.
+   ===================================================================== */
+
+@media(min-width:680px){
+  .hero__cta .btn{min-width:auto;}
+}
+
+@media(min-width:940px){
+  .nav{display:flex;}
+  .nav-toggle{display:none;}
+  .footer-grid{grid-template-columns:1.6fr 1fr 1fr 1.3fr;}
+}
+
+/* Mobile sticky CTA appears only on small screens, on key pages */
+@media(max-width:760px){
+  body.has-sticky-cta{padding-bottom:76px;}
+  body.has-sticky-cta .sticky-cta{display:flex;}
+  body.has-sticky-cta .fab-stack--right{bottom:84px;}
+  body.has-sticky-cta .fab-stack--left{bottom:84px;}
+  .hero{padding-block:var(--sp-7) var(--sp-6);}
+  .hero__trust{gap:var(--sp-4);}
+  .section{padding-block:var(--sp-7);}
+  .cta-strip{padding:var(--sp-7) var(--sp-5);}
+}
+
+/* Larger tap targets on coarse pointers */
+@media(pointer:coarse){
+  .nav a, .footer-links a{padding-block:.6rem;}
+}
+
+/* Reduced motion: disable all non-essential animation */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important;}
+  .hero__aura{animation:none;}
+  [data-reveal]{opacity:1 !important; transform:none !important;}
+  .scroll-progress{display:none;}
+}

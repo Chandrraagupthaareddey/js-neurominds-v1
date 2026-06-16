@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treatment | JS Neurominds</title>
+  <meta name="description" content="JS Neurominds and Diagnostic Center, Tirupati." />
+  <link rel="canonical" href="https://neurominds.in/treatment.html" />
+  <meta property="og:title" content="Treatment | JS Neurominds" />
+  <meta property="og:description" content="JS Neurominds and Diagnostic Center, Tirupati." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/responsive.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <main id="main">
+    <section class="section">
+      <div class="container container--prose">
+        <div id="detail-wrap"></div>
+      </div>
+    </section>
+  </main>
+  <script type="module">
+    import { mountShell } from '/assets/js/app.js';
+    import '/assets/js/feedback.js';
+    import { hydrateDetail } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await hydrateDetail('treatment'); })();
+  </script>
+</body>
+</html>

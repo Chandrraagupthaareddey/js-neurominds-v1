@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Tests & Home Sample Collection | JS Neurominds</title>
+  <meta name="description" content="Lab tests with home sample collection around Chandragiri. Door pickup, reports usually within 24 hours subject to availability." />
+  <link rel="canonical" href="https://neurominds.in/lab.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/responsive.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <main id="main">
+    <section class="section">
+      <div class="container" style="max-width:960px">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow">Diagnostics</p>
+          <h1>Lab tests &amp; home sample collection</h1>
+          <p class="lede">Convenient door pickup around Chandragiri (within ~10 km). Reports are usually ready within 24 hours, depending on the test, package, and lab availability.</p>
+        </div>
+
+        <div class="assurance" data-reveal style="margin-bottom:var(--sp-7)">
+          <div class="assurance__item"><span class="ico">🏠</span> Door pickup</div>
+          <div class="assurance__item"><span class="ico">⏱</span> Reports usually &lt; 24 hrs</div>
+          <div class="assurance__item"><span class="ico">📍</span> ~10 km around Chandragiri</div>
+          <div class="assurance__item"><span class="ico">✓</span> Staff-verified before pickup</div>
+        </div>
+
+        <div class="grid grid--3" id="list-wrap" data-reveal="2" style="margin-bottom:var(--sp-8)"></div>
+
+        <div style="max-width:580px; margin:0 auto">
+          <div class="section-head section-head--center" data-reveal>
+            <p class="eyebrow eyebrow--center">Home collection</p>
+            <h2>Request a pickup</h2>
+            <p class="lede" style="margin-inline:auto">Tell us where and when — our team will confirm before pickup.</p>
+          </div>
+          <div class="card" style="box-shadow:var(--shadow-md)">
+            <div id="lab-mount"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="sticky-cta">
+    <a class="btn btn--ghost" href="/contact.html">Call us</a>
+    <a class="btn btn--primary" href="#lab-mount">Request pickup</a>
+  </div>
+
+  <script type="module">
+    import { mountShell } from '/assets/js/app.js';
+    import { hydrateList } from '/assets/js/pages.js';
+    import { renderLabForm } from '/assets/js/lab.js';
+    import '/assets/js/feedback.js';
+    (async () => {
+      document.body.classList.add('has-sticky-cta');
+      await mountShell();
+      await hydrateList('lab');
+      await renderLabForm('#lab-mount');
+    })();
+  </script>
+</body>
+</html>

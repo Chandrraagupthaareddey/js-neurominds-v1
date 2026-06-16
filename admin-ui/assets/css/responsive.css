@@ -1,0 +1,19 @@
+/* JS Neurominds V1 — admin responsive.css */
+.menu-btn{display:none;}
+@media(max-width:860px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{position:fixed; left:-280px; top:0; width:264px; transition:left .25s var(--ease); box-shadow:var(--shadow-lg);}
+  .sidebar.open{left:0;}
+  .menu-btn{display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border:1px solid var(--line); border-radius:9px; background:#fff; font-size:1.1rem; color:var(--ink-800);}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .topbar__right .userchip span:last-child{display:none;}
+  .role-switch label{display:none;}
+  .desk{grid-template-columns:1fr !important;}
+}
+@media(max-width:540px){
+  .kpi-grid{grid-template-columns:1fr;}
+  .content{padding:1rem;}
+  .topbar{padding:0 1rem;}
+  .env-pill{display:none;}
+  .drawer{width:100%;}
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treatments | JS Neurominds</title>
+  <meta name="description" content="Treatments and therapies at JS Neurominds, Tirupati." />
+  <link rel="canonical" href="https://neurominds.in/treatments.html" />
+  <meta property="og:title" content="Treatments | JS Neurominds" />
+  <meta property="og:description" content="Treatments and therapies at JS Neurominds, Tirupati." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/responsive.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <main id="main">
+    <section class="section">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow">JS Neurominds</p>
+          <h1>Treatments</h1>
+          <p class="lede">Evidence-based approaches, tailored to you.</p>
+        </div>
+        <div class="grid grid--3" id="list-wrap" data-reveal="2"></div>
+      </div>
+    </section>
+  </main>
+  <script type="module">
+    import { mountShell } from '/assets/js/app.js';
+    import '/assets/js/feedback.js';
+    import { hydrateList } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await hydrateList('treatments'); })();
+  </script>
+</body>
+</html>
