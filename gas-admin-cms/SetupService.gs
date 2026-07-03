@@ -204,7 +204,7 @@ function _seedSystemConfig_(cId, now) {
     whatsapp_link: 'https://wa.me/918553665381', call_link: 'tel:+918553665381',
     maps_url: 'https://share.google/FINrIJ0bVg0GX5D08',
     address: 'Beside Suzuki showroom, Hero PVR Motors Building, 10-1060, Ramachandra Nagar, Chandragiri, Thondavada, Andhra Pradesh 517101',
-    footer: 'Built and maintained by TCGR Technologies / tcgr.in',
+    footer: 'Built and maintained by tcgr.in',
     support_email: 'jsneurominds5@gmail.com', pwens_booking_url: 'https://jsneurominds.pwens.com/waselffollowuppage',
     domain: 'https://neurominds.in',
     logo_url: '/assets/brand/logo.png', footer_logo_url: '/assets/brand/logo.png',
@@ -459,7 +459,7 @@ function _seedSocialLinks_(cId, now) {
 function _seedFooterSettings_(cId, now) {
   var rows = [
     ['footer_about', 'Compassionate psychiatry, mental health, and diagnostic care in Chandragiri and Tirupati.', 'YES', 1],
-    ['footer_attribution', 'Built and maintained by TCGR Technologies / tcgr.in', 'YES', 2],
+    ['footer_attribution', 'Built and maintained by tcgr.in', 'YES', 2],
     ['footer_show_map', 'YES', 'YES', 3],
     ['footer_show_social', 'YES', 'YES', 4]
   ];

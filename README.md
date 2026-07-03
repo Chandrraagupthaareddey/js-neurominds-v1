@@ -76,6 +76,33 @@ VITE_ADMIN_API_URL=https://script.google.com/macros/s/YYYY/exec
 
 Production GAS URLs are **never hardcoded** - they are injected via environment at build time.
 
+## 6a. Admin access modes (Preview / OAuth / Restricted)
+
+The admin portal (`admin-ui/`) resolves access from environment variables at build time — no code change is ever needed to switch modes. Precedence:
+
+| Priority | Environment | Behavior |
+|----------|-------------|----------|
+| 1 | `VITE_ADMIN_PREVIEW=true` | **Preview Mode** — bypasses only the auth gate, auto-signs in as `super_admin`, loads the real dashboard with **full** create/update/delete/publish/save. Routing, sections, and RBAC are identical to production. |
+| 2 | `VITE_GOOGLE_CLIENT_ID=<id>` (and preview off) | **Production** — real Google OAuth sign-in (Google Identity Services → ID token → GAS verification → Users tab → role → session). |
+| 3 | none of the above | **Restricted** — clean access page: *"Admin access is restricted. Google authentication will be enabled before live admin use."* |
+
+**Going live later requires configuration only, not code:**
+
+1. Set `VITE_ADMIN_PREVIEW=false`
+2. Set `VITE_GOOGLE_CLIENT_ID` to the OAuth client ID
+3. Add authorized emails to the `Users` tab in the CONFIG_CONTENT workbook
+
+```bash
+# Preview (demo/dev before OAuth is ready)
+VITE_ADMIN_PREVIEW=true
+
+# Production (real auth)
+VITE_ADMIN_PREVIEW=false
+VITE_GOOGLE_CLIENT_ID=1234567890-abcdefg.apps.googleusercontent.com
+```
+
+
+
 ## 7. GAS deployment
 
 `clasp login` and `clasp push` are **backend deployment steps only**. See `docs/GAS_DEPLOYMENT.md`. The admin `runSetup()` provisions the Drive folder, both Sheets workbooks, all tabs, and seed data.

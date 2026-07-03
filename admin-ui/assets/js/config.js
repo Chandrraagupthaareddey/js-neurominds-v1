@@ -20,21 +20,28 @@ const env = import.meta.env || {};
 
 const API_MODE = (env.VITE_API_MODE || 'mock').toLowerCase();
 
-// Real Google OAuth client id — set once configured (Phase 2 / before live use).
+// Real Google OAuth client id — set once configured (before live use).
 const GOOGLE_CLIENT_ID = env.VITE_GOOGLE_CLIENT_ID || '';
 const OAUTH_CONFIGURED = !!GOOGLE_CLIENT_ID;
 
-// Developer-only escape hatch. Must be the literal string 'true'. Never set in
-// any committed env file, so every build/preview defaults to restricted access.
-const MOCK_LOGIN_ALLOWED = String(env.VITE_ENABLE_MOCK_LOGIN) === 'true' && !OAUTH_CONFIGURED;
+// PREVIEW MODE: highest-priority access mode. When VITE_ADMIN_PREVIEW=true the
+// admin bypasses ONLY the authentication gate and loads the real dashboard with
+// full functionality (create/update/delete/publish/save all intact). Routing,
+// sections, and RBAC behave exactly as production. Set to false + configure
+// VITE_GOOGLE_CLIENT_ID to switch to real Google OAuth — no code change needed.
+const PREVIEW = String(env.VITE_ADMIN_PREVIEW) === 'true';
 
-// When neither real OAuth nor the developer opt-in is present, the portal is
-// restricted: it renders only the clean access page — no dashboard, no data.
-const AUTH_DISABLED = !OAUTH_CONFIGURED && !MOCK_LOGIN_ALLOWED;
+// Developer-only escape hatch (legacy dev picker). Never set in committed env.
+const MOCK_LOGIN_ALLOWED = String(env.VITE_ENABLE_MOCK_LOGIN) === 'true' && !PREVIEW && !OAUTH_CONFIGURED;
+
+// The portal is restricted (clean access page, no dashboard, no data) ONLY when
+// none of: preview mode, real OAuth, or the dev opt-in is present.
+const AUTH_DISABLED = !PREVIEW && !OAUTH_CONFIGURED && !MOCK_LOGIN_ALLOWED;
 
 export const CONFIG = {
   API_MODE,
   USE_MOCK: API_MODE === 'mock',
+  PREVIEW,
   GOOGLE_CLIENT_ID,
   OAUTH_CONFIGURED,
   MOCK_LOGIN_ALLOWED,

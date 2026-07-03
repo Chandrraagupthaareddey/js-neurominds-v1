@@ -191,7 +191,7 @@ function renderFooter(cfg, social, flags) {
         </div>
         <div class="footer-bottom">
           <span>© ${new Date().getFullYear()} ${cfg.clinic_name}. All rights reserved.</span>
-          <span>${cfg.footer}</span>
+          <span>Built and maintained by <a href="https://tcgr.in/" target="_blank" rel="noopener">tcgr.in</a></span>
         </div>
       </div>
     </footer>

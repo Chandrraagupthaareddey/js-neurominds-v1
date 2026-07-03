@@ -107,7 +107,7 @@ export const adminApi = {
     await wait(30);
     return ok([
       { setting_key: 'footer_about', setting_value: 'Compassionate psychiatry, mental health, and diagnostic care.', is_enabled: 'YES', display_order: 1 },
-      { setting_key: 'footer_attribution', setting_value: CLINIC_CONFIG.footer || 'Built and maintained by TCGR Technologies / tcgr.in', is_enabled: 'YES', display_order: 2 },
+      { setting_key: 'footer_attribution', setting_value: CLINIC_CONFIG.footer || 'Built and maintained by tcgr.in', is_enabled: 'YES', display_order: 2 },
       { setting_key: 'footer_show_map', setting_value: 'YES', is_enabled: 'YES', display_order: 3 }
     ]);
   }

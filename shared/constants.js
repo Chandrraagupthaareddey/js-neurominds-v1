@@ -15,7 +15,7 @@ export const CLINIC = {
   call_link: 'tel:+918553665381',
   maps_url: 'https://share.google/FINrIJ0bVg0GX5D08',
   address: 'Beside Suzuki showroom, Hero PVR Motors Building, 10-1060, Ramachandra Nagar, Chandragiri, Thondavada, Andhra Pradesh 517101',
-  footer: 'Built and maintained by TCGR Technologies / tcgr.in',
+  footer: 'Built and maintained by tcgr.in',
   support_email: 'jsneurominds5@gmail.com',
   pwens_booking_url: 'https://jsneurominds.pwens.com/waselffollowuppage',
   domain: 'https://neurominds.in'

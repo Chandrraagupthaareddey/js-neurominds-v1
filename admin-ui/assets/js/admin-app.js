@@ -6,7 +6,7 @@
  * the content area.
  */
 import { CONFIG } from './config.js';
-import { signInAs, signOut, getSession, setRole, knownUsers, allowedSections } from './auth.js';
+import { signInAs, signOut, getSession, setRole, knownUsers, allowedSections, startPreviewSession } from './auth.js';
 import { ROLE_LABELS, ROLES } from '../../../shared/permissions.js';
 import { api } from './api.js';
 import { renderDashboard } from './dashboard.js';
@@ -56,6 +56,14 @@ let currentSection = 'dashboard';
 let navCounts = {};
 
 export function boot() {
+  // PREVIEW MODE (VITE_ADMIN_PREVIEW=true): bypass ONLY the auth gate. Seed a
+  // real super_admin session and load the existing dashboard with full
+  // functionality. Routing/sections/RBAC are unchanged from production.
+  if (CONFIG.PREVIEW) {
+    if (!getSession()) startPreviewSession();
+    renderShell();
+    return;
+  }
   // SECURITY GATE: in deployed envs without configured Google OAuth, do not
   // render the dashboard, navigation, or any admin data.
   if (CONFIG.AUTH_DISABLED) { renderAuthDisabled(); return; }
@@ -164,7 +172,7 @@ async function renderShell() {
               <a class="btn btn--ghost btn--sm" href="${CONFIG.PWENS_PUBLIC_BOOKING_URL}" target="_blank" rel="noopener">PWeNS Booking</a>
               <a class="btn btn--ghost btn--sm" href="${CONFIG.PWENS_LOGIN_URL}" target="_blank" rel="noopener">PWeNS Login</a>
             </div>
-            ${CONFIG.MOCK_LOGIN_ALLOWED ? `
+            ${(CONFIG.MOCK_LOGIN_ALLOWED || CONFIG.PREVIEW) ? `
             <div class="role-switch" title="Preview access by role">
               <label for="role-sel">Role</label>
               <select id="role-sel">

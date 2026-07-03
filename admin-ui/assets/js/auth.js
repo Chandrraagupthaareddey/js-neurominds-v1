@@ -48,6 +48,21 @@ export function signInAs(email) {
 
 export function signOut() { session = null; }
 
+/**
+ * Preview Mode session. Seeds a real super_admin session so the existing shell,
+ * RBAC, and all CRUD/publish actions work identically to production — the ONLY
+ * difference is that no credential was verified. Used when VITE_ADMIN_PREVIEW=true.
+ * Reuses the same session shape as signInAs(); no duplicated logic.
+ */
+export function startPreviewSession() {
+  const preferred = MOCK_USERS.find((u) => u.role_key === 'super_admin' && u.status === 'active')
+    || MOCK_USERS.find((u) => u.status === 'active');
+  session = preferred
+    ? { email: preferred.email, name: preferred.name, role: preferred.role_key, preview: true }
+    : { email: 'preview@jsneurominds', name: 'Preview Admin', role: 'super_admin', preview: true };
+  return session;
+}
+
 /** RBAC simulator: change the current session's role in place (local only). */
 export function setRole(roleKey) {
   if (session && ROLE_SECTIONS[roleKey]) {
