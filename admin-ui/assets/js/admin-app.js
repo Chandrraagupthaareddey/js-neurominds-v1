@@ -6,7 +6,7 @@
  * the content area.
  */
 import { CONFIG } from './config.js';
-import { signInAs, signOut, getSession, setRole, knownUsers, allowedSections, startPreviewSession } from './auth.js';
+import { signInAs, signInWithGoogleProfile, signOut, getSession, setRole, knownUsers, allowedSections, startPreviewSession } from './auth.js';
 import { ROLE_LABELS, ROLES } from '../../../shared/permissions.js';
 import { api } from './api.js';
 import { renderDashboard } from './dashboard.js';
@@ -120,8 +120,81 @@ function renderLogin(denied) {
   });
 }
 
-/* Real Google OAuth login (Phase 2). The button placeholder is shown; the
-   Google Identity Services flow + GAS ID-token verification land in Phase 2. */
+/* Real Google OAuth login — Google Identity Services (GIS).
+   Loads accounts.google.com/gsi/client, renders Google's official button,
+   decodes the returned ID token client-side, enforces the email allowlist,
+   and creates the standard session. Server-side token verification in GAS is
+   the planned hardening step before trusting writes from untrusted clients. */
+
+function decodeJwt(token) {
+  try {
+    const payload = String(token).split('.')[1];
+    const b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const json = decodeURIComponent(
+      atob(b64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+    );
+    return JSON.parse(json);
+  } catch (e) {
+    return null;
+  }
+}
+
+let gisLoading = null;
+function loadGis() {
+  if (window.google && window.google.accounts) return Promise.resolve();
+  if (gisLoading) return gisLoading;
+  gisLoading = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.async = true; s.defer = true;
+    s.onload = res;
+    s.onerror = () => rej(new Error('Failed to load Google Identity Services'));
+    document.head.appendChild(s);
+  });
+  return gisLoading;
+}
+
+function showLoginError(msg) {
+  const box = document.getElementById('login-error');
+  if (box) { box.style.display = 'block'; box.innerHTML = msg; }
+}
+
+function onGoogleCredential(response) {
+  const profile = decodeJwt(response && response.credential);
+  if (!profile || !profile.email) {
+    showLoginError('<strong>Sign-in failed.</strong> Could not read the Google account. Please try again.');
+    return;
+  }
+  const res = signInWithGoogleProfile(
+    { email: profile.email, name: profile.name, picture: profile.picture },
+    CONFIG.ALLOWED_ADMIN_EMAILS
+  );
+  if (res.ok) renderShell();
+  else showLoginError(`<strong>Access denied.</strong> <b>${res.email}</b> is not on the authorized admin list.`);
+}
+
+async function initGoogleSignIn() {
+  try {
+    await loadGis();
+    window.google.accounts.id.initialize({
+      client_id: CONFIG.GOOGLE_CLIENT_ID,
+      callback: onGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    const slot = document.getElementById('g-signin');
+    if (slot) {
+      window.google.accounts.id.renderButton(slot, {
+        type: 'standard', theme: 'outline', size: 'large',
+        text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: 280
+      });
+    }
+    window.google.accounts.id.prompt(); // One Tap where available
+  } catch (e) {
+    showLoginError('<strong>Could not load Google sign-in.</strong> Check the network and reload.');
+  }
+}
+
 function renderOAuthLogin(denied) {
   root().innerHTML = `
     <div class="login-wrap">
@@ -129,18 +202,14 @@ function renderOAuthLogin(denied) {
         <div class="brand__mark"><img src="/assets/brand/logo.png" alt="JS Neurominds" width="52" height="52" /></div>
         <h2>JS Neurominds</h2>
         <p class="muted" style="margin-top:0">Admin Portal · sign in with Google</p>
-        <div id="g-signin" style="margin-top:1.5rem"></div>
-        <button class="google-btn" id="login-btn"><span class="google-g"></span> Sign in with Google</button>
+        <div id="g-signin" style="margin-top:1.5rem; display:flex; justify-content:center"></div>
         <p class="muted" style="font-size:12px; margin-top:1rem">Only authorized clinic accounts can access this portal.</p>
-        ${denied ? `<div class="access-denied"><strong>Access denied.</strong> <b>${denied}</b> is not authorized.</div>` : ''}
+        <div class="access-denied" id="login-error" style="display:${denied ? 'block' : 'none'}">
+          ${denied ? `<strong>Access denied.</strong> <b>${denied}</b> is not authorized.` : ''}
+        </div>
       </div>
     </div>`;
-  // Phase 2: initialize Google Identity Services with CONFIG.GOOGLE_CLIENT_ID,
-  // exchange the ID token with the GAS Admin CMS, and create a session.
-  const btn = document.getElementById('login-btn');
-  if (btn) btn.addEventListener('click', () => {
-    alert('Google sign-in is configured server-side in Phase 2.');
-  });
+  initGoogleSignIn();
 }
 
 /* ---------------- Shell ---------------- */

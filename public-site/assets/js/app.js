@@ -269,9 +269,19 @@ export async function mountShell({ currentPath = location.pathname } = {}) {
   const root = document.body;
   root.prepend(renderEmergencyBar());
   root.children[0].after(renderHeader(cfg, nav, currentPath));
-  root.appendChild(renderFooter(cfg, social, flags));
+  const footerEl = renderFooter(cfg, social, flags);
+  root.appendChild(footerEl);
   if (flags.floating_cta_enabled !== false) {
     renderFabs(cfg, fabs).forEach((f) => root.appendChild(f));
+    // Mobile overlap guard: hide floating actions while the footer is on
+    // screen (the footer carries its own CTAs). CSS scopes the effect to
+    // small viewports, so desktop is unaffected.
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => document.body.classList.toggle('footer-in-view', e.isIntersecting));
+      }, { threshold: 0.05 });
+      io.observe(footerEl);
+    }
   }
 
   document.dispatchEvent(new CustomEvent('jsnm:shell-ready', { detail: { cfg, social, flags, fabs } }));

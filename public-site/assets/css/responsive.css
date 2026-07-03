@@ -61,3 +61,55 @@
 @media(max-width:939px){
   .nav .theme-slot{display:none;}
 }
+
+/* =====================================================================
+   Phase 2 — Mobile polish. All rules scoped to max-width queries;
+   desktop rendering is untouched.
+   ===================================================================== */
+@media(max-width:760px){
+  /* Enquire/feedback pill: restore pill shape (base .fab{width:48px} above
+     was squeezing it into a circle with wrapped text). Single line, solid
+     surface, readable — never a ghost circle over content. */
+  .fab--feedback{
+    width:auto; min-width:0; height:44px; padding:0 var(--sp-4);
+    white-space:nowrap; border-radius:var(--r-pill);
+    background:var(--surface); box-shadow:var(--shadow-lg);
+  }
+
+  /* Fixed floating buttons must never cover the last footer lines:
+     give the footer bottom clearance equal to the FAB zone. */
+  .site-footer{padding-bottom:calc(var(--sp-6) + 76px + env(safe-area-inset-bottom, 0px));}
+  body.has-sticky-cta .site-footer{padding-bottom:calc(var(--sp-6) + 150px + env(safe-area-inset-bottom, 0px));}
+
+  /* Hide floating actions entirely while the footer is on screen —
+     the footer carries its own callback/booking CTAs and contact links. */
+  .fab-stack{transition:opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);}
+  body.footer-in-view .fab-stack{opacity:0; pointer-events:none; transform:translateY(10px);}
+
+  /* Hero trust stats: clean 2×2 grid — no orphaned last item. */
+  .hero__trust{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:var(--sp-4) var(--sp-5);}
+  .hero__trust-item b{font-size:var(--fs-lg);}
+
+  /* Sticky CTA bar respects iPhone home-indicator safe area. */
+  .sticky-cta{padding-bottom:calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));}
+
+  /* Guard against accidental horizontal scroll from decorative layers. */
+  body{overflow-x:clip;}
+}
+
+@media(max-width:480px){
+  /* Hero breathes: calmer headline scale, stacked full-width CTAs. */
+  .hero h1{font-size:clamp(1.95rem, 8vw, 2.35rem);}
+  .hero .lede{font-size:var(--fs-base);}
+  .hero__cta{flex-direction:column; align-items:stretch;}
+  .hero__cta .btn{width:100%;}
+  .section{padding-block:var(--sp-6);}
+  .cta-strip{padding:var(--sp-6) var(--sp-4);}
+}
+
+@media(max-width:390px){
+  /* Compact header on the smallest phones. */
+  .brand__name{font-size:1rem;}
+  .brand__name span{font-size:.6rem; letter-spacing:.05em;}
+  .fab--feedback{height:40px; padding:0 var(--sp-3);}
+}

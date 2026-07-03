@@ -24,6 +24,13 @@ const API_MODE = (env.VITE_API_MODE || 'mock').toLowerCase();
 const GOOGLE_CLIENT_ID = env.VITE_GOOGLE_CLIENT_ID || '';
 const OAUTH_CONFIGURED = !!GOOGLE_CLIENT_ID;
 
+// Comma-separated allowlist of admin emails (VITE_ALLOWED_ADMIN_EMAILS).
+// The first email in the list is granted super_admin; the rest are admin.
+const ALLOWED_ADMIN_EMAILS = (env.VITE_ALLOWED_ADMIN_EMAILS || '')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
 // PREVIEW MODE: highest-priority access mode. When VITE_ADMIN_PREVIEW=true the
 // admin bypasses ONLY the authentication gate and loads the real dashboard with
 // full functionality (create/update/delete/publish/save all intact). Routing,
@@ -44,6 +51,7 @@ export const CONFIG = {
   PREVIEW,
   GOOGLE_CLIENT_ID,
   OAUTH_CONFIGURED,
+  ALLOWED_ADMIN_EMAILS,
   MOCK_LOGIN_ALLOWED,
   AUTH_DISABLED,
   ADMIN_API_URL: env.VITE_ADMIN_API_URL || '',
