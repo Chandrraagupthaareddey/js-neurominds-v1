@@ -1,7 +1,7 @@
 /**
  * JS Neurominds V1 — public-site/assets/js/booking.js
  * Two booking CTAs:
- *   1) Request Private Call Back — dropdown-driven, patient-friendly form.
+ *   1) Request Clinic Callback — dropdown-driven, patient-friendly form.
  *      Captures preferred call date/time only (no live calendar). Saves via API.
  *   2) Book Confirmed Appointment — redirects to PWeNS/Doctor24x7, tracked in GA4.
  *
@@ -94,8 +94,8 @@ export async function renderCallbackForm(mountSel) {
       <!-- honeypot (hidden from humans) -->
       <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true" />
 
-      <button class="btn btn--primary btn--lg btn--block" type="submit" id="cb-submit">Request private call back</button>
-      <p class="hint text-center" style="margin-top:.75rem">A call back is not a confirmed appointment. Our team will call you to help.</p>
+      <button class="btn btn--primary btn--lg btn--block" type="submit" id="cb-submit">Request Clinic Callback</button>
+      <p class="hint text-center" style="margin-top:.75rem">This is not a confirmed appointment. Our clinic team will call you to guide the next step.</p>
     </form>
     <div id="cb-result" class="hide"></div>
   `;
@@ -157,7 +157,7 @@ async function onSubmit(e, mount) {
     }
   } catch (err) {
     analytics.supportBookingError();
-    btn.disabled = false; btn.textContent = 'Request private call back';
+    btn.disabled = false; btn.textContent = 'Request Clinic Callback';
     const result = mount.querySelector('#cb-result');
     result.className = 'notice notice--err';
     result.textContent = 'Sorry, something went wrong sending your request. Please call us directly and we\'ll help right away.';
@@ -171,7 +171,7 @@ function showSuccess(mount, data) {
   form.classList.add('hide');
   result.className = 'form-success';
   result.innerHTML = `
-    <h3>Your private call back request has been received</h3>
+    <h3>Your clinic callback request has been received</h3>
     <p>This is not a confirmed appointment. Our clinic team will contact you shortly at your preferred time.</p>
     <p class="hint">Reference: ${data.callback_id}</p>
   `;
@@ -206,7 +206,7 @@ export function wireConfirmedBooking(sel, { doctorId = '', pwensUrl = '' } = {})
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     analytics.pwensBookingClick(doctorId);
-    const url = pwensUrl || (window.__JSNM__ && window.__JSNM__.cfg && window.__JSNM__.cfg.pwens_booking_url) || 'https://jsneurominds.pwens.com/';
+    const url = pwensUrl || (window.__JSNM__ && window.__JSNM__.cfg && window.__JSNM__.cfg.pwens_booking_url) || 'https://jsneurominds.pwens.com/waselffollowuppage';
     window.open(url, '_blank', 'noopener');
   });
 }

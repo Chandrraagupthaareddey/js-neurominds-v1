@@ -6,7 +6,8 @@
  */
 import {
   CLINIC_CONFIG, NAVIGATION, DOCTORS, CONDITIONS, TREATMENTS, SERVICES,
-  LAB_PACKAGES, BLOGS, FAQS, CALLBACK_OPTIONS
+  LAB_PACKAGES, BLOGS, FAQS, CALLBACK_OPTIONS,
+  SOCIAL_LINKS, TESTIMONIALS, GOOGLE_REVIEWS, FEATURE_FLAGS, FLOATING_CTA
 } from '../../../shared/mock-public-content.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -17,7 +18,24 @@ const findSlug = (rows, slug) => rows.find((r) => r.slug === slug) || null;
 
 export const mockApi = {
   async config() { await wait(40); return okEnv(CLINIC_CONFIG); },
-  async navigation() { await wait(30); return okEnv(NAVIGATION); },
+  async navigation() {
+    await wait(30);
+    // Respect the public_lab_tests_enabled flag: hide the Lab nav item when off.
+    const nav = NAVIGATION.filter((n) => {
+      if (n.route === '/lab' && !FEATURE_FLAGS.public_lab_tests_enabled) return false;
+      if (n.route === '/knowledge' && !FEATURE_FLAGS.public_knowledge_enabled) return false;
+      return true;
+    });
+    return okEnv(nav);
+  },
+  async featureFlags() { await wait(20); return okEnv(FEATURE_FLAGS); },
+  async floatingCta() {
+    await wait(20);
+    const rows = FLOATING_CTA
+      .filter((c) => String(c.is_enabled).toUpperCase() === 'YES')
+      .sort((a, b) => Number(a.display_order) - Number(b.display_order));
+    return okEnv(rows);
+  },
 
   async doctors() { await wait(60); return okEnv(byStatus(DOCTORS)); },
   async doctor(slug) { await wait(50); return okEnv(findSlug(DOCTORS, slug)); },
@@ -36,6 +54,29 @@ export const mockApi = {
 
   async faqs() { await wait(40); return okEnv(byStatus(FAQS)); },
   async callbackOptions() { await wait(30); return okEnv(CALLBACK_OPTIONS); },
+
+  // Trust + brand modules (only enabled/approved records surface).
+  async socialLinks() {
+    await wait(30);
+    const rows = SOCIAL_LINKS
+      .filter((s) => String(s.is_enabled).toUpperCase() === 'YES' && s.url)
+      .sort((a, b) => Number(a.display_order) - Number(b.display_order));
+    return okEnv(rows);
+  },
+  async testimonials() {
+    await wait(40);
+    const rows = TESTIMONIALS
+      .filter((t) => t.status === 'approved')
+      .sort((a, b) => Number(a.display_order) - Number(b.display_order));
+    return okEnv(rows);
+  },
+  async googleReviews() {
+    await wait(40);
+    return okEnv({
+      summary: GOOGLE_REVIEWS.summary,
+      reviews: GOOGLE_REVIEWS.reviews.filter((r) => r.status === 'approved')
+    });
+  },
 
   // Write paths echo a generated id, mirroring real API behaviour.
   async submitCallback(payload) {

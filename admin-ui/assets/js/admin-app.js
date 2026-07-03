@@ -19,6 +19,10 @@ import { renderSeo } from './seo.js';
 import { renderSystemHealth } from './system-health.js';
 import { renderRunbook } from './runbook.js';
 import { renderSimple } from './sections-misc.js';
+import {
+  renderSocialLinks, renderFooterSettings, renderBrandSettings, renderNavigation,
+  renderFeatureFlags, renderTestimonialsAdmin, renderReviewsAdmin
+} from './website-content.js';
 
 const root = () => document.getElementById('app-root');
 
@@ -34,34 +38,67 @@ const SECTIONS = {
   doctors:   { label: 'Doctors', icon: '⚕', group: 'Content', render: renderDoctors },
   services:  { label: 'Services & Lab', icon: '⚙', group: 'Content', render: renderServices },
   media:     { label: 'Media Library', icon: '⊞', group: 'Content', render: (e) => renderSimple(e, 'media') },
+  testimonials: { label: 'Testimonials', icon: '“', group: 'Website', render: renderTestimonialsAdmin },
+  reviews:   { label: 'Google Reviews', icon: '★', group: 'Website', render: renderReviewsAdmin },
+  navigation:{ label: 'Navigation', icon: '☰', group: 'Website', render: renderNavigation },
+  social:    { label: 'Social Links', icon: '🔗', group: 'Website', render: renderSocialLinks },
+  footer:    { label: 'Footer Settings', icon: '▭', group: 'Website', render: renderFooterSettings },
+  brand:     { label: 'Brand Settings', icon: '◈', group: 'Website', render: renderBrandSettings },
+  flags:     { label: 'Feature Flags', icon: '⚑', group: 'Website', render: renderFeatureFlags },
   health:    { label: 'System Health', icon: '♥', group: 'System', render: renderSystemHealth },
   backup:    { label: 'Backup Registry', icon: '⛁', group: 'System', render: (e) => renderSimple(e, 'backup') },
   settings:  { label: 'Settings', icon: '⚙', group: 'System', render: (e) => renderSimple(e, 'settings') },
   runbook:   { label: 'Runbook', icon: '📖', group: 'Help', render: renderRunbook }
 };
-const GROUP_ORDER = ['Overview', 'Operations', 'Insights', 'Content', 'System', 'Help'];
+const GROUP_ORDER = ['Overview', 'Operations', 'Insights', 'Content', 'Website', 'System', 'Help'];
 
 let currentSection = 'dashboard';
 let navCounts = {};
 
 export function boot() {
+  // SECURITY GATE: in deployed envs without configured Google OAuth, do not
+  // render the dashboard, navigation, or any admin data.
+  if (CONFIG.AUTH_DISABLED) { renderAuthDisabled(); return; }
   const session = getSession();
   if (!session) renderLogin();
   else renderShell();
 }
 
-/* ---------------- Login ---------------- */
-function renderLogin(denied) {
-  const users = knownUsers();
+/* Safe lockout screen — shown when mock login is not allowed and OAuth is not
+   yet configured (e.g. demo/production before Phase 2 auth is wired). */
+function renderAuthDisabled() {
   root().innerHTML = `
     <div class="login-wrap">
       <div class="login-card">
-        <div class="brand__mark"></div>
+        <div class="brand__mark"><img src="/assets/brand/logo.png" alt="JS Neurominds" width="52" height="52" /></div>
+        <h2>JS Neurominds</h2>
+        <p class="muted" style="margin-top:0">Admin Portal</p>
+        <div class="access-denied" style="margin-top:1.5rem">
+          <strong>Admin access is temporarily disabled</strong> until secure Google
+          authentication is configured. Please contact your administrator (TCGR Technologies).
+        </div>
+        <p class="muted" style="font-size:12px; margin-top:1rem">Environment: ${CONFIG.ENV} · auth: ${CONFIG.AUTH_MODE}</p>
+      </div>
+    </div>`;
+}
+
+/* ---------------- Login ---------------- */
+function renderLogin(denied) {
+  // Real Google OAuth path (deployed env with VITE_GOOGLE_CLIENT_ID set).
+  if (!CONFIG.MOCK_LOGIN_ALLOWED && CONFIG.OAUTH_CONFIGURED) { renderOAuthLogin(denied); return; }
+
+  const users = knownUsers();
+  const devBadge = `<div class="env-pill" style="display:inline-block;margin-bottom:1rem">${CONFIG.ENV} · mock login (dev only)</div>`;
+  root().innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="brand__mark"><img src="/assets/brand/logo.png" alt="JS Neurominds" width="52" height="52" /></div>
         <h2>JS Neurominds</h2>
         <p class="muted" style="margin-top:0">Admin Portal · sign in to continue</p>
-        <p class="muted" style="font-size:12.5px; margin:1.25rem 0 .5rem; text-align:left">
-          Google-only sign in. In production this uses your Google account; here you can
-          simulate any authorized user to test role-based access.
+        ${devBadge}
+        <p class="muted" style="font-size:12.5px; margin:0 0 .5rem; text-align:left">
+          This simulated sign-in is available in local/dev only. In demo and production,
+          real Google authentication is required and this picker is disabled.
         </p>
         <div class="field" style="text-align:left">
           <label for="login-email">Signed-in Google account (simulated)</label>
@@ -83,6 +120,29 @@ function renderLogin(denied) {
   });
 }
 
+/* Real Google OAuth login (Phase 2). The button placeholder is shown; the
+   Google Identity Services flow + GAS ID-token verification land in Phase 2. */
+function renderOAuthLogin(denied) {
+  root().innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="brand__mark"><img src="/assets/brand/logo.png" alt="JS Neurominds" width="52" height="52" /></div>
+        <h2>JS Neurominds</h2>
+        <p class="muted" style="margin-top:0">Admin Portal · sign in with Google</p>
+        <div id="g-signin" style="margin-top:1.5rem"></div>
+        <button class="google-btn" id="login-btn"><span class="google-g"></span> Sign in with Google</button>
+        <p class="muted" style="font-size:12px; margin-top:1rem">Only authorized clinic accounts can access this portal.</p>
+        ${denied ? `<div class="access-denied"><strong>Access denied.</strong> <b>${denied}</b> is not authorized.</div>` : ''}
+      </div>
+    </div>`;
+  // Phase 2: initialize Google Identity Services with CONFIG.GOOGLE_CLIENT_ID,
+  // exchange the ID token with the GAS Admin CMS, and create a session.
+  const btn = document.getElementById('login-btn');
+  if (btn) btn.addEventListener('click', () => {
+    alert('Google sign-in is configured server-side in Phase 2.');
+  });
+}
+
 /* ---------------- Shell ---------------- */
 async function renderShell() {
   const session = getSession();
@@ -96,7 +156,7 @@ async function renderShell() {
     <div class="app">
       <aside class="sidebar" id="sidebar">
         <div class="sidebar__brand">
-          <span class="mk"></span>
+          <span class="mk"><img src="/assets/brand/logo.png" alt="JS Neurominds" width="38" height="38" /></span>
           <span><b>JS Neurominds</b><span>Admin Portal</span></span>
         </div>
         <nav id="nav">${renderNav(sections)}</nav>
@@ -109,6 +169,11 @@ async function renderShell() {
           </div>
           <div class="topbar__right">
             <span class="env-pill" title="Environment">${CONFIG.ENV} · ${CONFIG.API_MODE}</span>
+            ${CONFIG.USE_MOCK ? '<span class="env-pill" style="background:var(--info-bg);color:var(--info);border-color:var(--blue-100)" title="Data shown is sample/mock, not live analytics">Mock Preview</span>' : ''}
+            <div class="pwens-links" title="PWeNS booking partner">
+              <a class="btn btn--ghost btn--sm" href="${CONFIG.PWENS_PUBLIC_BOOKING_URL}" target="_blank" rel="noopener">PWeNS Booking</a>
+              <a class="btn btn--ghost btn--sm" href="${CONFIG.PWENS_LOGIN_URL}" target="_blank" rel="noopener">PWeNS Login</a>
+            </div>
             <div class="role-switch" title="RBAC simulator — switch roles to preview access">
               <label for="role-sel">Role</label>
               <select id="role-sel">

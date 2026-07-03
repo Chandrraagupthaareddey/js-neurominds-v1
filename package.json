@@ -5,19 +5,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:public": "vite --config vite.public.config.js --host 127.0.0.1 --port 5173",
-    "dev:admin": "vite --config vite.admin.config.js --host 127.0.0.1 --port 5174",
+    "dev:public": "vite --config vite.public.config.js --host 0.0.0.0 --port 5173",
+    "dev:admin": "vite --config vite.admin.config.js --host 0.0.0.0 --port 5174",
     "validate": "node scripts/validate-schemas.js && node scripts/validate-seed.js",
     "check:env": "node scripts/check-env.js",
     "clean": "node scripts/clean-dist.js",
-    "build": "node scripts/clean-dist.js && node scripts/build-stubs.js && vite build --config vite.public.config.js",
-    "build:admin": "vite build --config vite.admin.config.js",
+    "build": "node scripts/clean-dist.js && node scripts/build-stubs.js && vite build --config vite.public.config.js && node scripts/copy-static.js",
+    "build:admin": "vite build --config vite.admin.config.js && node scripts/copy-static.js admin",
     "preview:public": "vite preview --config vite.public.config.js --port 5173",
     "deploy:gas:admin": "cd gas-admin-cms && clasp push",
     "deploy:gas:public": "cd gas-public-api && clasp push"
   },
   "devDependencies": {
-    "vite": "^8.0.16"
+    "vite": "^5.4.10"
   },
   "engines": {
     "node": ">=18"

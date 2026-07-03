@@ -7,7 +7,8 @@ import {
   CLINIC_CONFIG, DOCTORS, CONDITIONS, TREATMENTS, SERVICES, LAB_PACKAGES,
   BLOGS, FAQS, MOCK_CALLBACK_REQUESTS, MOCK_CALLBACK_CHECKLIST,
   MOCK_CALLBACK_QUESTIONS, MOCK_LAB_REQUESTS, MOCK_FEEDBACK, MOCK_GA4_SUMMARY,
-  MOCK_HEALTH, MOCK_USERS, MOCK_PUBLISH_HISTORY
+  MOCK_HEALTH, MOCK_USERS, MOCK_PUBLISH_HISTORY,
+  SOCIAL_LINKS, TESTIMONIALS, GOOGLE_REVIEWS, FEATURE_FLAGS, FLOATING_CTA, NAVIGATION
 } from '../../../shared/mock-public-content.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -85,5 +86,29 @@ export const adminApi = {
   async syncContent() {
     await wait(400);
     return ok({ triggered: true, deploy_status: 'queued', at: new Date().toISOString().slice(0, 16).replace('T', ' ') });
+  },
+
+  // --- Admin foundation: website-content management (read views in V1) ---
+  async socialLinks() { await wait(40); return ok(structuredClone(SOCIAL_LINKS)); },
+  async testimonials() { await wait(40); return ok(structuredClone(TESTIMONIALS)); },
+  async googleReviews() { await wait(40); return ok(structuredClone(GOOGLE_REVIEWS)); },
+  async featureFlags() { await wait(30); return ok(structuredClone(FEATURE_FLAGS)); },
+  async floatingCta() { await wait(30); return ok(structuredClone(FLOATING_CTA)); },
+  async navigationItems() { await wait(30); return ok(structuredClone(NAVIGATION)); },
+  async brandSettings() {
+    await wait(30);
+    return ok({
+      logo_url: CLINIC_CONFIG.logo_url, footer_logo_url: CLINIC_CONFIG.footer_logo_url,
+      favicon_url: '/assets/brand/favicon-32x32.png', social_preview_url: CLINIC_CONFIG.social_preview_url,
+      alt_text: 'JS Neurominds and Diagnostic Center'
+    });
+  },
+  async footerSettings() {
+    await wait(30);
+    return ok([
+      { setting_key: 'footer_about', setting_value: 'Compassionate psychiatry, mental health, and diagnostic care.', is_enabled: 'YES', display_order: 1 },
+      { setting_key: 'footer_attribution', setting_value: CLINIC_CONFIG.footer || 'Built and maintained by TCGR Technologies / tcgr.in', is_enabled: 'YES', display_order: 2 },
+      { setting_key: 'footer_show_map', setting_value: 'YES', is_enabled: 'YES', display_order: 3 }
+    ]);
   }
 };

@@ -1,0 +1,14 @@
+{
+  "name": "JS Neurominds and Diagnostic Center",
+  "short_name": "JS Neurominds",
+  "description": "Compassionate psychiatry, mental health, and diagnostic care in Chandragiri and Tirupati.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e1b2a",
+  "theme_color": "#0e1b2a",
+  "icons": [
+    { "src": "/assets/brand/favicon-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/brand/favicon-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/assets/brand/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}

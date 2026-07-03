@@ -17,7 +17,8 @@ export const EVENTS = [
   'call_click', 'whatsapp_click', 'support_booking_click', 'support_booking_form_open',
   'support_booking_submit', 'support_booking_error', 'pwens_booking_click',
   'doctor_calendar_click', 'doctor_profile_view', 'condition_view', 'treatment_view',
-  'lab_page_view', 'lab_package_view', 'lab_request_submit', 'faq_expand', 'feedback_submit'
+  'lab_page_view', 'lab_package_view', 'lab_request_submit', 'faq_expand', 'feedback_submit',
+  'google_review_click', 'map_click', 'instagram_click', 'testimonial_view', 'knowledge_view'
 ];
 
 let ready = false;
@@ -75,5 +76,11 @@ export const analytics = {
   labPackageView: (lab_package_id) => track('lab_package_view', { lab_package_id }),
   labRequestSubmit: (lab_request_id) => track('lab_request_submit', { lab_request_id }),
   faqExpand: (page_slug) => track('faq_expand', { page_slug }),
-  feedbackSubmit: () => track('feedback_submit', {})
+  feedbackSubmit: () => track('feedback_submit', {}),
+  googleReviewClick: (cta_type) => track('google_review_click', { cta_type }),
+  mapClick: (cta_type) => track('map_click', { cta_type }),
+  instagramClick: (cta_type) => track('instagram_click', { cta_type }),
+  testimonialView: (page_slug) => track('testimonial_view', { page_slug }),
+  knowledgeView: (page_slug) => track('knowledge_view', { page_slug }),
+  pwensBookingClickCta: (cta_type) => track('pwens_booking_click', { cta_type })
 };

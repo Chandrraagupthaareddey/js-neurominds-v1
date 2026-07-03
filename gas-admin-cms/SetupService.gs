@@ -26,20 +26,29 @@ var SCHEMA = {
   CONFIG_CONTENT: 'JSNM_V1_CONFIG_CONTENT',
   OPERATIONS_AUDIT: 'JSNM_V1_OPERATIONS_AUDIT',
   CONFIG_CONTENT_TABS: {
-    Pages: ['page_id','slug','title','in_nav','nav_order','status','updated_at'],
-    Conditions: ['condition_id','slug','name','one_line_summary','symptoms','when_to_consult','treatment_approach','related_conditions','is_emergency','faqs','seo_title','seo_description','status','updated_at'],
+    Pages: ['page_id','slug','title','in_nav','nav_order','is_enabled','status','updated_at'],
+    Conditions: ['condition_id','slug','name','one_line_summary','symptoms','when_to_consult','treatment_approach','related_conditions','is_emergency','category','is_featured','display_order','faqs','seo_title','seo_description','status','updated_at'],
     Treatments: ['treatment_id','slug','name','one_line_summary','overview','what_to_expect','conditions_treated','seo_title','seo_description','status','updated_at'],
-    Doctors: ['doctor_id','slug','full_name','qualification','specialization','experience_years','languages','consultation_type','conditions_handled','short_bio','profile_photo_link','support_booking_enabled','direct_booking_enabled','online_consultation_enabled','clinic_visit_enabled','pwens_booking_url','status','updated_at'],
+    Doctors: ['doctor_id','slug','full_name','qualification','specialization','experience_years','languages','consultation_type','conditions_handled','short_bio','profile_photo_link','photo_url','support_booking_enabled','direct_booking_enabled','online_consultation_enabled','clinic_visit_enabled','pwens_booking_url','status','updated_at'],
     Services: ['service_id','slug','name','summary','detail','icon','status','updated_at'],
     Lab_Packages: ['lab_package_id','slug','name','summary','turnaround','includes','status','updated_at'],
     Lab_Tests: ['lab_test_id','lab_package_id','name','description','status','updated_at'],
     Locations: ['location_id','slug','name','area','pincode','maps_url','seo_title','seo_description','status','updated_at'],
     Blogs: ['blog_id','slug','title','excerpt','body','author','category','cover_image','seo_title','seo_description','status','updated_at'],
     FAQs: ['faq_id','scope','question','answer','display_order','status','updated_at'],
+    Testimonials: ['testimonial_id','author_display','area','rating','quote','is_featured','display_order','status','created_at','moderated_by','updated_at'],
+    Google_Reviews: ['review_id','author_display','rating','relative_time','text','review_url','google_status','status','display_order','created_at','updated_at'],
     SEO_Metadata: ['seo_id','page_type','slug','meta_title','meta_description','og_image','canonical','updated_at'],
     Media_Library: ['media_id','file_name','drive_file_id','drive_url','alt_text','uploaded_by','created_at'],
-    Navigation: ['nav_id','label','route','display_order','visible','updated_at'],
-    Promotions: ['promo_id','title','body','start_date','end_date','active','updated_at'],
+    Navigation: ['nav_id','label','route','icon','is_enabled','display_order','open_in_new_tab','role_visibility','updated_by','updated_at'],
+    Promotions: ['promo_id','title','body','placement','type','start_date','end_date','is_enabled','active','updated_at'],
+    Social_Links: ['social_id','platform','label','icon','url','is_enabled','display_order','open_in_new_tab','aria_label','updated_by','updated_at'],
+    Footer_Settings: ['setting_key','setting_value','is_enabled','display_order','updated_by','updated_at'],
+    Brand_Settings: ['setting_key','setting_value','asset_url','alt_text','is_enabled','updated_by','updated_at'],
+    Theme_Settings: ['setting_key','setting_value','setting_type','allowed_values','is_active','updated_by','updated_at'],
+    Floating_CTA: ['cta_id','kind','label','value','whatsapp_text','is_enabled','display_order','device_visibility','updated_by','updated_at'],
+    Publish_Queue: ['publish_id','entity_type','entity_id','change_summary','status','requested_by','requested_at','reviewed_by','reviewed_at','published_by','published_at','notes'],
+    Content_Versions: ['version_id','entity_type','entity_id','version_number','old_value','new_value','status','created_by','created_at','approved_by','approved_at','rollback_available'],
     Users: ['email','role_key','name','status','created_at','last_login_at'],
     Roles: ['role_key','role_label','description'],
     Role_Permissions: ['role_key','section_key','can_view','can_edit','can_publish'],
@@ -112,6 +121,14 @@ function runSetup() {
   _seedLab_(cId, now);
   _seedFaqs_(cId, now);
   _seedRunbook_(cId, now);
+  _seedFeatureFlags_(cId, now);
+  _seedSocialLinks_(cId, now);
+  _seedFooterSettings_(cId, now);
+  _seedBrandSettings_(cId, now);
+  _seedThemeSettings_(cId, now);
+  _seedFloatingCta_(cId, now);
+  _seedTestimonials_(cId, now);
+  _seedGoogleReviews_(cId, now);
   _seedCallbackChecklist_(oId);
   _seedCallbackQuestions_(oId);
 
@@ -162,13 +179,13 @@ function _seedUsers_(cId, now) {
 }
 
 function _seedRolePermissions_(cId) {
-  var sections = ['dashboard','booking','callback','lab','marketing','seo','content','doctors','services','media','feedback','health','backup','settings','runbook'];
+  var sections = ['dashboard','booking','callback','lab','marketing','seo','content','doctors','services','media','testimonials','reviews','navigation','social','footer','brand','flags','feedback','health','backup','settings','runbook'];
   var matrix = {
-    super_admin: { view: sections, edit: sections, publish: ['content','doctors','services','seo'] },
-    admin: { view: ['dashboard','booking','callback','lab','seo','content','doctors','services','media','feedback','health','runbook'], edit: ['callback','lab','content','doctors','services','feedback','seo'], publish: ['content','doctors','services','seo'] },
+    super_admin: { view: sections, edit: sections, publish: ['content','doctors','services','seo','testimonials','reviews','navigation','social','footer','brand','flags'] },
+    admin: { view: ['dashboard','booking','callback','lab','seo','content','doctors','services','media','testimonials','reviews','navigation','social','footer','brand','flags','feedback','health','runbook'], edit: ['callback','lab','content','doctors','services','feedback','seo','testimonials','reviews','navigation','social','footer','brand','flags'], publish: ['content','doctors','services','seo','testimonials','reviews','navigation','social','footer','brand'] },
     lab_team: { view: ['dashboard','lab','runbook'], edit: ['lab'], publish: [] },
-    content_editor: { view: ['dashboard','content','runbook'], edit: ['content'], publish: [] },
-    marketing: { view: ['dashboard','marketing','runbook'], edit: [], publish: [] }
+    content_editor: { view: ['dashboard','content','testimonials','runbook'], edit: ['content','testimonials'], publish: [] },
+    marketing: { view: ['dashboard','marketing','seo','testimonials','reviews','social','runbook'], edit: ['seo','testimonials','reviews','social'], publish: [] }
   };
   var rows = [];
   Object.keys(matrix).forEach(function (role) {
@@ -188,8 +205,12 @@ function _seedSystemConfig_(cId, now) {
     maps_url: 'https://share.google/FINrIJ0bVg0GX5D08',
     address: 'Beside Suzuki showroom, Hero PVR Motors Building, 10-1060, Ramachandra Nagar, Chandragiri, Thondavada, Andhra Pradesh 517101',
     footer: 'Built and maintained by TCGR Technologies / tcgr.in',
-    support_email: 'jsneurominds5@gmail.com', pwens_booking_url: 'https://jsneurominds.pwens.com/',
+    support_email: 'jsneurominds5@gmail.com', pwens_booking_url: 'https://jsneurominds.pwens.com/waselffollowuppage',
     domain: 'https://neurominds.in',
+    logo_url: '/assets/brand/logo.png', footer_logo_url: '/assets/brand/logo.png',
+    social_preview_url: '/assets/brand/social-preview.png',
+    google_review_url: 'https://share.google/FINrIJ0bVg0GX5D08',
+    google_rating: '4.9', google_review_count: '60',
     cloudflare_auto_deploy_enabled: 'NO', last_cloudflare_deploy_status: '', last_cloudflare_deploy_triggered_at: ''
     // CLOUDFLARE_DEPLOY_HOOK_URL is intentionally NOT seeded here — it is a secret,
     // stored only in Script Properties, set manually post-setup.
@@ -210,20 +231,23 @@ function _seedAnalyticsConfig_(cId, now) {
 }
 
 function _seedNavigation_(cId, now) {
+  // Lab Tests is present in the nav but hidden publicly by the
+  // public_lab_tests_enabled feature flag (default OFF). is_enabled here is the
+  // per-item admin toggle; the public site additionally respects the flag.
   var nav = [
     ['About','/about',1],['Doctors','/doctors',2],['Conditions','/conditions',3],
     ['Treatments','/treatments',4],['Services','/services',5],['Lab Tests','/lab',6],
-    ['Blog','/blog',7],['FAQ','/faq',8],['Contact','/contact',9]
+    ['Knowledge','/knowledge',7],['FAQ','/faq',8],['Contact','/contact',9]
   ];
   SheetService.appendMany(cId, 'Navigation', nav.map(function (n) {
-    return { nav_id: Utils.genId('NAV'), label: n[0], route: n[1], display_order: n[2], visible: 'YES', updated_at: now };
+    return { nav_id: Utils.genId('NAV'), label: n[0], route: n[1], icon: '', is_enabled: 'YES', display_order: n[2], open_in_new_tab: 'NO', role_visibility: 'public', updated_by: 'system', updated_at: now };
   }));
 }
 
 function _seedPages_(cId, now) {
-  var pages = ['home','about','doctors','conditions','treatments','services','lab','booking','blog','faq','contact','privacy','terms','medical-disclaimer','emergency'];
+  var pages = ['home','about','doctors','conditions','treatments','services','lab','booking','knowledge','faq','contact','privacy','terms','medical-disclaimer','emergency','testimonials'];
   SheetService.appendMany(cId, 'Pages', pages.map(function (p, i) {
-    return { page_id: Utils.genId('PG'), slug: p === 'home' ? '' : p, title: p.charAt(0).toUpperCase() + p.slice(1), in_nav: 'NO', nav_order: i + 1, status: 'published', updated_at: now };
+    return { page_id: Utils.genId('PG'), slug: p === 'home' ? '' : p, title: p.charAt(0).toUpperCase() + p.slice(1), in_nav: 'NO', nav_order: i + 1, is_enabled: 'YES', status: 'published', updated_at: now };
   }));
 }
 
@@ -339,27 +363,55 @@ function _seedConditions_(cId, now) {
     ['grief','Grief & Loss','Compassionate support through bereavement and loss.','Sadness;Difficulty coping;Sleep or appetite changes','When grief feels overwhelming or persists in a way that affects daily life.','Supportive counselling at your own pace.','NO']
   ];
 
+  // Category lookup + featured set (first 6 curated conditions are featured on home).
+  var CAT = {
+    'depression':'Mood','anxiety':'Anxiety','sleep-problems':'Sleep','addiction':'Addiction',
+    'child-teen-concerns':'Child & Teen','self-harm-thoughts':'Crisis Support','stress':'Stress',
+    'ocd':'Anxiety','bipolar':'Mood','memory-concerns':'Older Adults','relationship-stress':'Relationships','grief':'Grief'
+  };
+  var FEATURED = { 'depression':1,'anxiety':1,'sleep-problems':1,'addiction':1,'child-teen-concerns':1,'self-harm-thoughts':1 };
+
+  var order = 0;
   var rows = curated.map(function (c) {
+    order++;
     return {
       condition_id: Utils.genId('CND'), slug: c[0], name: c[1], one_line_summary: c[2],
       symptoms: c[3], when_to_consult: c[4], treatment_approach: c[5], related_conditions: '',
-      is_emergency: c[6], faqs: '', seo_title: c[1] + ' Treatment in Tirupati | JS Neurominds',
+      is_emergency: c[6], category: CAT[c[0]] || 'General', is_featured: FEATURED[c[0]] ? 'YES' : 'NO',
+      display_order: order, faqs: '', seo_title: c[1] + ' Treatment in Tirupati | JS Neurominds',
       seo_description: c[2], status: 'published', updated_at: now
     };
   });
 
   // Expand to exactly 60 published rows with additional valid, patient-safe topics.
   var extra = ['panic-attacks','social-anxiety','phobias','ptsd','postnatal-depression','perinatal-anxiety','adult-adhd','autism-support','anger-management','low-self-esteem','exam-stress','workplace-stress','smoking-cessation','alcohol-dependence','internet-overuse','gaming-overuse','eating-concerns','body-image-concerns','chronic-pain-coping','health-anxiety','adjustment-difficulties','loneliness','caregiver-stress','menopause-mood','andropause-mood','sexual-wellbeing-concerns','psychosomatic-concerns','tic-concerns','nail-biting','bedwetting-support','learning-difficulties','school-refusal','teen-mood-concerns','sleep-in-children','elderly-depression','elderly-anxiety','dementia-support','post-stroke-mood','thyroid-related-mood','vitamin-deficiency-mood','migraine-and-mood','irritability','mood-and-diabetes','postpartum-support','marital-counselling','divorce-coping','financial-stress','bereavement-support'];
+  var EXTRA_CAT = {
+    'panic-attacks':'Anxiety','social-anxiety':'Anxiety','phobias':'Anxiety','ptsd':'Trauma',
+    'postnatal-depression':'Mood','perinatal-anxiety':'Anxiety','adult-adhd':'Neurodevelopmental',
+    'autism-support':'Neurodevelopmental','anger-management':'Behavioural','low-self-esteem':'Mood',
+    'exam-stress':'Stress','workplace-stress':'Stress','smoking-cessation':'Addiction','alcohol-dependence':'Addiction',
+    'internet-overuse':'Addiction','gaming-overuse':'Addiction','eating-concerns':'Behavioural','body-image-concerns':'Behavioural',
+    'chronic-pain-coping':'Wellbeing','health-anxiety':'Anxiety','adjustment-difficulties':'Mood','loneliness':'Mood',
+    'caregiver-stress':'Stress','menopause-mood':'Mood','andropause-mood':'Mood','sexual-wellbeing-concerns':'Wellbeing',
+    'psychosomatic-concerns':'Wellbeing','tic-concerns':'Neurodevelopmental','nail-biting':'Behavioural','bedwetting-support':'Child & Teen',
+    'learning-difficulties':'Child & Teen','school-refusal':'Child & Teen','teen-mood-concerns':'Child & Teen','sleep-in-children':'Sleep',
+    'elderly-depression':'Older Adults','elderly-anxiety':'Older Adults','dementia-support':'Older Adults','post-stroke-mood':'Older Adults',
+    'thyroid-related-mood':'Wellbeing','vitamin-deficiency-mood':'Wellbeing','migraine-and-mood':'Wellbeing','irritability':'Mood',
+    'mood-and-diabetes':'Wellbeing','postpartum-support':'Mood','marital-counselling':'Relationships','divorce-coping':'Relationships',
+    'financial-stress':'Stress','bereavement-support':'Grief'
+  };
   var idx = 0;
   while (rows.length < 60 && idx < extra.length) {
     var slug = extra[idx++];
     var name = slug.replace(/-/g, ' ').replace(/\b\w/g, function (m) { return m.toUpperCase(); });
+    order++;
     rows.push({
       condition_id: Utils.genId('CND'), slug: slug, name: name,
       one_line_summary: 'Compassionate, evidence-based support for ' + name.toLowerCase() + '.',
       symptoms: '', when_to_consult: 'When it affects your daily life or wellbeing, our team can help.',
       treatment_approach: 'A personalised, supportive plan tailored to you.',
-      related_conditions: '', is_emergency: 'NO', faqs: '',
+      related_conditions: '', is_emergency: 'NO', category: EXTRA_CAT[slug] || 'General', is_featured: 'NO',
+      display_order: order, faqs: '',
       seo_title: name + ' | JS Neurominds', seo_description: 'Support for ' + name.toLowerCase() + ' in Tirupati and Chandragiri.',
       status: 'published', updated_at: now
     });
@@ -367,4 +419,113 @@ function _seedConditions_(cId, now) {
 
   SheetService.appendMany(cId, 'Conditions', rows);
   Logger.log('Seeded ' + rows.length + ' conditions.');
+}
+
+/* ---------------- Phase 1 seed functions (website-management foundations) ----------------
+ * These mirror shared/mock-public-content.js. They run once during runSetup()
+ * into freshly-created empty tabs; runSetup() refuses a second run, so seeding
+ * is idempotent (no duplicate rows).
+ */
+
+function _seedFeatureFlags_(cId, now) {
+  // Lab Tests intentionally hidden in V1 (consultation focus). Re-enabling here
+  // returns all Lab content publicly with no code change/deploy.
+  var flags = [
+    ['public_lab_tests_enabled', 'FALSE', 'Show Lab Tests publicly (nav, footer, homepage, sitemap). Default OFF.'],
+    ['public_testimonials_enabled', 'TRUE', 'Show the public Testimonials page and cards.'],
+    ['public_reviews_enabled', 'TRUE', 'Show the Google Reviews section publicly.'],
+    ['public_knowledge_enabled', 'TRUE', 'Show the Knowledge hub publicly.'],
+    ['public_announcements_enabled', 'FALSE', 'Show the announcement banner publicly.'],
+    ['floating_cta_enabled', 'TRUE', 'Show floating contact buttons (call/WhatsApp/enquire).']
+  ];
+  SheetService.appendMany(cId, 'Feature_Flags', flags.map(function (f) {
+    return { flag_key: f[0], enabled: f[1], description: f[2], updated_at: now };
+  }));
+}
+
+function _seedSocialLinks_(cId, now) {
+  var rows = [
+    ['soc_instagram', 'instagram', 'Instagram', 'instagram', 'https://www.instagram.com/js_neurominds/', 'YES', 1, 'YES', 'JS Neurominds on Instagram'],
+    ['soc_whatsapp', 'whatsapp', 'WhatsApp', 'whatsapp', 'https://wa.me/918553665381', 'YES', 2, 'YES', 'Message JS Neurominds on WhatsApp'],
+    ['soc_google', 'google', 'Google Profile', 'google', 'https://share.google/FINrIJ0bVg0GX5D08', 'YES', 3, 'YES', 'JS Neurominds on Google'],
+    ['soc_youtube', 'youtube', 'YouTube', 'youtube', '', 'NO', 4, 'YES', 'JS Neurominds on YouTube'],
+    ['soc_facebook', 'facebook', 'Facebook', 'facebook', '', 'NO', 5, 'YES', 'JS Neurominds on Facebook']
+  ];
+  SheetService.appendMany(cId, 'Social_Links', rows.map(function (r) {
+    return { social_id: r[0], platform: r[1], label: r[2], icon: r[3], url: r[4], is_enabled: r[5], display_order: r[6], open_in_new_tab: r[7], aria_label: r[8], updated_by: 'system', updated_at: now };
+  }));
+}
+
+function _seedFooterSettings_(cId, now) {
+  var rows = [
+    ['footer_about', 'Compassionate psychiatry, mental health, and diagnostic care in Chandragiri and Tirupati.', 'YES', 1],
+    ['footer_attribution', 'Built and maintained by TCGR Technologies / tcgr.in', 'YES', 2],
+    ['footer_show_map', 'YES', 'YES', 3],
+    ['footer_show_social', 'YES', 'YES', 4]
+  ];
+  SheetService.appendMany(cId, 'Footer_Settings', rows.map(function (r) {
+    return { setting_key: r[0], setting_value: r[1], is_enabled: r[2], display_order: r[3], updated_by: 'system', updated_at: now };
+  }));
+}
+
+function _seedBrandSettings_(cId, now) {
+  var rows = [
+    ['main_logo', '', '/assets/brand/logo.png', 'JS Neurominds and Diagnostic Center', 'YES'],
+    ['footer_logo', '', '/assets/brand/logo.png', 'JS Neurominds and Diagnostic Center', 'YES'],
+    ['favicon', '', '/assets/brand/favicon-32x32.png', 'JS Neurominds', 'YES'],
+    ['social_preview', '', '/assets/brand/social-preview.png', 'JS Neurominds social preview', 'YES']
+  ];
+  SheetService.appendMany(cId, 'Brand_Settings', rows.map(function (r) {
+    return { setting_key: r[0], setting_value: r[1], asset_url: r[2], alt_text: r[3], is_enabled: r[4], updated_by: 'system', updated_at: now };
+  }));
+}
+
+function _seedThemeSettings_(cId, now) {
+  var rows = [
+    ['theme_default_mode', 'system', 'select', 'light|dark|system', 'YES'],
+    ['primary_color', '#0f6f6a', 'color', '', 'YES'],
+    ['secondary_color', '#1f6feb', 'color', '', 'YES'],
+    ['cta_color', '#0f6f6a', 'color', '', 'YES'],
+    ['font_scale', 'default', 'select', 'compact|default|large', 'YES']
+  ];
+  SheetService.appendMany(cId, 'Theme_Settings', rows.map(function (r) {
+    return { setting_key: r[0], setting_value: r[1], setting_type: r[2], allowed_values: r[3], is_active: r[4], updated_by: 'system', updated_at: now };
+  }));
+}
+
+function _seedFloatingCta_(cId, now) {
+  // WhatsApp number is admin-configurable; defaults to the locked clinic WhatsApp.
+  var rows = [
+    ['fab_call', 'call', 'Call Clinic', 'tel:+918553665381', '', 'YES', 1, 'all'],
+    ['fab_whatsapp', 'whatsapp', 'WhatsApp Clinic', 'https://wa.me/918553665381', 'Hi, I would like to know more about JS Neurominds.', 'YES', 2, 'all'],
+    ['fab_enquire', 'feedback', 'Enquire Now', '', '', 'YES', 3, 'all']
+  ];
+  SheetService.appendMany(cId, 'Floating_CTA', rows.map(function (r) {
+    return { cta_id: r[0], kind: r[1], label: r[2], value: r[3], whatsapp_text: r[4], is_enabled: r[5], display_order: r[6], device_visibility: r[7], updated_by: 'system', updated_at: now };
+  }));
+}
+
+function _seedTestimonials_(cId, now) {
+  var rows = [
+    ['tst_1', 'R. K.', 'Tirupati', 5, 'The team listened without rushing and explained every step. I finally felt understood and supported.', 'YES', 1, 'approved'],
+    ['tst_2', 'S. Devi', 'Chandragiri', 5, 'Booking a callback was simple and the doctor was kind and patient. The online consultation saved us a long trip.', 'YES', 2, 'approved'],
+    ['tst_3', 'A family member', 'Tirupati', 5, 'Compassionate care for our teenager. Gentle, professional, and never judgemental.', 'YES', 3, 'approved'],
+    ['tst_4', 'M. Reddy', 'Thondavada', 4, 'Clean clinic, on-time, and the home lab collection was very convenient.', 'YES', 4, 'approved']
+  ];
+  SheetService.appendMany(cId, 'Testimonials', rows.map(function (r) {
+    return { testimonial_id: r[0], author_display: r[1], area: r[2], rating: r[3], quote: r[4], is_featured: r[5], display_order: r[6], status: r[7], created_at: now, moderated_by: 'system', updated_at: now };
+  }));
+}
+
+function _seedGoogleReviews_(cId, now) {
+  // Stored review summary lives in System_Config-style rows here; individual
+  // approved reviews are curated manually. google_status tracks sync presence.
+  var rows = [
+    ['gr_1', 'Praveen K', 5, 'a month ago', 'Very professional and caring. The doctor took time to understand our concerns and guided us patiently.', 'https://share.google/FINrIJ0bVg0GX5D08', 'active', 'approved', 1],
+    ['gr_2', 'Lakshmi N', 5, '2 months ago', 'Compassionate and trustworthy clinic. Highly recommend for mental health support in Tirupati.', 'https://share.google/FINrIJ0bVg0GX5D08', 'active', 'approved', 2],
+    ['gr_3', 'Suresh B', 5, '3 months ago', 'Smooth booking, friendly staff, and the home sample collection was right on time.', 'https://share.google/FINrIJ0bVg0GX5D08', 'active', 'approved', 3]
+  ];
+  SheetService.appendMany(cId, 'Google_Reviews', rows.map(function (r) {
+    return { review_id: r[0], author_display: r[1], rating: r[2], relative_time: r[3], text: r[4], review_url: r[5], google_status: r[6], status: r[7], display_order: r[8], created_at: now, updated_at: now };
+  }));
 }

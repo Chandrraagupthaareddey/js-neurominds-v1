@@ -18,7 +18,7 @@ const fail = (m) => { errors++; console.error('  ✗', m); };
 const warn = (m) => { warnings++; console.warn('  !', m); };
 
 const EXPECTED = {
-  [CONFIG_CONTENT_WORKBOOK]: { tabs: CONFIG_CONTENT_TABS, count: 21 },
+  [CONFIG_CONTENT_WORKBOOK]: { tabs: CONFIG_CONTENT_TABS, count: 30 },
   [OPERATIONS_AUDIT_WORKBOOK]: { tabs: OPERATIONS_AUDIT_TABS, count: 14 }
 };
 
@@ -56,4 +56,4 @@ if (errors) {
   console.error(`Schema validation FAILED — ${errors} error(s), ${warnings} warning(s).`);
   process.exit(1);
 }
-console.log(`Schema validation passed — 35 tabs total, ${warnings} warning(s).`);
+console.log(`Schema validation passed — 44 tabs total, ${warnings} warning(s).`);

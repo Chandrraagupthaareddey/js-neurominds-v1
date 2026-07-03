@@ -14,7 +14,7 @@ const TYPES = [
   ['treatments', 'Treatments', 'name'],
   ['services', 'Services', 'name'],
   ['lab_packages', 'Lab Packages', 'name'],
-  ['blogs', 'Blogs', 'title'],
+  ['blogs', 'Knowledge Articles', 'title'],
   ['faqs', 'FAQs', 'question']
 ];
 let activeType = 'conditions';

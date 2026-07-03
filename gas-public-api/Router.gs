@@ -17,6 +17,11 @@ var Router = {
       case 'labPackages': return Utils.ok(ContentService_.labPackages());
       case 'blogs': return Utils.ok(ContentService_.blogs());
       case 'faqs': return Utils.ok(ContentService_.faqs());
+      case 'socialLinks': return Utils.ok(ContentService_.socialLinks());
+      case 'testimonials': return Utils.ok(ContentService_.testimonials());
+      case 'googleReviews': return Utils.ok(ContentService_.googleReviews());
+      case 'featureFlags': return Utils.ok(ContentService_.featureFlags());
+      case 'floatingCta': return Utils.ok(ContentService_.floatingCta());
       case 'condition': return Utils.ok(ContentService_.conditionBySlug(params.slug));
       case 'treatment': return Utils.ok(ContentService_.treatmentBySlug(params.slug));
       case 'doctor': return Utils.ok(ContentService_.doctorBySlug(params.slug));

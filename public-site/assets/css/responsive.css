@@ -37,3 +37,27 @@
   [data-reveal]{opacity:1 !important; transform:none !important;}
   .scroll-progress{display:none;}
 }
+
+/* =====================================================================
+   Phase 1 — floating CTA sizing + device visibility + footer safe-spacing.
+   Smaller FABs on mobile, clear of the sticky CTA bar; device-targeted FABs.
+   ===================================================================== */
+.dv-desktop{display:grid;}
+.dv-mobile{display:none;}
+@media(max-width:760px){
+  .dv-desktop{display:none;}
+  .dv-mobile{display:grid;}
+  .fab{width:48px; height:48px; font-size:1.1rem;}
+  .fab--feedback{height:42px; font-size:var(--fs-xs); padding:0 var(--sp-3);}
+  .fab-stack--right{bottom:var(--sp-4); right:var(--sp-3); gap:var(--sp-2);}
+  .fab-stack--left{bottom:var(--sp-4); left:var(--sp-3);}
+}
+/* When a page has the sticky mobile CTA bar, lift FABs above it (no overlap). */
+@media(max-width:760px){
+  body.has-sticky-cta .fab-stack--right{bottom:calc(76px + var(--sp-3));}
+  body.has-sticky-cta .fab-stack--left{bottom:calc(76px + var(--sp-3));}
+}
+/* Theme toggle: hide the desktop inline slot on mobile (it moves into mobile-nav if needed) */
+@media(max-width:939px){
+  .nav .theme-slot{display:none;}
+}
