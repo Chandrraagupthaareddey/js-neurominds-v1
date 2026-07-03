@@ -40,6 +40,17 @@ var AdminRouter = {
       case 'health': return Utils.ok(AdminRouter._health(user));
       case 'publishHistory': return Utils.ok(SheetService.readAll(adminOperationsAuditId_(), 'Publish_History'));
       case 'users': RoleService.requireView(user, 'settings'); return Utils.ok(SheetService.readAll(adminConfigContentId_(), 'Users'));
+
+      /* website-management foundation reads (RBAC-gated) */
+      case 'socialLinks': RoleService.requireView(user, 'social'); return Utils.ok(SheetService.readAll(adminConfigContentId_(), 'Social_Links'));
+      case 'footerSettings': RoleService.requireView(user, 'footer'); return Utils.ok(SheetService.readAll(adminConfigContentId_(), 'Footer_Settings'));
+      case 'brandSettings': RoleService.requireView(user, 'brand'); return Utils.ok(AdminRouter._brand());
+      case 'themeSettings': RoleService.requireView(user, 'brand'); return Utils.ok(SheetService.readAll(adminConfigContentId_(), 'Theme_Settings'));
+      case 'navigationItems': RoleService.requireView(user, 'navigation'); return Utils.ok(SheetService.readAll(adminConfigContentId_(), 'Navigation'));
+      case 'featureFlags': RoleService.requireView(user, 'flags'); return Utils.ok(AdminRouter._flags());
+      case 'floatingCta': RoleService.requireView(user, 'settings'); return Utils.ok(SheetService.readAll(adminConfigContentId_(), 'Floating_CTA'));
+      case 'testimonials': RoleService.requireView(user, 'testimonials'); return Utils.ok(SheetService.readAll(adminConfigContentId_(), 'Testimonials'));
+      case 'googleReviews': RoleService.requireView(user, 'reviews'); return Utils.ok(AdminRouter._reviews());
       case 'runBackup': return Utils.json(BackupService.run(user));
       case 'runbook': return Utils.ok(RunbookService.get(user, payload.mode));
 
@@ -54,6 +65,42 @@ var AdminRouter = {
       clinic_name: sys.clinic_name, clinic_short: sys.clinic_short, display_phone: sys.display_phone,
       cta_phone: sys.cta_phone, whatsapp_link: sys.whatsapp_link, maps_url: sys.maps_url,
       pwens_booking_url: sys.pwens_booking_url, email_support: sys.support_email
+    };
+  },
+
+  // Brand settings keyed for the admin Brand screen.
+  _brand: function () {
+    var b = {};
+    SheetService.readAll(adminConfigContentId_(), 'Brand_Settings').forEach(function (r) { b[r.setting_key] = r.asset_url || r.setting_value; });
+    return {
+      logo_url: b.main_logo || '/assets/brand/logo.png',
+      footer_logo_url: b.footer_logo || '/assets/brand/logo.png',
+      favicon_url: b.favicon || '/assets/brand/favicon-32x32.png',
+      social_preview_url: b.social_preview || '/assets/brand/social-preview.png',
+      alt_text: 'JS Neurominds and Diagnostic Center'
+    };
+  },
+
+  // Feature flags as a typed object (TRUE/FALSE strings -> booleans).
+  _flags: function () {
+    var out = {};
+    SheetService.readAll(adminConfigContentId_(), 'Feature_Flags').forEach(function (r) {
+      out[r.flag_key] = String(r.enabled).toUpperCase() === 'TRUE' || r.enabled === true;
+    });
+    return out;
+  },
+
+  // Google reviews with summary (rating/count from System_Config).
+  _reviews: function () {
+    var sys = {};
+    SheetService.readAll(adminConfigContentId_(), 'System_Config').forEach(function (r) { sys[r.config_key] = r.config_value; });
+    var reviews = SheetService.readAll(adminConfigContentId_(), 'Google_Reviews');
+    return {
+      summary: {
+        rating: Number(sys.google_rating || 0), review_count: Number(sys.google_review_count || reviews.length),
+        profile_url: sys.google_review_url || '', write_review_url: sys.google_review_url || ''
+      },
+      reviews: reviews
     };
   },
 

@@ -17,7 +17,7 @@ export const CLINIC = {
   address: 'Beside Suzuki showroom, Hero PVR Motors Building, 10-1060, Ramachandra Nagar, Chandragiri, Thondavada, Andhra Pradesh 517101',
   footer: 'Built and maintained by TCGR Technologies / tcgr.in',
   support_email: 'jsneurominds5@gmail.com',
-  pwens_booking_url: 'https://jsneurominds.pwens.com/',
+  pwens_booking_url: 'https://jsneurominds.pwens.com/waselffollowuppage',
   domain: 'https://neurominds.in'
 };
 
@@ -52,7 +52,8 @@ export const GA4_EVENTS = [
   'call_click', 'whatsapp_click', 'support_booking_click', 'support_booking_form_open',
   'support_booking_submit', 'support_booking_error', 'pwens_booking_click',
   'doctor_calendar_click', 'doctor_profile_view', 'condition_view', 'treatment_view',
-  'lab_page_view', 'lab_package_view', 'lab_request_submit', 'faq_expand', 'feedback_submit'
+  'lab_page_view', 'lab_package_view', 'lab_request_submit', 'faq_expand', 'feedback_submit',
+  'google_review_click', 'map_click', 'instagram_click', 'testimonial_view', 'knowledge_view'
 ];
 
 // GA4 parameters that may EVER be sent. Anything else is dropped (no PII).
@@ -88,4 +89,37 @@ export const DEFAULT_USERS = [
   { email: 'tcgr.8553665381@gmail.com', role_key: 'super_admin', name: 'TCGR Super Admin' },
   { email: 'jsneurominds5@gmail.com', role_key: 'admin', name: 'Clinic Admin' },
   { email: 'jayapriya13@gmail.com', role_key: 'admin', name: 'Dr. Jayapriya' }
+];
+
+// Public feature flags. Drive show/hide of whole sections without code changes.
+// Admin edits these in Settings → Feature Flags (Feature_Flags tab). The public
+// site treats a missing flag as its default below (fail-safe).
+export const FEATURE_FLAGS = {
+  public_lab_tests_enabled: false,   // Lab Tests intentionally hidden in V1 (consultation focus)
+  public_testimonials_enabled: true,
+  public_reviews_enabled: true,
+  public_knowledge_enabled: true,
+  public_announcements_enabled: false,
+  floating_cta_enabled: true
+};
+
+// Brand assets (admin-editable via Brand_Settings in Phase 2; safe defaults here).
+// asset paths are site-relative so they resolve on both public + admin builds.
+export const BRAND = {
+  logo_url: '/assets/brand/logo.png',
+  logo_svg: '/assets/brand/logo.svg',
+  favicon_url: '/assets/brand/favicon-32x32.png',
+  footer_logo_url: '/assets/brand/logo.png',
+  social_preview_url: '/assets/brand/social-preview.png',
+  alt_text: 'JS Neurominds and Diagnostic Center'
+};
+
+// Footer social links. Only enabled rows with a non-empty url render publicly.
+// platform drives the icon; admin can edit url/enabled/order (Social_Links tab).
+export const SOCIAL_LINKS = [
+  { social_id: 'soc_instagram', platform: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/js_neurominds/', is_enabled: 'YES', display_order: 1, open_in_new_tab: 'YES', aria_label: 'JS Neurominds on Instagram' },
+  { social_id: 'soc_whatsapp', platform: 'whatsapp', label: 'WhatsApp', url: 'https://wa.me/918553665381', is_enabled: 'YES', display_order: 2, open_in_new_tab: 'YES', aria_label: 'Message JS Neurominds on WhatsApp' },
+  { social_id: 'soc_google', platform: 'google', label: 'Google Profile', url: 'https://share.google/FINrIJ0bVg0GX5D08', is_enabled: 'YES', display_order: 3, open_in_new_tab: 'YES', aria_label: 'JS Neurominds on Google' },
+  { social_id: 'soc_youtube', platform: 'youtube', label: 'YouTube', url: '', is_enabled: 'NO', display_order: 4, open_in_new_tab: 'YES', aria_label: 'JS Neurominds on YouTube' },
+  { social_id: 'soc_facebook', platform: 'facebook', label: 'Facebook', url: '', is_enabled: 'NO', display_order: 5, open_in_new_tab: 'YES', aria_label: 'JS Neurominds on Facebook' }
 ];

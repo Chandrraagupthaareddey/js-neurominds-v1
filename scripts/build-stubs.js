@@ -34,15 +34,17 @@ async function loadContent() {
       const u = new URL(base); u.searchParams.set('action', action);
       const r = await fetch(u); const j = await r.json(); return j.data || [];
     };
+    let flags = {};
+    try { const fr = await fetch(new URL(base + '?action=featureFlags')); const fj = await fr.json(); flags = fj.data || {}; } catch (e) { flags = {}; }
     return {
       conditions: await get('conditions'), treatments: await get('treatments'),
-      doctors: await get('doctors'), labPackages: await get('labPackages'), blogs: await get('blogs')
+      doctors: await get('doctors'), labPackages: await get('labPackages'), blogs: await get('blogs'), _flags: flags
     };
   }
   const m = await import('../shared/mock-public-content.js');
   return {
     conditions: m.CONDITIONS, treatments: m.TREATMENTS, doctors: m.DOCTORS,
-    labPackages: m.LAB_PACKAGES, blogs: m.BLOGS
+    labPackages: m.LAB_PACKAGES, blogs: m.BLOGS, _flags: m.FEATURE_FLAGS || {}
   };
 }
 
@@ -56,7 +58,7 @@ function jsonLd(type, item, canonical) {
     return { ...base, '@type': 'Physician', name: item.full_name, medicalSpecialty: 'Psychiatry',
       url: canonical, address: CLINIC.address };
   }
-  if (type === 'blog') {
+  if (type === 'blog' || type === 'knowledge') {
     return { ...base, '@type': 'Article', headline: item.title, author: { '@type': 'Organization', name: CLINIC.clinic_name }, url: canonical };
   }
   if (type === 'condition' || type === 'treatment') {
@@ -66,7 +68,9 @@ function jsonLd(type, item, canonical) {
   return { ...base, '@type': 'WebPage', name: titleOf(item), url: canonical };
 }
 
-function stubHtml(type, item, detailFile) {
+function stubHtml(def, item) {
+  const type = def.type;
+  const detailFile = def.detail;
   const canonical = `${DOMAIN}/p/${type}/${item.slug}.html`;
   const detailUrl = `/${detailFile}.html?slug=${item.slug}`;
   const title = esc(titleOf(item));
@@ -95,7 +99,7 @@ function stubHtml(type, item, detailFile) {
   <main id="main" class="section">
     <div class="container" style="max-width:760px">
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="/">Home</a> / <a href="/${type}s.html">${esc(cap(type))}s</a> / ${esc(item.name || item.full_name || item.title)}
+        <a href="/">Home</a> / <a href="/${def.listFile}.html">${esc(def.label)}</a> / ${esc(item.name || item.full_name || item.title)}
       </nav>
       <h1>${esc(item.name || item.full_name || item.title)}</h1>
       <p class="lede">${esc(firstPara(item))}</p>
@@ -119,21 +123,31 @@ async function main() {
   const sitemapUrls = [];
   let total = 0;
 
+  const flags = content._flags || {};
+  const labEnabled = flags.public_lab_tests_enabled === true;
+  const knowledgeEnabled = flags.public_knowledge_enabled !== false;
+
   for (const def of STUB_TYPES) {
+    // Respect feature flags: no Lab stubs when Lab is hidden; no Knowledge stubs when disabled.
+    if (def.type === 'lab_package' && !labEnabled) { console.log('  lab_package: skipped (public_lab_tests_enabled=false)'); continue; }
+    if (def.type === 'knowledge' && !knowledgeEnabled) { console.log('  knowledge: skipped (disabled)'); continue; }
     const rows = (content[def.api] || []).filter((r) => !r.status || r.status === 'published');
     if (!rows.length) continue;
     const dir = resolve(outBase, def.type);
     mkdirSync(dir, { recursive: true });
     for (const item of rows) {
-      writeFileSync(resolve(dir, `${item.slug}.html`), stubHtml(def.type, item, def.detail));
+      writeFileSync(resolve(dir, `${item.slug}.html`), stubHtml(def, item));
       sitemapUrls.push({ loc: `${DOMAIN}/p/${def.type}/${item.slug}.html`, priority: def.priority });
       total++;
     }
     console.log(`  ${def.type}: ${rows.length} stub(s)`);
   }
 
-  // Sitemap (static pages + stubs).
-  const staticUrls = ['', 'about', 'doctors', 'conditions', 'treatments', 'services', 'lab', 'blog', 'faq', 'contact']
+  // Sitemap (static pages + stubs). Lab/Knowledge static URLs respect flags.
+  const staticPages = ['', 'about', 'doctors', 'conditions', 'treatments', 'services', 'testimonials', 'faq', 'contact'];
+  if (labEnabled) staticPages.splice(6, 0, 'lab');
+  if (knowledgeEnabled) staticPages.push('knowledge');
+  const staticUrls = staticPages
     .map((p) => ({ loc: `${DOMAIN}/${p ? p + '.html' : ''}`, priority: p ? 0.6 : 1.0 }));
   const all = [...staticUrls, ...sitemapUrls];
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

@@ -33,7 +33,15 @@ const live = {
   health: () => realPost('health'),
   publishHistory: () => realPost('publishHistory'),
   users: () => realPost('users'),
-  syncContent: () => realPost('syncContent')
+  syncContent: () => realPost('syncContent'),
+  socialLinks: () => realPost('socialLinks'),
+  testimonials: () => realPost('testimonials'),
+  googleReviews: () => realPost('googleReviews'),
+  featureFlags: () => realPost('featureFlags'),
+  floatingCta: () => realPost('floatingCta'),
+  navigationItems: () => realPost('navigationItems'),
+  brandSettings: () => realPost('brandSettings'),
+  footerSettings: () => realPost('footerSettings')
 };
 
 export const api = CONFIG.USE_MOCK ? mock : live;

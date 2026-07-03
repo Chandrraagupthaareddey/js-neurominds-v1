@@ -4,10 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Conditions | JS Neurominds</title>
+  <link rel="icon" href="/assets/brand/favicon-32x32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/brand/favicon-16x16.png" sizes="16x16" type="image/png" />
+  <link rel="icon" href="/assets/brand/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0e1b2a" />
   <meta name="description" content="Conditions we support — depression, anxiety, sleep, addiction and more." />
   <link rel="canonical" href="https://neurominds.in/conditions.html" />
   <meta property="og:title" content="Conditions | JS Neurominds" />
   <meta property="og:description" content="Conditions we support — depression, anxiety, sleep, addiction and more." />
+  <meta property="og:image" content="https://neurominds.in/assets/brand/social-preview.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://neurominds.in/assets/brand/social-preview.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="/assets/css/main.css" />
@@ -22,17 +31,21 @@
         <div class="section-head" data-reveal>
           <p class="eyebrow">JS Neurominds</p>
           <h1>Conditions we support</h1>
-          <p class="lede">Clear, caring information about common mental health concerns.</p>
+          <p class="lede">Clear, caring information about the mental health concerns we help with. Browse or search the full list below.</p>
         </div>
-        <div class="grid grid--3" id="list-wrap" data-reveal="2"></div>
+        <div id="conditions-toolbar" data-reveal="2"></div>
+        <div class="grid grid--3" id="conditions-hub" data-reveal="2"></div>
+        <div class="notice notice--privacy" style="margin-top:var(--sp-6)">
+          This information is for general awareness only and is not a diagnosis or a guarantee of treatment outcomes. Please consult a qualified clinician for advice specific to you.
+        </div>
       </div>
     </section>
   </main>
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
-    import { hydrateList } from '/assets/js/pages.js';
-    (async () => { await mountShell(); await hydrateList('conditions'); })();
+    import { hydrateConditionsHub } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await hydrateConditionsHub(); })();
   </script>
 </body>
 </html>

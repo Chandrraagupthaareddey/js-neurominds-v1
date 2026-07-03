@@ -140,3 +140,47 @@ strong{color:var(--ink-800); font-weight:600;}
 
 @media(min-width:680px){ .grid--2{grid-template-columns:repeat(2,1fr);} .grid--4{grid-template-columns:repeat(2,1fr);} }
 @media(min-width:920px){ .grid--3{grid-template-columns:repeat(3,1fr);} .grid--4{grid-template-columns:repeat(4,1fr);} }
+
+/* =====================================================================
+   Theme layer — light (default), dark, and system.
+   app.js sets data-theme="light|dark" on <html>; "system" removes the attr
+   and defers to prefers-color-scheme. Brand accent hues are preserved; only
+   canvas/surface/ink/line tokens are remapped for contrast and calm at night.
+   ===================================================================== */
+:root{ color-scheme: light; }
+
+/* Shared dark token map, applied for explicit dark OR system-dark. */
+[data-theme="dark"]{
+  color-scheme: dark;
+  --canvas:#0b1622; --canvas-2:#0f1d2c; --surface:#13212f; --surface-2:#16273a;
+  --line:#23344a; --line-cool:#23344a;
+  --ink-900:#f3f6fa; --ink-800:#e4ebf2; --ink-700:#cdd8e3; --ink-600:#b1c0ce;
+  --ink-500:#90a2b4; --ink-400:#7d8fa1; --ink-300:#5f7286;
+  --text:var(--ink-800); --text-soft:var(--ink-600); --text-faint:var(--ink-400);
+  --brand:#f3f6fa;
+  --teal-50:#10302e; --teal-100:#16403c; --blue-50:#102338; --blue-100:#163354;
+  --lavender-50:#1a1830;
+  --warn-bg:#3a2c12; --ok-bg:#13301f; --err-bg:#3a1c16; --info-bg:#163354;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md:0 8px 24px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.4);
+  --shadow-lg:0 20px 50px rgba(0,0,0,.55), 0 6px 16px rgba(0,0,0,.4);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --canvas:#0b1622; --canvas-2:#0f1d2c; --surface:#13212f; --surface-2:#16273a;
+    --line:#23344a; --line-cool:#23344a;
+    --ink-900:#f3f6fa; --ink-800:#e4ebf2; --ink-700:#cdd8e3; --ink-600:#b1c0ce;
+    --ink-500:#90a2b4; --ink-400:#7d8fa1; --ink-300:#5f7286;
+    --text:var(--ink-800); --text-soft:var(--ink-600); --text-faint:var(--ink-400);
+    --brand:#f3f6fa;
+    --teal-50:#10302e; --teal-100:#16403c; --blue-50:#102338; --blue-100:#163354;
+    --lavender-50:#1a1830;
+    --warn-bg:#3a2c12; --ok-bg:#13301f; --err-bg:#3a1c16; --info-bg:#163354;
+    --shadow-xs:0 1px 2px rgba(0,0,0,.4);
+    --shadow-sm:0 2px 8px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
+    --shadow-md:0 8px 24px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.4);
+    --shadow-lg:0 20px 50px rgba(0,0,0,.55), 0 6px 16px rgba(0,0,0,.4);
+  }
+}

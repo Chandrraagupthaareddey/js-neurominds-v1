@@ -11,11 +11,11 @@ import { MOCK_USERS } from '../../../shared/mock-public-content.js';
 
 // Role -> allowed section keys. Mirrors Role_Permissions in the CMS.
 export const ROLE_SECTIONS = {
-  super_admin: ['dashboard','booking','callback','lab','marketing','seo','content','doctors','services','media','feedback','health','backup','settings','runbook'],
-  admin:       ['dashboard','booking','callback','lab','seo','content','doctors','services','media','feedback','health','runbook'],
+  super_admin: ['dashboard','booking','callback','lab','marketing','seo','content','doctors','services','media','testimonials','reviews','navigation','social','footer','brand','flags','feedback','health','backup','settings','runbook'],
+  admin:       ['dashboard','booking','callback','lab','seo','content','doctors','services','media','testimonials','reviews','navigation','social','footer','brand','flags','feedback','health','runbook'],
   lab_team:    ['dashboard','lab','runbook'],
-  content_editor: ['dashboard','content','runbook'],
-  marketing:   ['dashboard','marketing','runbook']
+  content_editor: ['dashboard','content','testimonials','runbook'],
+  marketing:   ['dashboard','marketing','seo','testimonials','reviews','social','runbook']
 };
 
 export const ROLE_LABELS = {

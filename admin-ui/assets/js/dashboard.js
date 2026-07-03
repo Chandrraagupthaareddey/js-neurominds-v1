@@ -5,6 +5,11 @@
  */
 import { api } from './api.js';
 import { sparkline, donut, bars } from './charts.js';
+import { CONFIG } from './config.js';
+
+const GA_BADGE = CONFIG.USE_MOCK
+  ? '<span class="badge attention" title="Sample data — not live GA4">Mock Preview</span>'
+  : '<span class="badge ok">GA4 Data API</span>';
 
 const esc = (s) => String(s == null ? '' : s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
@@ -34,7 +39,7 @@ export async function renderDashboard(mount) {
       <div class="panel">
         <div class="panel__head">
           <h3>Sessions &amp; leads · ${esc(ga.range)}</h3>
-          <span class="badge ok">GA4 Data API</span>
+          ${GA_BADGE}
         </div>
         <div class="panel__body">
           ${sparkline(ga.daily_sessions)}
@@ -90,6 +95,7 @@ export async function renderDashboard(mount) {
     </div>
 
     <p class="muted" style="font-size:12px">Analytics are powered by the GA4 Data API. BigQuery is an optional sandbox archive and is not queried for these dashboards in V1.</p>
+    ${CONFIG.USE_MOCK ? '<p class="muted" style="font-size:12px"><strong>Mock Preview:</strong> these figures are sample data for layout review, not live analytics. Live numbers appear once the GA4 Data API is connected.</p>' : ''}
   `;
 }
 

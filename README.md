@@ -115,4 +115,3 @@ git check-ignore -v .env .clasp.json credentials.json token.json service-account
 ---
 
 (c) JS Neurominds and Diagnostic Center. Built and maintained by TCGR Technologies (tcgr.in).
-# js-neurominds-v1
