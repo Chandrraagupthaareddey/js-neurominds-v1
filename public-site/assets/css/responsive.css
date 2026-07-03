@@ -49,8 +49,8 @@
   .dv-mobile{display:grid;}
   .fab{width:48px; height:48px; font-size:1.1rem;}
   .fab--feedback{height:42px; font-size:var(--fs-xs); padding:0 var(--sp-3);}
-  .fab-stack--right{bottom:var(--sp-4); right:var(--sp-3); gap:var(--sp-2);}
-  .fab-stack--left{bottom:var(--sp-4); left:var(--sp-3);}
+  .fab-stack--right{bottom:calc(var(--sp-4) + env(safe-area-inset-bottom, 0px)); right:var(--sp-3); gap:var(--sp-2);}
+  .fab-stack--left{bottom:calc(var(--sp-4) + env(safe-area-inset-bottom, 0px)); left:var(--sp-3);}
 }
 /* When a page has the sticky mobile CTA bar, lift FABs above it (no overlap). */
 @media(max-width:760px){

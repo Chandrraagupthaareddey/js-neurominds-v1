@@ -54,7 +54,7 @@ export const DOCTORS = [
     conditions_handled: 'Depression, Anxiety, Sleep disorders, Addiction, Child & teen concerns',
     short_bio: 'Dr. Jayapriya T is a consultant psychiatrist providing compassionate, evidence-based mental health care for individuals and families across Tirupati and Chandragiri.',
     profile_photo_link: '',
-    photo_url: '',
+    photo_url: '/assets/img/doctor-placeholder.svg',
     support_booking_enabled: 'YES',
     direct_booking_enabled: 'YES',
     online_consultation_enabled: 'YES',
@@ -594,7 +594,7 @@ export const FEATURE_FLAGS = {
 // defaults to the locked clinic WhatsApp. device_visibility: all|desktop|mobile.
 export const FLOATING_CTA = [
   { cta_id: 'fab_call', kind: 'call', label: 'Call Clinic', value: 'tel:+918553665381', is_enabled: 'YES', display_order: 1, device_visibility: 'all' },
-  { cta_id: 'fab_whatsapp', kind: 'whatsapp', label: 'WhatsApp Clinic', value: 'https://wa.me/918553665381', whatsapp_text: 'Hi, I would like to know more about JS Neurominds.', is_enabled: 'YES', display_order: 2, device_visibility: 'all' },
+  { cta_id: 'fab_whatsapp', kind: 'whatsapp', label: 'WhatsApp Clinic', value: 'https://wa.me/9986559998', whatsapp_text: 'Hi, I would like to know more about JS Neurominds.', is_enabled: 'YES', display_order: 2, device_visibility: 'all' },
   { cta_id: 'fab_enquire', kind: 'feedback', label: 'Enquire Now', value: '', is_enabled: 'YES', display_order: 3, device_visibility: 'all' }
 ];
 

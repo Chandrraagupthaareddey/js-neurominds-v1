@@ -7,9 +7,9 @@ import { api } from './api.js';
 import { sparkline, donut, bars } from './charts.js';
 import { CONFIG } from './config.js';
 
-const GA_BADGE = CONFIG.USE_MOCK
-  ? '<span class="badge attention" title="Sample data — not live GA4">Mock Preview</span>'
-  : '<span class="badge ok">GA4 Data API</span>';
+const GA_BADGE = CONFIG.ANALYTICS_CONNECTED
+  ? '<span class="badge ok">GA4 Data API</span>'
+  : '<span class="badge attention" title="Connect the GA4 Data API to show live numbers">Not connected</span>';
 
 const esc = (s) => String(s == null ? '' : s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
@@ -35,6 +35,7 @@ export async function renderDashboard(mount) {
       ${kpi('Feedback pending', k.feedback_pending, 'Awaiting moderation')}
     </div>
 
+    ${CONFIG.ANALYTICS_CONNECTED ? `
     <div class="chart-row">
       <div class="panel">
         <div class="panel__head">
@@ -74,6 +75,17 @@ export async function renderDashboard(mount) {
         <div class="panel__body">${donut(ga.by_device.map((s) => ({ label: cap(s.device), value: s.sessions })), { size: 140 })}</div>
       </div>
     </div>
+    ` : `
+    <div class="panel">
+      <div class="panel__head"><h3>Website analytics</h3>${GA_BADGE}</div>
+      <div class="panel__body">
+        <div class="empty-state" style="padding:2rem 1rem;text-align:center">
+          <p style="font-size:15px;font-weight:500;margin:0 0 .35rem">Real analytics not connected yet.</p>
+          <p class="muted" style="font-size:13px;margin:0">Sessions, traffic sources, and key website actions will appear here once the GA4 Data API is connected.</p>
+        </div>
+      </div>
+    </div>
+    `}
 
     <div class="panel">
       <div class="panel__head"><h3>Recent callback requests</h3></div>
@@ -95,7 +107,7 @@ export async function renderDashboard(mount) {
     </div>
 
     <p class="muted" style="font-size:12px">Analytics are powered by the GA4 Data API. BigQuery is an optional sandbox archive and is not queried for these dashboards in V1.</p>
-    ${CONFIG.USE_MOCK ? '<p class="muted" style="font-size:12px"><strong>Mock Preview:</strong> these figures are sample data for layout review, not live analytics. Live numbers appear once the GA4 Data API is connected.</p>' : ''}
+    ${CONFIG.ANALYTICS_CONNECTED ? '' : '<p class="muted" style="font-size:12px"><strong>Real analytics not connected yet.</strong> Live sessions, leads, and bookings will appear here once the GA4 Data API is connected.</p>'}
   `;
 }
 

@@ -74,43 +74,35 @@ function renderAuthDisabled() {
         <h2>JS Neurominds</h2>
         <p class="muted" style="margin-top:0">Admin Portal</p>
         <div class="access-denied" style="margin-top:1.5rem">
-          <strong>Admin access is temporarily disabled</strong> until secure Google
-          authentication is configured. Please contact your administrator (TCGR Technologies).
+          <strong>Admin access is restricted.</strong><br>
+          Google authentication will be enabled before live admin use.
         </div>
-        <p class="muted" style="font-size:12px; margin-top:1rem">Environment: ${CONFIG.ENV} · auth: ${CONFIG.AUTH_MODE}</p>
       </div>
     </div>`;
 }
 
 /* ---------------- Login ---------------- */
 function renderLogin(denied) {
-  // Real Google OAuth path (deployed env with VITE_GOOGLE_CLIENT_ID set).
-  if (!CONFIG.MOCK_LOGIN_ALLOWED && CONFIG.OAUTH_CONFIGURED) { renderOAuthLogin(denied); return; }
+  // Real Google OAuth path (VITE_GOOGLE_CLIENT_ID set).
+  if (CONFIG.OAUTH_CONFIGURED) { renderOAuthLogin(denied); return; }
 
+  // Developer-only simulated sign-in. Reached ONLY when VITE_ENABLE_MOCK_LOGIN
+  // === 'true' on a developer machine; never in a normal build or preview.
   const users = knownUsers();
-  const devBadge = `<div class="env-pill" style="display:inline-block;margin-bottom:1rem">${CONFIG.ENV} · mock login (dev only)</div>`;
   root().innerHTML = `
     <div class="login-wrap">
       <div class="login-card">
         <div class="brand__mark"><img src="/assets/brand/logo.png" alt="JS Neurominds" width="52" height="52" /></div>
         <h2>JS Neurominds</h2>
-        <p class="muted" style="margin-top:0">Admin Portal · sign in to continue</p>
-        ${devBadge}
-        <p class="muted" style="font-size:12.5px; margin:0 0 .5rem; text-align:left">
-          This simulated sign-in is available in local/dev only. In demo and production,
-          real Google authentication is required and this picker is disabled.
-        </p>
-        <div class="field" style="text-align:left">
-          <label for="login-email">Signed-in Google account (simulated)</label>
+        <p class="muted" style="margin-top:0">Admin Portal</p>
+        <div class="field" style="text-align:left; margin-top:1.25rem">
+          <label for="login-email">Developer sign-in</label>
           <select id="login-email">
-            <optgroup label="Authorized users">
-              ${users.map((u) => `<option value="${u.email}">${u.email} — ${ROLE_LABELS[u.role_key]}</option>`).join('')}
-            </optgroup>
-            <option value="random.person@gmail.com">random.person@gmail.com — (not authorized)</option>
+            ${users.map((u) => `<option value="${u.email}">${u.email} — ${ROLE_LABELS[u.role_key]}</option>`).join('')}
           </select>
         </div>
-        <button class="google-btn" id="login-btn"><span class="google-g"></span> Sign in with Google</button>
-        ${denied ? `<div class="access-denied"><strong>Access denied.</strong> The account <b>${denied}</b> is not authorized for this portal. Ask a Super Admin to add it to the Users list.</div>` : ''}
+        <button class="google-btn" id="login-btn"><span class="google-g"></span> Continue</button>
+        ${denied ? `<div class="access-denied"><strong>Access denied.</strong> <b>${denied}</b> is not authorized.</div>` : ''}
       </div>
     </div>`;
   document.getElementById('login-btn').addEventListener('click', () => {
@@ -168,18 +160,17 @@ async function renderShell() {
             <h1 id="section-title">${SECTIONS[currentSection].label}</h1>
           </div>
           <div class="topbar__right">
-            <span class="env-pill" title="Environment">${CONFIG.ENV} · ${CONFIG.API_MODE}</span>
-            ${CONFIG.USE_MOCK ? '<span class="env-pill" style="background:var(--info-bg);color:var(--info);border-color:var(--blue-100)" title="Data shown is sample/mock, not live analytics">Mock Preview</span>' : ''}
             <div class="pwens-links" title="PWeNS booking partner">
               <a class="btn btn--ghost btn--sm" href="${CONFIG.PWENS_PUBLIC_BOOKING_URL}" target="_blank" rel="noopener">PWeNS Booking</a>
               <a class="btn btn--ghost btn--sm" href="${CONFIG.PWENS_LOGIN_URL}" target="_blank" rel="noopener">PWeNS Login</a>
             </div>
-            <div class="role-switch" title="RBAC simulator — switch roles to preview access">
+            ${CONFIG.MOCK_LOGIN_ALLOWED ? `
+            <div class="role-switch" title="Preview access by role">
               <label for="role-sel">Role</label>
               <select id="role-sel">
                 ${ROLES.map((r) => `<option value="${r}" ${r === session.role ? 'selected' : ''}>${ROLE_LABELS[r]}</option>`).join('')}
               </select>
-            </div>
+            </div>` : ''}
             <span class="userchip">
               <span class="userchip__avatar">${initials(session.name)}</span>
               <span>${session.name}</span>
@@ -195,7 +186,8 @@ async function renderShell() {
   bindNav();
   document.getElementById('signout-btn').addEventListener('click', () => { signOut(); boot(); });
   document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
-  document.getElementById('role-sel').addEventListener('change', (e) => {
+  const roleSel = document.getElementById('role-sel');
+  if (roleSel) roleSel.addEventListener('change', (e) => {
     setRole(e.target.value);
     renderShell(); // re-render with new permissions
   });

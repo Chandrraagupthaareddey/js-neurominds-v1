@@ -100,15 +100,35 @@ export async function hydrateList(kind) {
     return;
   }
   wrap.innerHTML = res.data.map((item) => {
-    const icon = iconFor(item.slug, kind === 'doctors' ? '🩺' : kind === 'lab' ? '🧪' : '📄');
+    // Doctors get a richer, dedicated card (photo, credentials, modes, CTA).
+    if (kind === 'doctors') {
+      const photo = (item.photo_url || item.profile_photo_link)
+        ? `<img class="doctor-card__photo" src="${esc(item.photo_url || item.profile_photo_link)}" alt="${esc(item.full_name)}" width="96" height="96" loading="lazy" decoding="async" />`
+        : `<div class="card__icon">${esc(initials(item.full_name))}</div>`;
+      const modes = [];
+      if (String(item.online_consultation_enabled).toUpperCase() === 'YES') modes.push('Online');
+      if (String(item.clinic_visit_enabled).toUpperCase() === 'YES') modes.push('In-clinic');
+      const modeChips = modes.map((m) => `<span class="chip">${m}</span>`).join('');
+      return `
+        <div class="card doctor-card doctor-card--list">
+          ${photo}
+          <div class="doctor-card__body">
+            <h3>${esc(item.full_name)}</h3>
+            ${item.qualification ? `<p class="doctor-card__qual">${esc(item.qualification)}</p>` : ''}
+            <p class="doctor-card__spec">${esc(item.specialization || item.short_bio || '')}</p>
+            <div class="chip-row">
+              ${item.experience_years ? `<span class="chip">${esc(item.experience_years)} yrs</span>` : ''}
+              ${item.languages ? `<span class="chip">${esc(item.languages)}</span>` : ''}
+              ${modeChips}
+            </div>
+            <a class="btn btn--ghost btn--sm" href="/doctor.html?slug=${esc(item.slug)}">View full profile</a>
+          </div>
+        </div>`;
+    }
+    const icon = iconFor(item.slug, kind === 'lab' ? '🧪' : '📄');
     const extra = kind === 'lab' && item.turnaround ? `<span class="chip">${esc(item.turnaround)}</span>` : '';
-    const headVisual = kind === 'doctors'
-      ? ((item.photo_url || item.profile_photo_link)
-          ? `<img class="doctor-card__photo" src="${esc(item.photo_url || item.profile_photo_link)}" alt="${esc(item.full_name)}" width="84" height="84" loading="lazy" decoding="async" />`
-          : `<div class="card__icon">${esc(initials(item.full_name))}</div>`)
-      : `<div class="card__icon">${icon}</div>`;
     const inner = `
-      ${headVisual}
+      <div class="card__icon">${icon}</div>
       <h3>${esc(item[cfg.title])}</h3>
       <p>${esc(item[cfg.sub])}</p>
       ${extra ? `<div class="chip-row">${extra}</div>` : ''}

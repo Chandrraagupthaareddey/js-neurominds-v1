@@ -65,7 +65,7 @@ function themeToggle() {
 function brandMark(cfg, forFooter) {
   const logo = (cfg && (forFooter ? cfg.footer_logo_url : cfg.logo_url)) || LOGO;
   return `
-    <span class="brand__logo" aria-hidden="true"><img src="${logo}" alt="" width="42" height="42" loading="eager" decoding="async" /></span>
+    <span class="brand__logo" aria-hidden="true"><img src="${logo}" alt="" width="44" height="44" loading="eager" decoding="async" /></span>
     <span class="brand__name">${cfg.clinic_short}<span>Psychiatry &amp; Diagnostics</span></span>`;
 }
 

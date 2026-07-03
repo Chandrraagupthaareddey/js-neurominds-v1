@@ -107,7 +107,7 @@ export const FEATURE_FLAGS = {
 // asset paths are site-relative so they resolve on both public + admin builds.
 export const BRAND = {
   logo_url: '/assets/brand/logo.png',
-  logo_svg: '/assets/brand/logo.svg',
+  logo_svg: '/assets/brand/logo.png',
   favicon_url: '/assets/brand/favicon-32x32.png',
   footer_logo_url: '/assets/brand/logo.png',
   social_preview_url: '/assets/brand/social-preview.png',

@@ -29,6 +29,7 @@ const items = target === 'admin'
       { rel: 'p', required: false },                 // SEO stubs (skipped when no stubs)
       { rel: 'sitemap.xml', required: true },
       { rel: 'assets/brand', required: true },
+      { rel: 'assets/img', required: false },
       { rel: 'site.webmanifest', required: true },
       { rel: 'robots.txt', required: false }
     ];

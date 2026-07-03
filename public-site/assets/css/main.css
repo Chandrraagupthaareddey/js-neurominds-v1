@@ -44,6 +44,15 @@
   --line:#e9e6df;          /* warm hairline */
   --line-cool:#e3e9f0;     /* cool hairline for blue contexts */
 
+  /* Stable dark surfaces — used by footer & dark CTA. These must NOT invert in
+     dark mode (otherwise white-on-white). Fixed literals, referenced everywhere
+     the design intends a permanently-dark navy block. */
+  --footer-bg:#0e1b2a;
+  --footer-text:rgba(255,255,255,.74);
+  --footer-text-strong:#ffffff;
+  --footer-text-soft:rgba(255,255,255,.52);
+  --footer-line:rgba(255,255,255,.14);
+
   /* ---------- color: semantic ---------- */
   --text:var(--ink-800);
   --text-soft:var(--ink-600);
@@ -93,7 +102,7 @@
   --dur-fast:.15s; --dur:.25s; --dur-slow:.5s;
 
   /* ---------- layout ---------- */
-  --maxw:1180px; --maxw-prose:720px; --header-h:72px;
+  --maxw:1320px; --maxw-prose:760px; --header-h:72px;
 }
 
 /* ---------- reset ---------- */
