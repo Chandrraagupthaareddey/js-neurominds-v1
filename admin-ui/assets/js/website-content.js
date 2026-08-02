@@ -123,6 +123,7 @@ export async function renderFeatureFlags(mount) {
   const canEdit = can('edit_settings');
   const labelFor = {
     public_lab_tests_enabled: 'Lab Tests — public visibility',
+    public_callback_enabled: 'Clinic Callback CTAs & form',
     public_testimonials_enabled: 'Testimonials page',
     public_reviews_enabled: 'Google Reviews section',
     public_knowledge_enabled: 'Knowledge hub',

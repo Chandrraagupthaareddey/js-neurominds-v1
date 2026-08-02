@@ -43,7 +43,7 @@ var ContentService_ = {
     var cached = ContentService_._cacheGet('feature_flags');
     if (cached) return cached;
     var defaults = {
-      public_lab_tests_enabled: false, public_testimonials_enabled: true, public_reviews_enabled: true,
+      public_lab_tests_enabled: false, public_callback_enabled: false, public_testimonials_enabled: true, public_reviews_enabled: true,
       public_knowledge_enabled: true, public_announcements_enabled: false, floating_cta_enabled: true
     };
     var rows = SheetService.readAll(getConfigContentId_(), 'Feature_Flags');

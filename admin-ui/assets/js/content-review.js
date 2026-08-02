@@ -1,29 +1,24 @@
 /**
  * JS Neurominds V1 — admin-ui/assets/js/content-review.js
- * Content Review & Publishing. Lists content by type with status, lets
- * authorized roles publish drafts and trigger a content sync (which, in
- * production, calls the Cloudflare Deploy Hook to rebuild SEO stubs).
+ * Content Review, editing & publishing. Lists content by type with status,
+ * opens a per-item editor (draft → review → publish), and triggers a content
+ * sync (which, in production, calls the Cloudflare Deploy Hook to rebuild SEO
+ * stubs + sitemap from published content).
  */
 import { api } from './api.js';
 import { can } from './auth.js';
 import { toast } from './admin-app.js';
+import { CONTENT_TYPES, CONTENT_TYPE_ORDER } from './content-fields.js';
+import { openContentEditor } from './content-editor.js';
 
 const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
-const TYPES = [
-  ['conditions', 'Conditions', 'name'],
-  ['treatments', 'Treatments', 'name'],
-  ['services', 'Services', 'name'],
-  ['lab_packages', 'Lab Packages', 'name'],
-  ['blogs', 'Knowledge Articles', 'title'],
-  ['faqs', 'FAQs', 'question']
-];
+
 let activeType = 'conditions';
 
 export async function renderContentReview(mount) {
-  const res = await api.content();
-  const data = res.data;
-  const canPublish = can('publish');
+  const canEdit = can('edit_content');
   const canSync = can('sync');
+  let data = (await api.content()).data;
 
   mount.innerHTML = `
     <div class="panel">
@@ -35,33 +30,39 @@ export async function renderContentReview(mount) {
       </div>
       <div class="panel__body">
         <div class="runbook-tabs" id="type-tabs">
-          ${TYPES.map(([key, label]) => `<button class="runbook-tab ${key === activeType ? 'active' : ''}" data-type="${key}">${label}</button>`).join('')}
+          ${CONTENT_TYPE_ORDER.map((key) => `<button class="runbook-tab ${key === activeType ? 'active' : ''}" data-type="${key}">${CONTENT_TYPES[key].label}</button>`).join('')}
         </div>
         <div id="content-table"></div>
       </div>
     </div>
-    <p class="muted" style="font-size:12px">Publishing updates the live content. Syncing triggers a Cloudflare rebuild so SEO stubs and the sitemap regenerate from approved content.</p>`;
+    <p class="muted" style="font-size:12px">${canEdit ? 'Click any item to edit it. Edits are saved as a private draft; the live site changes only when an admin publishes. ' : ''}Syncing triggers a Cloudflare rebuild so SEO stubs and the sitemap regenerate from published content.</p>`;
+
+  const refresh = async () => { data = (await api.content()).data; renderTable(); };
 
   const renderTable = () => {
-    const [, , titleField] = TYPES.find((t) => t[0] === activeType);
+    const meta = CONTENT_TYPES[activeType];
     const rows = data[activeType] || [];
     document.getElementById('content-table').innerHTML = `
       <table class="table">
-        <thead><tr><th>Title</th><th>Status</th>${canPublish ? '<th></th>' : ''}</tr></thead>
+        <thead><tr><th>Title</th><th>Status</th><th></th></tr></thead>
         <tbody>
-          ${rows.map((r, i) => `
-            <tr>
-              <td><strong>${esc(r[titleField])}</strong></td>
-              <td><span class="badge ${r.status || 'published'}">${esc(r.status || 'published')}</span></td>
-              ${canPublish ? `<td>${(r.status && r.status !== 'published') ? `<button class="btn btn--ghost btn--sm publish-btn" data-i="${i}">Publish</button>` : '<span class="muted" style="font-size:12px">Live</span>'}</td>` : ''}
-            </tr>`).join('')}
+          ${rows.map((r, i) => {
+            const status = r.status || 'published';
+            const hasDraft = !!r._draft;
+            return `
+            <tr class="${canEdit ? 'selectable' : ''}" data-i="${i}">
+              <td><strong>${esc(r[meta.titleField])}</strong>${hasDraft ? ' <span class="badge review" style="font-size:.62rem">draft pending</span>' : ''}</td>
+              <td><span class="badge ${esc(status)}">${esc(status)}</span></td>
+              <td style="text-align:right">${canEdit ? '<span class="muted" style="font-size:12px">Edit ›</span>' : '<span class="muted" style="font-size:12px">Live</span>'}</td>
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>`;
-    if (canPublish) {
-      document.querySelectorAll('.publish-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const r = rows[btn.dataset.i]; r.status = 'published';
-          toast(`Published: ${r[titleField]}`); renderTable();
+    if (canEdit) {
+      document.querySelectorAll('#content-table tr.selectable').forEach((tr) => {
+        tr.addEventListener('click', () => {
+          const item = rows[tr.dataset.i];
+          openContentEditor(item, meta, refresh);
         });
       });
     }

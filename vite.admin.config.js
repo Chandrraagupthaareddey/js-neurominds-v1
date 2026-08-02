@@ -4,6 +4,7 @@ import { resolve } from 'path';
 // Admin portal — single-page app. Root is admin-ui/.
 export default defineConfig({
   root: resolve(__dirname, 'admin-ui'),
+  envDir: resolve(__dirname),
   appType: 'spa',
   server: { port: 5174, fs: { allow: [resolve(__dirname)] } },
   preview: { port: 5174 },

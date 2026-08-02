@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <meta name="theme-color" content="#0e1b2a" />
-  <meta name="description" content="Request a Clinic Callback from our clinic team, or book a confirmed appointment online via our trusted booking partner PWeNS." />
+  <meta name="description" content="Book a confirmed appointment online via our trusted booking partner PWeNS." />
   <link rel="canonical" href="https://neurominds.in/booking.html" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,40 +25,17 @@
       <div class="container" style="max-width:960px">
         <div class="section-head section-head--center" data-reveal>
           <p class="eyebrow eyebrow--center">Book with us</p>
-          <h1>Two easy ways to start</h1>
-          <p class="lede" style="margin-inline:auto">Not sure yet? Ask for a clinic callback. Ready to confirm? Book online in minutes.</p>
+          <h1>Book a confirmed appointment</h1>
+          <p class="lede" style="margin-inline:auto">Check live availability, choose a time, and confirm your appointment securely online — in just a few minutes.</p>
         </div>
 
-        <div class="grid grid--2" data-reveal="2">
-          <div class="choice choice--accent" id="confirmed">
+        <div data-reveal="2" style="max-width:560px; margin-inline:auto">
+          <div class="choice choice--accent" id="confirmed" style="text-align:center; align-items:center">
             <span class="tag tag--blue choice__badge">Ready to book</span>
             <h2>Book confirmed appointment</h2>
             <p>Check live availability, choose a time, and confirm your appointment securely with our trusted booking partner. Payment and confirmation happen there.</p>
-            <button class="btn btn--dark btn--lg btn--block" id="confirmed-btn">Check availability &amp; book</button>
+            <button class="btn btn--primary btn--lg btn--block" id="confirmed-btn">Check availability &amp; book</button>
             <p class="choice__note">You'll be taken to PWeNS to complete your booking securely.</p>
-          </div>
-
-          <div class="choice choice--primary">
-            <span class="tag choice__badge">Prefer to talk first</span>
-            <h2>Request a Clinic Callback</h2>
-            <p>Hesitant, or want to talk before booking? Leave your details and our clinic team will call you at your preferred time. <strong>This is not a confirmed appointment.</strong></p>
-            <a class="btn btn--primary btn--lg btn--block" href="#callback">Request Clinic Callback</a>
-            <p class="choice__note">No payment. No obligation.</p>
-          </div>
-        </div>
-
-        <div id="callback" style="max-width:580px; margin:var(--sp-8) auto 0">
-          <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--center">Clinic Callback</p>
-            <h2>Tell us how to reach you</h2>
-            <p class="lede" style="margin-inline:auto">It only takes a minute. We'll never ask for medical details here.</p>
-          </div>
-          <div class="card" style="box-shadow:var(--shadow-md)">
-            <div id="callback-mount">
-              <div class="skeleton skeleton--line w80"></div>
-              <div class="skeleton skeleton--line"></div>
-              <div class="skeleton skeleton--line w60"></div>
-            </div>
           </div>
         </div>
       </div>
@@ -67,18 +44,16 @@
 
   <!-- Mobile sticky actions -->
   <div class="sticky-cta">
-    <a class="btn btn--ghost" id="sticky-callback" href="#callback">Call back</a>
-    <button class="btn btn--dark" id="sticky-confirmed">Book online</button>
+    <button class="btn btn--primary btn--block" id="sticky-confirmed">Book confirmed appointment</button>
   </div>
 
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
-    import { renderCallbackForm, wireConfirmedBooking } from '/assets/js/booking.js';
+    import { wireConfirmedBooking } from '/assets/js/booking.js';
     import '/assets/js/feedback.js';
     (async () => {
       document.body.classList.add('has-sticky-cta');
       const cfg = await mountShell();
-      await renderCallbackForm('#callback-mount');
       wireConfirmedBooking('#confirmed-btn', { doctorId: 'doc_jayapriya', pwensUrl: cfg.pwens_booking_url });
       wireConfirmedBooking('#sticky-confirmed', { doctorId: 'doc_jayapriya', pwensUrl: cfg.pwens_booking_url });
     })();

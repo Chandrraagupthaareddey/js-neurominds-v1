@@ -96,6 +96,7 @@ export const DEFAULT_USERS = [
 // site treats a missing flag as its default below (fail-safe).
 export const FEATURE_FLAGS = {
   public_lab_tests_enabled: false,   // Lab Tests intentionally hidden in V1 (consultation focus)
+  public_callback_enabled: false,    // Clinic Callback intentionally hidden (booking-first). Backend code preserved.
   public_testimonials_enabled: true,
   public_reviews_enabled: true,
   public_knowledge_enabled: true,

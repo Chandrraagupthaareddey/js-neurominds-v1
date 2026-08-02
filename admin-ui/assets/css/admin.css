@@ -236,3 +236,7 @@ button{font-family:inherit; cursor:pointer;}
 /* PWeNS quick links in topbar */
 .pwens-links{display:flex; gap:.4rem;}
 @media(max-width:1100px){ .pwens-links{display:none;} }
+
+/* Content editor drawer */
+.editor-status{margin-bottom:1rem; font-size:13px; color:var(--ink-600);}
+.content-editor textarea{min-height:70px; resize:vertical;}

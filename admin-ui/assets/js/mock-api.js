@@ -11,6 +11,8 @@ import {
   SOCIAL_LINKS, TESTIMONIALS, GOOGLE_REVIEWS, FEATURE_FLAGS, FLOATING_CTA, NAVIGATION
 } from '../../../shared/mock-public-content.js';
 
+import { getSession } from './auth.js';
+
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const ok = (data) => ({ success: true, code: 200, data, error: null });
 
@@ -19,6 +21,26 @@ let callbacks = structuredClone(MOCK_CALLBACK_REQUESTS);
 let labRequests = structuredClone(MOCK_LAB_REQUESTS);
 let feedback = structuredClone(MOCK_FEEDBACK);
 const statusHistory = {}; // callback_id -> [{status, note, at}]
+
+// Mutable content store so edit/draft/publish work in preview exactly like live.
+// Each item may carry a private `_draft` overlay of unpublished field changes.
+const contentStore = {
+  conditions: structuredClone(CONDITIONS),
+  treatments: structuredClone(TREATMENTS),
+  services: structuredClone(SERVICES),
+  lab_packages: structuredClone(LAB_PACKAGES),
+  blogs: structuredClone(BLOGS),
+  faqs: structuredClone(FAQS)
+};
+const TAB_TO_STORE = {
+  Conditions: 'conditions', Treatments: 'treatments', Services: 'services',
+  Lab_Packages: 'lab_packages', Blogs: 'blogs', FAQs: 'faqs'
+};
+const nowIso = () => new Date().toISOString().slice(0, 16).replace('T', ' ');
+const findContent = (tab, keyCol, keyVal) => {
+  const arr = contentStore[TAB_TO_STORE[tab]] || [];
+  return arr.find((r) => String(r[keyCol]) === String(keyVal));
+};
 
 export const adminApi = {
   async config() { await wait(30); return ok(CLINIC_CONFIG); },
@@ -65,9 +87,47 @@ export const adminApi = {
   async content() {
     await wait(70);
     return ok({
-      conditions: CONDITIONS, treatments: TREATMENTS, services: SERVICES,
-      lab_packages: LAB_PACKAGES, blogs: BLOGS, faqs: FAQS
+      conditions: contentStore.conditions, treatments: contentStore.treatments,
+      services: contentStore.services, lab_packages: contentStore.lab_packages,
+      blogs: contentStore.blogs, faqs: contentStore.faqs
     });
+  },
+  // Save edits to a private draft overlay — live fields are untouched.
+  async saveContentDraft(tab, keyCol, keyVal, fields) {
+    await wait(80);
+    const item = findContent(tab, keyCol, keyVal);
+    if (!item) return { success: false, error: 'not_found' };
+    item._draft = Object.assign({}, item._draft || {}, fields);
+    item.status = 'draft';
+    item.updated_by = (getSession() && getSession().email) || 'editor';
+    item.updated_at = nowIso();
+    return ok({ tab, keyVal, status: item.status });
+  },
+  async submitContentForReview(tab, keyCol, keyVal) {
+    await wait(60);
+    const item = findContent(tab, keyCol, keyVal);
+    if (!item) return { success: false, error: 'not_found' };
+    item.status = 'pending';
+    item.updated_at = nowIso();
+    return ok({ tab, keyVal, status: item.status });
+  },
+  async requestContentChanges(tab, keyCol, keyVal) {
+    await wait(60);
+    const item = findContent(tab, keyCol, keyVal);
+    if (!item) return { success: false, error: 'not_found' };
+    item.status = 'draft'; // sent back to the editor; draft kept
+    item.updated_at = nowIso();
+    return ok({ tab, keyVal, status: item.status });
+  },
+  async publishContent(tab, keyCol, keyVal) {
+    await wait(120);
+    const item = findContent(tab, keyCol, keyVal);
+    if (!item) return { success: false, error: 'not_found' };
+    if (item._draft) { Object.assign(item, item._draft); delete item._draft; } // apply draft to live
+    item.status = 'published';
+    item.updated_by = (getSession() && getSession().email) || 'admin';
+    item.updated_at = nowIso();
+    return ok({ tab, keyVal, status: 'published' });
   },
   async doctors() { await wait(50); return ok(DOCTORS); },
   async feedback() { await wait(50); return ok(feedback); },

@@ -432,6 +432,7 @@ function _seedFeatureFlags_(cId, now) {
   // returns all Lab content publicly with no code change/deploy.
   var flags = [
     ['public_lab_tests_enabled', 'FALSE', 'Show Lab Tests publicly (nav, footer, homepage, sitemap). Default OFF.'],
+    ['public_callback_enabled', 'FALSE', 'Show Request Clinic Callback CTAs and the callback form (hero, footer, booking, contact). Default OFF — booking-first.'],
     ['public_testimonials_enabled', 'TRUE', 'Show the public Testimonials page and cards.'],
     ['public_reviews_enabled', 'TRUE', 'Show the Google Reviews section publicly.'],
     ['public_knowledge_enabled', 'TRUE', 'Show the Knowledge hub publicly.'],

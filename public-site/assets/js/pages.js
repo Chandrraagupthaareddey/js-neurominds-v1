@@ -28,10 +28,14 @@ function skeletonCards(n, mount) {
 }
 
 function ctaPair() {
+  const flags = (window.__JSNM__ && window.__JSNM__.flags) || {};
+  const callback = flags.public_callback_enabled
+    ? '<a class="btn btn--ghost" href="/booking.html">Request Clinic Callback</a>'
+    : '';
   return `
     <div class="hero__cta" style="margin-top:var(--sp-6)">
-      <a class="btn btn--primary" href="/booking.html">Request Clinic Callback</a>
-      <a class="btn btn--ghost" href="/booking.html#confirmed">Book confirmed appointment</a>
+      <a class="btn btn--primary" href="/booking.html#confirmed">Book confirmed appointment</a>
+      ${callback}
     </div>`;
 }
 

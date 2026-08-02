@@ -5,6 +5,7 @@ import { resolve } from 'path';
 // shared/ lives one level up; server.fs.allow grants dev-server access.
 export default defineConfig({
   root: resolve(__dirname, 'public-site'),
+  envDir: resolve(__dirname),
   appType: 'mpa',
   server: { port: 5173, fs: { allow: [resolve(__dirname)] } },
   preview: { port: 5173 },

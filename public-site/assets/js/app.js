@@ -181,10 +181,10 @@ function renderFooter(cfg, social, flags) {
           </div>
           <div>
             <h4>Get started</h4>
-            <p class="footer-contact">Request a clinic callback or book a confirmed appointment online.</p>
+            <p class="footer-contact">${flags.public_callback_enabled ? 'Request a clinic callback or book a confirmed appointment online.' : 'Book a confirmed appointment online in minutes.'}</p>
             <div class="footer-cta">
-              <a class="btn btn--primary btn--block" href="/booking.html">Request Clinic Callback</a>
-              <a class="btn btn--ghost btn--block footer-cta__ghost" href="/booking.html#confirmed">Book Confirmed Appointment</a>
+              ${flags.public_callback_enabled ? '<a class="btn btn--ghost btn--block footer-cta__ghost" href="/booking.html">Request Clinic Callback</a>' : ''}
+              <a class="btn btn--primary btn--block" href="/booking.html#confirmed">Book Confirmed Appointment</a>
             </div>
             <a class="footer-map" href="${cfg.maps_url}" target="_blank" rel="noopener" data-map-link>📍 Get directions on Google Maps</a>
           </div>

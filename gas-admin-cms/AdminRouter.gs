@@ -34,6 +34,9 @@ var AdminRouter = {
       case 'feedback': return Utils.ok(ContentAdminService.feedback(user));
       case 'updateFeedbackStatus': return Utils.json(ContentAdminService.moderateFeedback(user, payload.id, payload.status));
       case 'publishContent': return Utils.json(ContentAdminService.publish(user, payload.tab, payload.keyCol, payload.keyVal));
+      case 'saveContentDraft': return Utils.json(ContentAdminService.saveDraft(user, payload.tab, payload.keyCol, payload.keyVal, payload.fields));
+      case 'submitContentForReview': return Utils.json(ContentAdminService.submitForReview(user, payload.tab, payload.keyCol, payload.keyVal));
+      case 'requestContentChanges': return Utils.json(ContentAdminService.requestChanges(user, payload.tab, payload.keyCol, payload.keyVal));
       case 'syncContent': return Utils.json(CloudflareDeployService.triggerRebuild(user, 'content_sync'));
 
       /* system */

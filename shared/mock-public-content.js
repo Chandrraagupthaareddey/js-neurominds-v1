@@ -583,6 +583,7 @@ export const FAQS = [
 // its safe default. Lab Tests are intentionally hidden in V1.
 export const FEATURE_FLAGS = {
   public_lab_tests_enabled: false,
+  public_callback_enabled: false,   // Clinic Callback intentionally hidden (booking-first). Backend code preserved.
   public_testimonials_enabled: true,
   public_reviews_enabled: true,
   public_knowledge_enabled: true,
