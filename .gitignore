@@ -66,3 +66,4 @@ backups/
 *.xlsx
 *.xls
 *.ods
+.npmrc
