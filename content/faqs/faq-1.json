@@ -1,0 +1,8 @@
+{
+  "faq_id": "faq_1",
+  "scope": "general",
+  "question": "Do I need a referral to book?",
+  "answer": "No referral is needed. You can request a clinic callback or book directly.",
+  "order": 1,
+  "status": "published"
+}

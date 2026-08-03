@@ -1,0 +1,8 @@
+{
+  "faq_id": "faq_4",
+  "scope": "booking",
+  "question": "What happens after I request a call back?",
+  "answer": "Our clinic team will call you at your preferred time to guide you. A call back is not a confirmed appointment.",
+  "order": 4,
+  "status": "published"
+}

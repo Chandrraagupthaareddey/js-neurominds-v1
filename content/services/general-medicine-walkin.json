@@ -1,0 +1,7 @@
+{
+  "service_id": "svc_walkin",
+  "slug": "general-medicine-walkin",
+  "name": "General Medicine / Walk-in Support",
+  "summary": "Walk-in support for general health concerns alongside mental health care.",
+  "status": "published"
+}

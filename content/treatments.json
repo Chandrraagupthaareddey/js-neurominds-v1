@@ -12,18 +12,6 @@
     "seo_description": "Confidential counselling and psychotherapy in Tirupati."
   },
   {
-    "treatment_id": "tx_medication",
-    "slug": "medication-management",
-    "name": "Medication Management",
-    "one_line_summary": "Careful, monitored use of medication when clinically appropriate.",
-    "overview": "Medication is considered thoughtfully and reviewed regularly.",
-    "what_to_expect": "Assessment, discussion of options, and ongoing follow-up.",
-    "conditions_treated": "Depression;Bipolar Disorder;Anxiety",
-    "status": "published",
-    "seo_title": "Psychiatric Medication Management in Tirupati | JS Neurominds",
-    "seo_description": "Safe, monitored psychiatric medication management in Tirupati."
-  },
-  {
     "treatment_id": "tx_deaddiction",
     "slug": "de-addiction-support",
     "name": "De-Addiction Support",
@@ -34,5 +22,17 @@
     "status": "published",
     "seo_title": "De-Addiction Support in Tirupati | JS Neurominds",
     "seo_description": "Confidential de-addiction support in Tirupati and Chandragiri."
+  },
+  {
+    "treatment_id": "tx_medication",
+    "slug": "medication-management",
+    "name": "Medication Management",
+    "one_line_summary": "Careful, monitored use of medication when clinically appropriate.",
+    "overview": "Medication is considered thoughtfully and reviewed regularly.",
+    "what_to_expect": "Assessment, discussion of options, and ongoing follow-up.",
+    "conditions_treated": "Depression;Bipolar Disorder;Anxiety",
+    "status": "published",
+    "seo_title": "Psychiatric Medication Management in Tirupati | JS Neurominds",
+    "seo_description": "Safe, monitored psychiatric medication management in Tirupati."
   }
 ]

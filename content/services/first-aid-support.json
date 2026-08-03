@@ -1,0 +1,7 @@
+{
+  "service_id": "svc_firstaid",
+  "slug": "first-aid-support",
+  "name": "First Aid Support",
+  "summary": "Basic first aid support at the clinic. Not an emergency service.",
+  "status": "published"
+}

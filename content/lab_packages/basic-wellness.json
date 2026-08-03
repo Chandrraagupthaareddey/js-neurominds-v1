@@ -1,0 +1,8 @@
+{
+  "lab_package_id": "lab_basic",
+  "slug": "basic-wellness",
+  "name": "Basic Wellness Panel",
+  "summary": "A general wellness screening package. Home sample collection available.",
+  "turnaround": "Reports usually within 24 hours, subject to test and lab availability.",
+  "status": "published"
+}

@@ -1,0 +1,20 @@
+{
+  "doctor_id": "doc_jayapriya",
+  "slug": "dr-jayapriya-t",
+  "full_name": "Dr. Jayapriya T",
+  "qualification": "MBBS, MD (Psychiatry)",
+  "specialization": "Psychiatry · Adult, Child & Geriatric Mental Health",
+  "experience_years": 10,
+  "languages": "Telugu, Tamil, English, Hindi",
+  "consultation_type": "Clinic visit, Online",
+  "conditions_handled": "Depression, Anxiety, Sleep disorders, Addiction, Child & teen concerns",
+  "short_bio": "Dr. Jayapriya T is a consultant psychiatrist providing compassionate, evidence-based mental health care for individuals and families across Tirupati and Chandragiri.",
+  "profile_photo_link": "",
+  "photo_url": "/assets/img/doctor-placeholder.svg",
+  "support_booking_enabled": "YES",
+  "direct_booking_enabled": "YES",
+  "online_consultation_enabled": "YES",
+  "clinic_visit_enabled": "YES",
+  "pwens_booking_url": "https://jsneurominds.pwens.com/waselffollowuppage",
+  "status": "published"
+}

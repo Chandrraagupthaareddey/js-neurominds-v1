@@ -1,0 +1,7 @@
+{
+  "service_id": "svc_online",
+  "slug": "online-consultation",
+  "name": "Online Consultation",
+  "summary": "Consult from home with a secure online appointment.",
+  "status": "published"
+}

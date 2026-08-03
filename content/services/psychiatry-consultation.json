@@ -1,0 +1,7 @@
+{
+  "service_id": "svc_psychiatry",
+  "slug": "psychiatry-consultation",
+  "name": "Psychiatry Consultation",
+  "summary": "Comprehensive mental health assessment and care for adults, children, and seniors.",
+  "status": "published"
+}

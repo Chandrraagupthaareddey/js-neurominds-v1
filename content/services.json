@@ -1,16 +1,9 @@
 [
   {
-    "service_id": "svc_psychiatry",
-    "slug": "psychiatry-consultation",
-    "name": "Psychiatry Consultation",
-    "summary": "Comprehensive mental health assessment and care for adults, children, and seniors.",
-    "status": "published"
-  },
-  {
-    "service_id": "svc_online",
-    "slug": "online-consultation",
-    "name": "Online Consultation",
-    "summary": "Consult from home with a secure online appointment.",
+    "service_id": "svc_firstaid",
+    "slug": "first-aid-support",
+    "name": "First Aid Support",
+    "summary": "Basic first aid support at the clinic. Not an emergency service.",
     "status": "published"
   },
   {
@@ -21,10 +14,17 @@
     "status": "published"
   },
   {
-    "service_id": "svc_firstaid",
-    "slug": "first-aid-support",
-    "name": "First Aid Support",
-    "summary": "Basic first aid support at the clinic. Not an emergency service.",
+    "service_id": "svc_online",
+    "slug": "online-consultation",
+    "name": "Online Consultation",
+    "summary": "Consult from home with a secure online appointment.",
+    "status": "published"
+  },
+  {
+    "service_id": "svc_psychiatry",
+    "slug": "psychiatry-consultation",
+    "name": "Psychiatry Consultation",
+    "summary": "Comprehensive mental health assessment and care for adults, children, and seniors.",
     "status": "published"
   }
 ]

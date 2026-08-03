@@ -1,0 +1,176 @@
+# JS Neurominds V1 — Sveltia CMS configuration
+# Edits commit to GitHub -> Cloudflare rebuilds -> site updates in ~2 min.
+# The OAuth base_url is the small auth Worker set up in Session 2c.
+
+backend:
+  name: github
+  repo: Chandrraagupthaareddey/js-neurominds-v1
+  branch: main
+  base_url: https://REPLACE_WITH_OAUTH_WORKER_URL
+  commit_messages:
+    create: 'Content: create {{collection}} "{{slug}}"'
+    update: 'Content: update {{collection}} "{{slug}}"'
+    delete: 'Content: delete {{collection}} "{{slug}}"'
+
+# Where uploaded images go (kept minimal — mostly a static, image-light site).
+media_folder: public-site/assets/img
+public_folder: /assets/img
+
+# Small UX niceties
+publish_mode: simple
+site_url: https://neurominds.in
+
+collections:
+  - name: conditions
+    label: Conditions
+    label_singular: Condition
+    folder: content/conditions
+    identifier_field: name
+    create: true
+    slug: '{{slug}}'
+    format: json
+    summary: '{{name}} — {{status}}'
+    fields:
+      - { name: condition_id, label: ID, widget: string, required: false }
+      - { name: slug, label: Slug (URL), widget: string, hint: 'Lowercase, dashes. Changing this changes the page URL.' }
+      - { name: name, label: Name, widget: string }
+      - { name: one_line_summary, label: One-line summary, widget: text }
+      - { name: symptoms, label: Symptoms (separate with ;), widget: text, required: false }
+      - { name: when_to_consult, label: When to consult, widget: text, required: false }
+      - { name: treatment_approach, label: Treatment approach, widget: text, required: false }
+      - { name: category, label: Category, widget: string, required: false }
+      - { name: is_emergency, label: 'Emergency condition?', widget: boolean, default: false, required: false }
+      - { name: is_featured, label: 'Feature on homepage?', widget: boolean, default: false, required: false }
+      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+      - { name: seo_title, label: SEO title, widget: string, required: false }
+      - { name: seo_description, label: SEO description, widget: text, required: false }
+      - { name: related_conditions, label: Related conditions, widget: list, required: false }
+      - { name: faqs, label: FAQs, widget: list, required: false, fields: [ { name: question, widget: string }, { name: answer, widget: text } ] }
+
+  - name: treatments
+    label: Treatments
+    label_singular: Treatment
+    folder: content/treatments
+    identifier_field: name
+    create: true
+    slug: '{{slug}}'
+    format: json
+    summary: '{{name}} — {{status}}'
+    fields:
+      - { name: treatment_id, label: ID, widget: string, required: false }
+      - { name: slug, label: Slug (URL), widget: string }
+      - { name: name, label: Name, widget: string }
+      - { name: one_line_summary, label: One-line summary, widget: text }
+      - { name: overview, label: Overview, widget: text, required: false }
+      - { name: what_to_expect, label: What to expect, widget: text, required: false }
+      - { name: conditions_treated, label: Conditions treated (separate with ;), widget: text, required: false }
+      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+      - { name: seo_title, label: SEO title, widget: string, required: false }
+      - { name: seo_description, label: SEO description, widget: text, required: false }
+
+  - name: services
+    label: Services
+    label_singular: Service
+    folder: content/services
+    identifier_field: name
+    create: true
+    slug: '{{slug}}'
+    format: json
+    fields:
+      - { name: service_id, label: ID, widget: string, required: false }
+      - { name: slug, label: Slug (URL), widget: string }
+      - { name: name, label: Name, widget: string }
+      - { name: summary, label: Summary, widget: text }
+      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+
+  - name: lab_packages
+    label: Lab Packages
+    label_singular: Lab Package
+    folder: content/lab_packages
+    identifier_field: name
+    create: true
+    slug: '{{slug}}'
+    format: json
+    fields:
+      - { name: lab_package_id, label: ID, widget: string, required: false }
+      - { name: slug, label: Slug (URL), widget: string }
+      - { name: name, label: Name, widget: string }
+      - { name: summary, label: Summary, widget: text }
+      - { name: turnaround, label: Turnaround, widget: string, required: false }
+      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+
+  - name: blogs
+    label: Knowledge Articles
+    label_singular: Article
+    folder: content/blogs
+    identifier_field: title
+    create: true
+    slug: '{{slug}}'
+    format: json
+    summary: '{{title}} — {{status}}'
+    fields:
+      - { name: blog_id, label: ID, widget: string, required: false }
+      - { name: slug, label: Slug (URL), widget: string }
+      - { name: title, label: Title, widget: string }
+      - { name: excerpt, label: Excerpt, widget: text }
+      - { name: author, label: Author, widget: string, required: false }
+      - { name: category, label: Category, widget: string, required: false }
+      - { name: body, label: Body, widget: markdown }
+      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+      - { name: seo_title, label: SEO title, widget: string, required: false }
+      - { name: seo_description, label: SEO description, widget: text, required: false }
+
+  - name: faqs
+    label: FAQs
+    label_singular: FAQ
+    folder: content/faqs
+    identifier_field: question
+    create: true
+    slug: '{{fields.faq_id}}'
+    format: json
+    summary: '{{question}}'
+    fields:
+      - { name: faq_id, label: ID, widget: string, required: false }
+      - { name: scope, label: Scope, widget: string, required: false }
+      - { name: question, label: Question, widget: string }
+      - { name: answer, label: Answer, widget: text }
+      - { name: order, label: Display order, widget: number, default: 1, value_type: int }
+      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+
+  - name: doctors
+    label: Doctors
+    label_singular: Doctor
+    folder: content/doctors
+    identifier_field: full_name
+    create: true
+    slug: '{{slug}}'
+    format: json
+    summary: '{{full_name}}'
+    fields:
+      - { name: doctor_id, label: ID, widget: string, required: false }
+      - { name: slug, label: Slug (URL), widget: string }
+      - { name: full_name, label: Full name, widget: string }
+      - { name: qualification, label: Qualification, widget: string, required: false }
+      - { name: specialization, label: Specialization, widget: string, required: false }
+      - { name: experience_years, label: Years of experience, widget: number, required: false, value_type: int }
+      - { name: languages, label: Languages, widget: string, required: false }
+      - { name: short_bio, label: Short bio, widget: text, required: false }
+      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+
+  - name: testimonials
+    label: Testimonials
+    label_singular: Testimonial
+    folder: content/testimonials
+    identifier_field: quote
+    create: true
+    slug: '{{fields.testimonial_id}}'
+    format: json
+    summary: '{{author_display}} — {{rating}}★'
+    fields:
+      - { name: testimonial_id, label: ID, widget: string, required: false }
+      - { name: author_display, label: Author (display), widget: string }
+      - { name: area, label: Area, widget: string, required: false }
+      - { name: rating, label: Rating, widget: number, min: 1, max: 5, default: 5, value_type: int }
+      - { name: quote, label: Quote, widget: text }
+      - { name: display_order, label: Display order, widget: number, default: 1, value_type: int }
+      - { name: status, label: Status, widget: select, options: [pending, approved], default: pending }

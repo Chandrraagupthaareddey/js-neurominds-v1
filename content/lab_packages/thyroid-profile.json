@@ -1,0 +1,8 @@
+{
+  "lab_package_id": "lab_thyroid",
+  "slug": "thyroid-profile",
+  "name": "Thyroid Profile",
+  "summary": "Thyroid function screening with convenient home sample collection.",
+  "turnaround": "Reports usually within 24 hours, subject to test and lab availability.",
+  "status": "published"
+}
