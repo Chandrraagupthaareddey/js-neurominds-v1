@@ -1,0 +1,52 @@
+[
+  {
+    "social_id": "soc_instagram",
+    "platform": "instagram",
+    "label": "Instagram",
+    "url": "https://www.instagram.com/js_neurominds/",
+    "is_enabled": "YES",
+    "display_order": 1,
+    "open_in_new_tab": "YES",
+    "aria_label": "JS Neurominds on Instagram"
+  },
+  {
+    "social_id": "soc_whatsapp",
+    "platform": "whatsapp",
+    "label": "WhatsApp",
+    "url": "https://wa.me/918553665381",
+    "is_enabled": "YES",
+    "display_order": 2,
+    "open_in_new_tab": "YES",
+    "aria_label": "Message JS Neurominds on WhatsApp"
+  },
+  {
+    "social_id": "soc_google",
+    "platform": "google",
+    "label": "Google Profile",
+    "url": "https://share.google/FINrIJ0bVg0GX5D08",
+    "is_enabled": "YES",
+    "display_order": 3,
+    "open_in_new_tab": "YES",
+    "aria_label": "JS Neurominds on Google"
+  },
+  {
+    "social_id": "soc_youtube",
+    "platform": "youtube",
+    "label": "YouTube",
+    "url": "",
+    "is_enabled": "NO",
+    "display_order": 4,
+    "open_in_new_tab": "YES",
+    "aria_label": "JS Neurominds on YouTube"
+  },
+  {
+    "social_id": "soc_facebook",
+    "platform": "facebook",
+    "label": "Facebook",
+    "url": "",
+    "is_enabled": "NO",
+    "display_order": 5,
+    "open_in_new_tab": "YES",
+    "aria_label": "JS Neurominds on Facebook"
+  }
+]

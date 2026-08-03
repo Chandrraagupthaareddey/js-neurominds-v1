@@ -1,0 +1,34 @@
+[
+  {
+    "faq_id": "faq_1",
+    "scope": "general",
+    "question": "Do I need a referral to book?",
+    "answer": "No referral is needed. You can request a clinic callback or book directly.",
+    "order": 1,
+    "status": "published"
+  },
+  {
+    "faq_id": "faq_2",
+    "scope": "general",
+    "question": "Is my information kept private?",
+    "answer": "Yes. Your privacy is respected and protected at every step.",
+    "order": 2,
+    "status": "published"
+  },
+  {
+    "faq_id": "faq_3",
+    "scope": "general",
+    "question": "Do you offer online consultations?",
+    "answer": "Yes, secure online consultations are available alongside clinic visits.",
+    "order": 3,
+    "status": "published"
+  },
+  {
+    "faq_id": "faq_4",
+    "scope": "booking",
+    "question": "What happens after I request a call back?",
+    "answer": "Our clinic team will call you at your preferred time to guide you. A call back is not a confirmed appointment.",
+    "order": 4,
+    "status": "published"
+  }
+]

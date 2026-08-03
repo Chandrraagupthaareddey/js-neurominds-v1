@@ -1,0 +1,52 @@
+[
+  {
+    "label": "Home",
+    "route": "/",
+    "order": 1
+  },
+  {
+    "label": "About",
+    "route": "/about",
+    "order": 2
+  },
+  {
+    "label": "Doctors",
+    "route": "/doctors",
+    "order": 3
+  },
+  {
+    "label": "Conditions",
+    "route": "/conditions",
+    "order": 4
+  },
+  {
+    "label": "Treatments",
+    "route": "/treatments",
+    "order": 5
+  },
+  {
+    "label": "Services",
+    "route": "/services",
+    "order": 6
+  },
+  {
+    "label": "Lab Tests",
+    "route": "/lab",
+    "order": 7
+  },
+  {
+    "label": "Knowledge",
+    "route": "/knowledge",
+    "order": 8
+  },
+  {
+    "label": "FAQ",
+    "route": "/faq",
+    "order": 9
+  },
+  {
+    "label": "Contact",
+    "route": "/contact",
+    "order": 10
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "lab_package_id": "lab_basic",
+    "slug": "basic-wellness",
+    "name": "Basic Wellness Panel",
+    "summary": "A general wellness screening package. Home sample collection available.",
+    "turnaround": "Reports usually within 24 hours, subject to test and lab availability.",
+    "status": "published"
+  },
+  {
+    "lab_package_id": "lab_mental",
+    "slug": "mental-wellness-screen",
+    "name": "Mental Wellness Screening Support",
+    "summary": "Supportive screening relevant to mental wellbeing, guided by your clinician.",
+    "turnaround": "Reports usually within 24 hours, subject to test and lab availability.",
+    "status": "published"
+  },
+  {
+    "lab_package_id": "lab_thyroid",
+    "slug": "thyroid-profile",
+    "name": "Thyroid Profile",
+    "summary": "Thyroid function screening with convenient home sample collection.",
+    "turnaround": "Reports usually within 24 hours, subject to test and lab availability.",
+    "status": "published"
+  }
+]
