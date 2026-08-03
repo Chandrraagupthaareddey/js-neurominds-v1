@@ -21,7 +21,7 @@
     "deploy:gas:public": "cd gas-public-api && clasp push"
   },
   "devDependencies": {
-    "vite": "^5.4.10"
+    "vite": "^8.2.0"
   },
   "engines": {
     "node": ">=18"
