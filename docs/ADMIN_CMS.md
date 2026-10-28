@@ -35,65 +35,64 @@ Editor (browser) ──save──▶ GitHub (main branch, /content/**.json)
 
 Anything saved with **Status = Draft** (or Testimonial = Pending) is kept in the repo but not shown on the site.
 
-## One-time setup
+## One-time setup — Google sign-in with email roles (free)
 
-### 1. A GitHub account for the clinic (free)
+```
+Editor ──Sign in with Google──▶ admin.neurominds.in (Admin Gateway Worker)
+                                   ├─ checks email → role (super_admin / admin)
+                                   ├─ serves the CMS UI
+                                   └─ forwards CMS requests to GitHub using ONE server-held token
+```
 
-Editors don't need personal GitHub accounts. Create **one** account for the clinic
-(e.g. with `jsneurominds5@gmail.com`) at https://github.com/signup, then — signed in as the
-repo owner `Chandrraagupthaareddey` — go to the repo → **Settings → Collaborators → Add people**
-and add that account with **Write** access. Accept the invitation from the clinic account's email.
+Who can sign in is just two lists on the Worker (`cloudflare/admin-gateway/wrangler.toml`):
 
-### 2. Sign-in method
+| Role | Emails | Can edit |
+|---|---|---|
+| **super_admin** | tcgr.8553665381@gmail.com | everything |
+| **admin** | jsneurominds5@gmail.com, js@neurominds.in | all content, page text, clinic details, buttons, social links, reviews — but **not** Feature switches, Navigation menu or SEO defaults |
 
-**Option A — "Sign in with Token" (default, zero infrastructure)**
+To add/remove a person: edit `SUPER_ADMIN_EMAILS` / `ADMIN_EMAILS` in `wrangler.toml`, run `npm run deploy:gateway`. Takes effect immediately (roles are checked on every request). Every commit message records who made the change (`— by Name <email>`).
 
-1. Signed in to GitHub as the clinic account, open
-   https://github.com/settings/personal-access-tokens/new
-2. Token name: `JS Neurominds admin`. Expiration: 1 year (set a reminder).
-   Repository access: **Only select repositories → js-neurominds-v1**.
-   Permissions → Repository permissions: **Contents: Read and write**, **Pull requests: Read and write**.
-3. Generate, copy the token.
-4. Open https://admin.neurominds.in → **Sign in with Token** → paste. The browser remembers it
-   (per device). Repeat once per device/browser the clinic uses.
+### Step 1 — Google OAuth client (5 min, Google Cloud Console, free)
+1. https://console.cloud.google.com → create project **JS Neurominds Admin**.
+2. **APIs & Services → OAuth consent screen**: External → App name `JS Neurominds Admin`, support email `jsneurominds5@gmail.com`, developer email yours → Save. Scopes: none to add (email/profile are default). Under **Audience**, click **Publish app** (these scopes need no Google review).
+3. **APIs & Services → Credentials → Create credentials → OAuth client ID** → *Web application* → Name `admin.neurominds.in` → **Authorized redirect URIs**: `https://admin.neurominds.in/callback` → Create.
+4. Copy the **Client ID** and **Client secret**.
 
-**Option B — "Sign in with GitHub" button (nicer for staff, still free, ~10 minutes)**
+### Step 2 — Free the hostname
+Cloudflare → Workers & Pages → the Pages project(s) → **Custom domains**: if `admin.neurominds.in` is attached to any project, **remove** it (the Worker will own it). Keep `neurominds.in` / `www` as they are.
 
-1. Deploy the official authenticator Worker to your Cloudflare account with one click:
-   https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2Fsveltia%2Fsveltia-cms-auth
-   Note the Worker URL, e.g. `https://sveltia-cms-auth.<subdomain>.workers.dev`.
-2. GitHub → https://github.com/settings/applications/new →
-   Homepage `https://admin.neurominds.in`, **Authorization callback URL** `<WORKER_URL>/callback`.
-   Copy the Client ID; generate and copy a Client Secret.
-3. Cloudflare → Workers → `sveltia-cms-auth` → Settings → Variables:
-   `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` (encrypt), `ALLOWED_DOMAINS` = `admin.neurominds.in, neurominds.in`.
-4. In `admin/config.yml` set:
-   ```yaml
-   backend:
-     ...
-     base_url: https://sveltia-cms-auth.<subdomain>.workers.dev
-     auth_methods: [oauth, token]
-   ```
-   Commit → the login page now shows **Sign in with GitHub**.
+### Step 3 — Deploy the Admin Gateway Worker (one command + 4 secrets)
+```bash
+cd cloudflare/admin-gateway
+npx wrangler login                       # opens the browser once
+npx wrangler deploy                      # creates the Worker + admin.neurominds.in
+npx wrangler secret put GOOGLE_CLIENT_ID      # paste from Step 1
+npx wrangler secret put GOOGLE_CLIENT_SECRET  # paste from Step 1
+npx wrangler secret put GITHUB_TOKEN          # the fine-grained GitHub token (Contents RW + Pull requests RW on js-neurominds-v1)
+npx wrangler secret put SESSION_SECRET        # any long random string, e.g. output of: openssl rand -hex 32
+```
+The GitHub token is created once, by the repo owner, at https://github.com/settings/personal-access-tokens/new
+(Only select repositories → js-neurominds-v1; Permissions: Contents = Read and write, Pull requests = Read and write).
+Nobody else ever sees or needs it. Set a 1-year expiry and a calendar reminder to rotate it (`wrangler secret put GITHUB_TOKEN` again).
 
-### 3. Cloudflare Pages
+### Step 4 — Publish the CMS config
+`git push origin main` (the `admin/config.yml` already points at the gateway). Cloudflare Pages rebuilds `neurominds.in/admin/`, which the Worker serves at `admin.neurominds.in`.
 
-The admin is included in the public build at `dist/admin/`, so **`https://neurominds.in/admin/`
-works as soon as the main site deploys.** For the `admin.neurominds.in` subdomain either:
+### Step 5 — Test
+Open https://admin.neurominds.in → **Sign in with Google** → pick the account → the editor opens with your name top-right.
+An email that is not in either list sees: *"… is not an admin of this website."*
 
-- **Simplest:** in the *existing* Pages project add the custom domain `admin.neurominds.in` too, and
-  add a redirect rule (Cloudflare → Rules → Redirect Rules) `admin.neurominds.in/` → `https://neurominds.in/admin/`; or
-- **Separate project:** create a Pages project from the same repo with
-  **Build command** `npm run build:admin`, **Output directory** `dist-admin`, custom domain `admin.neurominds.in`.
-  (If an old project for `admin-ui` exists, just change its build command/output to these.)
-
-Main site project settings stay: build `npm run build`, output `dist`, Node 18+.
-Environment variables needed (Production): `VITE_API_MODE=live`, `VITE_PUBLIC_API_URL=<Apps Script forms /exec URL>`
-(only for the Enquire/Callback/Lab forms), `VITE_GA4_MEASUREMENT_ID=G-WKLHEDHC5D`. Nothing else.
+Troubleshooting:
+- `redirect_uri_mismatch` from Google → the redirect URI in Step 1 must be exactly `https://admin.neurominds.in/callback`.
+- "GOOGLE_CLIENT_ID is not configured" → the secret was not set; re-run `wrangler secret put`.
+- Saves fail with 401/403 from GitHub → the GITHUB_TOKEN expired or lacks Contents RW; create a new one and `wrangler secret put GITHUB_TOKEN`.
+- Admin sees "Your role (admin) cannot change …" → that file is super-admin-only by design.
+- `https://admin.neurominds.in/healthz` should return `{"ok":true}`; `/api/me` shows your session/role after login.
 
 ## Daily use
 
-1. Open https://admin.neurominds.in (or https://neurominds.in/admin/), sign in.
+1. Open https://admin.neurominds.in → **Sign in with Google** with an allowed email.
 2. Pick a section, edit, **Save**. The top bar shows the deploy status; ~2 minutes later refresh the site.
 3. **Images**: use the image fields (doctor photo, article cover, logo). They are stored in
    `public-site/assets/img/` in the repo. Keep them small (≤ 300 KB; square 600×600 for doctor photos).
@@ -122,6 +121,8 @@ content/<type>/*.json   ← one file per condition/treatment/doctor/service/pack
 scripts/build-pages.js  ← pre-renders /conditions/<slug> etc. + sitemap + robots
 scripts/vite-plugin-content.js ← bakes content into the static pages at build
 ```
+
+cloudflare/admin-gateway/ ← Google sign-in + roles + GitHub proxy Worker (wrangler.toml holds the email lists)
 
 The former Apps Script admin (`gas-admin-cms/`, `admin-ui/`) is kept in the repo as an archive and is
 no longer deployed; `gas-public-api/` is still used **only** to email/log the website forms.

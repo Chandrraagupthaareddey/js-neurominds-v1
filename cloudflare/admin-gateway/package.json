@@ -1,0 +1,11 @@
+{
+  "name": "jsnm-admin-gateway",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": { "wrangler": "^3.100.0" }
+}

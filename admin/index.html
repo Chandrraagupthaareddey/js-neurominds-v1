@@ -23,10 +23,19 @@
          Every save becomes a commit on GitHub → Cloudflare Pages rebuilds → live in ~2 minutes. -->
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
     <script>
-      // Remove the fallback once the CMS has rendered.
+      // Remove the fallback once the CMS has rendered, and relabel the OAuth button:
+      // sign-in goes through the Admin Gateway (Google), not GitHub directly.
+      const relabel = () => {
+        document.querySelectorAll('button, a').forEach((b) => {
+          if (/sign in with github/i.test(b.textContent || '')) b.textContent = 'Sign in with Google';
+        });
+      };
       new MutationObserver((m, obs) => {
-        if (document.querySelector('sveltia-cms, .sveltia-cms, [class*="sveltia"]')) { const f = document.getElementById('jsnm-fallback'); if (f) f.remove(); obs.disconnect(); }
+        const f = document.getElementById('jsnm-fallback');
+        if (f && document.body.children.length > 2) f.remove();
+        relabel();
       }).observe(document.body, { childList: true, subtree: true });
+      setTimeout(relabel, 1500);
     </script>
   </body>
 </html>

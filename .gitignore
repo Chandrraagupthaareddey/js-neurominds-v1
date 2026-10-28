@@ -50,8 +50,11 @@ service_account.json
 
 # Cloudflare / Wrangler local files
 .wrangler/
-wrangler.toml
+/wrangler.toml
 !wrangler.toml.example
+!cloudflare/admin-gateway/wrangler.toml
+cloudflare/admin-gateway/node_modules/
+cloudflare/admin-gateway/.dev.vars
 
 # OS / editor files
 .DS_Store

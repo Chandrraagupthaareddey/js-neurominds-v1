@@ -22,7 +22,9 @@
     "content:migrate": "node scripts/migrate-content-types.js",
     "pages": "node scripts/build-content-index.js && node scripts/build-pages.js",
     "legacy:dev:admin": "vite --config vite.admin.config.js --host 127.0.0.1 --port 5174",
-    "legacy:build:admin": "node scripts/build-content-index.js && vite build --config vite.admin.config.js && node scripts/copy-static.js admin"
+    "legacy:build:admin": "node scripts/build-content-index.js && vite build --config vite.admin.config.js && node scripts/copy-static.js admin",
+    "test:gateway": "node --test cloudflare/admin-gateway/test/*.test.js",
+    "deploy:gateway": "cd cloudflare/admin-gateway && npx wrangler deploy"
   },
   "devDependencies": {
     "vite": "^8.2.0"

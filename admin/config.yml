@@ -7,24 +7,27 @@
 # No database, no server, no Apps Script involved for content.
 #
 # Sign-in:
-#   Default = "Sign in with Token": one-time paste of a GitHub fine-grained
-#   personal access token for the clinic's GitHub account (see docs/ADMIN_CMS.md).
-#   Zero infrastructure. To switch to the friendlier "Sign in with GitHub"
-#   button, deploy the free Sveltia CMS Authenticator Worker and fill in
-#   base_url below + set auth_methods: [oauth, token].
+#   "Sign in with Google" through the Admin Gateway Worker (cloudflare/admin-gateway).
+#   Who may sign in, and with which role, is the SUPER_ADMIN_EMAILS / ADMIN_EMAILS
+#   list on that Worker. Editors never need a GitHub account.
 # =============================================================================
 backend:
   name: github
   repo: Chandrraagupthaareddey/js-neurominds-v1
   branch: main
+  # Google sign-in + email roles via the Admin Gateway Worker (cloudflare/admin-gateway).
+  # The Worker swaps in the single server-held GitHub token; editors never need GitHub.
+  base_url: https://admin.neurominds.in
+  auth_endpoint: auth
+  api_root: https://admin.neurominds.in/gh/api/v3
   auth_methods:
-    - token
+    - oauth
   commit_messages:
-    create: 'Content: create {{collection}} "{{slug}}"'
-    update: 'Content: update {{collection}} "{{slug}}"'
-    delete: 'Content: delete {{collection}} "{{slug}}"'
-    uploadMedia: 'Media: upload "{{path}}"'
-    deleteMedia: 'Media: delete "{{path}}"'
+    create: 'Content: create {{collection}} "{{slug}}" — by {{author-name}} <{{author-email}}>'
+    update: 'Content: update {{collection}} "{{slug}}" — by {{author-name}} <{{author-email}}>'
+    delete: 'Content: delete {{collection}} "{{slug}}" — by {{author-name}} <{{author-email}}>'
+    uploadMedia: 'Media: upload "{{path}}" — by {{author-name}}'
+    deleteMedia: 'Media: delete "{{path}}" — by {{author-name}}'
 media_folder: public-site/assets/img
 public_folder: /assets/img
 site_url: https://neurominds.in
