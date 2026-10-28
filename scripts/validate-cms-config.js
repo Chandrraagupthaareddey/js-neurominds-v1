@@ -26,6 +26,10 @@ cfg.split('\n').forEach((line, i) => {
   if (/\t/.test(line)) fail(`line ${i + 1}: tab character (YAML requires spaces)`);
 });
 if (/^\s*&|:\s*&[a-z_]+|\*[a-z_]+\s*$/m.test(cfg)) fail('config.yml uses YAML anchors; keep it plain for the CMS parser');
+// Decap/Netlify-only options that Sveltia CMS rejects at load time.
+for (const opt of ['allow_multiple', 'editor_components', 'show_preview_links', 'local_backend']) {
+  if (new RegExp(`^\\s*${opt}:`, 'm').test(cfg) || new RegExp(`[,{]\\s*${opt}:`).test(cfg)) fail(`config.yml uses "${opt}", which Sveltia CMS does not support`);
+}
 
 const folders = [...cfg.matchAll(/^\s*folder:\s*(\S+)/gm)].map((m) => m[1].replace(/['"]/g, ''));
 const files = [...cfg.matchAll(/^\s*file:\s*(\S+)/gm)].map((m) => m[1].replace(/['"]/g, ''));

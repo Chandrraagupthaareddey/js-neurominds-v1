@@ -116,17 +116,14 @@ collections:
             label: Logo
             widget: image
             required: false
-            allow_multiple: false
           - name: footer_logo_url
             label: Footer logo
             widget: image
             required: false
-            allow_multiple: false
           - name: social_preview_url
             label: Social share image (1200×630)
             widget: image
             required: false
-            allow_multiple: false
           - name: ga4_measurement_id
             label: GA4 measurement ID
             widget: string
@@ -413,7 +410,6 @@ collections:
             label: Default share image
             widget: image
             required: false
-            allow_multiple: false
           - name: google_site_verification
             label: Google Search Console verification code
             widget: string
@@ -1306,7 +1302,6 @@ collections:
         label: Photo
         widget: image
         required: false
-        allow_multiple: false
         hint: Square photo works best (e.g. 600×600).
       - name: profile_photo_link
         label: Photo link (external
@@ -1451,7 +1446,6 @@ collections:
         label: Cover image
         widget: image
         required: false
-        allow_multiple: false
       - name: body
         label: Article body
         widget: markdown
