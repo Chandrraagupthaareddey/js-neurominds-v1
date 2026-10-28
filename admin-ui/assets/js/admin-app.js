@@ -1,14 +1,21 @@
 /**
  * JS Neurominds V1 — admin-ui/assets/js/admin-app.js
- * Admin SPA bootstrap + router. Login view (Google sign-in simulator) →
- * portal shell with a role-filtered sidebar. Includes an in-app role switcher
- * (RBAC simulator) and an environment indicator. Section modules render into
- * the content area.
+ * Admin SPA bootstrap + router. Login view (Google Identity Services) →
+ * portal shell with a role-filtered sidebar. Section modules render into the
+ * content area.
+ *
+ * Audit changes (Batch A):
+ *   JP-031 — preview-mode bypass, env-driven mock login and the in-app role
+ *            switcher were removed. A developer picker exists only under the
+ *            Vite dev server (dev-login.js, dynamically imported behind
+ *            import.meta.env.DEV, excluded from production builds).
+ *   JP-001 / JP-029 — API failures are typed (ApiError) and rendered with
+ *            specific, actionable copy instead of a TypeError message.
  */
 import { CONFIG } from './config.js';
-import { signInAs, signInWithGoogleProfile, signOut, getSession, setRole, knownUsers, allowedSections, startPreviewSession } from './auth.js';
-import { ROLE_LABELS, ROLES } from '../../../shared/permissions.js';
+import { signInWithGoogleProfile, signOut, getSession, allowedSections } from './auth.js';
 import { api } from './api.js';
+import { describeApiError } from './api-envelope.js';
 import { renderDashboard } from './dashboard.js';
 import { renderCallbackDesk } from './callback-desk.js';
 import { renderLabDesk } from './lab-desk.js';
@@ -56,16 +63,9 @@ let currentSection = 'dashboard';
 let navCounts = {};
 
 export function boot() {
-  // PREVIEW MODE (VITE_ADMIN_PREVIEW=true): bypass ONLY the auth gate. Seed a
-  // real super_admin session and load the existing dashboard with full
-  // functionality. Routing/sections/RBAC are unchanged from production.
-  if (CONFIG.PREVIEW) {
-    if (!getSession()) startPreviewSession();
-    renderShell();
-    return;
-  }
   // SECURITY GATE: in deployed envs without configured Google OAuth, do not
-  // render the dashboard, navigation, or any admin data.
+  // render the dashboard, navigation, or any admin data. There is no preview
+  // or environment-variable bypass of this gate (JP-031).
   if (CONFIG.AUTH_DISABLED) { renderAuthDisabled(); return; }
   const session = getSession();
   if (!session) renderLogin();
@@ -90,34 +90,19 @@ function renderAuthDisabled() {
 }
 
 /* ---------------- Login ---------------- */
-function renderLogin(denied) {
+async function renderLogin(denied) {
   // Real Google OAuth path (VITE_GOOGLE_CLIENT_ID set).
   if (CONFIG.OAUTH_CONFIGURED) { renderOAuthLogin(denied); return; }
 
-  // Developer-only simulated sign-in. Reached ONLY when VITE_ENABLE_MOCK_LOGIN
-  // === 'true' on a developer machine; never in a normal build or preview.
-  const users = knownUsers();
-  root().innerHTML = `
-    <div class="login-wrap">
-      <div class="login-card">
-        <div class="brand__mark"><img src="/assets/brand/logo.png" alt="JS Neurominds" width="52" height="52" /></div>
-        <h2>JS Neurominds</h2>
-        <p class="muted" style="margin-top:0">Admin Portal</p>
-        <div class="field" style="text-align:left; margin-top:1.25rem">
-          <label for="login-email">Developer sign-in</label>
-          <select id="login-email">
-            ${users.map((u) => `<option value="${u.email}">${u.email} — ${ROLE_LABELS[u.role_key]}</option>`).join('')}
-          </select>
-        </div>
-        <button class="google-btn" id="login-btn"><span class="google-g"></span> Continue</button>
-        ${denied ? `<div class="access-denied"><strong>Access denied.</strong> <b>${denied}</b> is not authorized.</div>` : ''}
-      </div>
-    </div>`;
-  document.getElementById('login-btn').addEventListener('click', () => {
-    const email = document.getElementById('login-email').value;
-    const res = signInAs(email);
-    if (res.ok) renderShell(); else renderLogin(res.email);
-  });
+  // Developer sign-in: dev server only. `import.meta.env.DEV` is a build-time
+  // constant, so this branch and the dynamically imported module are removed
+  // from every `vite build` output. Not reachable via any environment variable.
+  if (import.meta.env.DEV && CONFIG.DEV_LOGIN_ALLOWED) {
+    const { renderDevLogin } = await import('./dev-login.js');
+    renderDevLogin(root(), { onSignedIn: renderShell, denied });
+    return;
+  }
+  renderAuthDisabled();
 }
 
 /* Real Google OAuth login — Google Identity Services (GIS).
@@ -218,8 +203,9 @@ async function renderShell() {
   let sections = allowedSections();
   if (!sections.includes(currentSection)) currentSection = 'dashboard';
 
-  // fetch nav counts (new callbacks / lab) for badges
-  try { const d = await api.dashboard(); navCounts = d.data.kpis || {}; } catch (e) { navCounts = {}; }
+  // fetch nav counts (new callbacks / lab) for badges; a failing backend must
+  // not prevent the shell from rendering (the section view explains the error).
+  try { const d = await api.dashboard(); navCounts = (d.data && d.data.kpis) || {}; } catch (e) { navCounts = {}; }
 
   root().innerHTML = `
     <div class="app">
@@ -241,13 +227,6 @@ async function renderShell() {
               <a class="btn btn--ghost btn--sm" href="${CONFIG.PWENS_PUBLIC_BOOKING_URL}" target="_blank" rel="noopener">PWeNS Booking</a>
               <a class="btn btn--ghost btn--sm" href="${CONFIG.PWENS_LOGIN_URL}" target="_blank" rel="noopener">PWeNS Login</a>
             </div>
-            ${(CONFIG.MOCK_LOGIN_ALLOWED || CONFIG.PREVIEW) ? `
-            <div class="role-switch" title="Preview access by role">
-              <label for="role-sel">Role</label>
-              <select id="role-sel">
-                ${ROLES.map((r) => `<option value="${r}" ${r === session.role ? 'selected' : ''}>${ROLE_LABELS[r]}</option>`).join('')}
-              </select>
-            </div>` : ''}
             <span class="userchip">
               <span class="userchip__avatar">${initials(session.name)}</span>
               <span>${session.name}</span>
@@ -263,11 +242,6 @@ async function renderShell() {
   bindNav();
   document.getElementById('signout-btn').addEventListener('click', () => { signOut(); boot(); });
   document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
-  const roleSel = document.getElementById('role-sel');
-  if (roleSel) roleSel.addEventListener('change', (e) => {
-    setRole(e.target.value);
-    renderShell(); // re-render with new permissions
-  });
   renderSection(currentSection);
 }
 
@@ -307,9 +281,24 @@ async function renderSection(key) {
   </div></div>`;
   try { await SECTIONS[key].render(content); }
   catch (err) {
-    console.error(err);
-    content.innerHTML = `<div class="panel"><div class="panel__body"><span class="badge error">Error</span><p style="margin-top:.75rem">Could not load this section. ${err.message}</p></div></div>`;
+    console.error('[admin] section failed:', key, err);
+    content.innerHTML = renderSectionError(err);
   }
+}
+
+/** Specific, non-technical error panel for a failed section (JP-001/JP-029). */
+export function renderSectionError(err) {
+  const d = describeApiError(err);
+  return `<div class="panel"><div class="panel__body">
+    <span class="badge error">Error</span>
+    <h3 style="margin:.75rem 0 .25rem">${escapeHtml(d.title)}</h3>
+    <p style="margin:0">${escapeHtml(d.body)}</p>
+    <p class="muted" style="font-size:12px;margin-top:.75rem">Code: ${escapeHtml(d.code)}</p>
+  </div></div>`;
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
 }
 
 function initials(name) {

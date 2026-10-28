@@ -5,13 +5,16 @@
  */
 import { api } from './api.js';
 import { analytics } from './analytics.js';
+import { isSubmissionBackendAvailable, unavailableNoticeHtml, failureHtml } from './submission-status.js';
 
 function modalTemplate() {
+  const available = isSubmissionBackendAvailable();
   return `
     <div class="modal-overlay" id="fb-overlay" role="dialog" aria-modal="true" aria-labelledby="fb-title">
       <div class="card modal">
         <h3 id="fb-title">Share your feedback</h3>
         <p class="hint">Your feedback helps us care better. Please don't include any medical details.</p>
+        ${available ? '' : unavailableNoticeHtml('feedback')}
         <form id="fb-form">
           <div class="form-field">
             <label for="fb-rating">Rating</label>
@@ -34,7 +37,7 @@ function modalTemplate() {
           <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true" />
           <div style="display:flex;gap:.5rem;">
             <button type="button" class="btn btn--ghost" id="fb-cancel">Cancel</button>
-            <button type="submit" class="btn btn--primary" style="flex:1">Send feedback</button>
+            <button type="submit" class="btn btn--primary" style="flex:1" ${available ? '' : 'disabled aria-disabled="true"'}>${available ? 'Send feedback' : 'Submission unavailable'}</button>
           </div>
         </form>
         <div id="fb-done" class="hide"></div>
@@ -81,7 +84,7 @@ function openModal() {
     btn.disabled = true; btn.textContent = 'Sending…';
     try {
       const res = await api.submitFeedback(payload);
-      if (!res.success) throw new Error(res.error);
+      if (!res || !res.success || !res.data) { const e = new Error((res && res.error) || 'Request failed'); e.code = res && res.code; throw e; }
       analytics.feedbackSubmit();
       form.classList.add('hide');
       const done = document.getElementById('fb-done');
@@ -90,7 +93,12 @@ function openModal() {
       done.classList.remove('hide');
       setTimeout(close, 1800);
     } catch (err) {
+      // Honest failure: never show "Thank you" unless the backend confirmed the save.
       btn.disabled = false; btn.textContent = 'Send feedback';
+      const done = document.getElementById('fb-done');
+      done.className = 'notice notice--err';
+      done.innerHTML = failureHtml(err);
+      done.classList.remove('hide');
     }
   });
 }

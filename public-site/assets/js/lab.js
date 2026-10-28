@@ -5,6 +5,7 @@
  */
 import { api } from './api.js';
 import { analytics } from './analytics.js';
+import { isSubmissionBackendAvailable, unavailableNoticeHtml, failureHtml } from './submission-status.js';
 
 function opt(list) { return list.map((o) => `<option value="${o}">${o}</option>`).join(''); }
 
@@ -14,7 +15,9 @@ export async function renderLabForm(mountSel) {
   const pkgRes = await api.labPackages();
   const packages = (pkgRes.data || []).map((p) => p.name);
 
+  const available = isSubmissionBackendAvailable();
   mount.innerHTML = `
+    ${available ? '' : unavailableNoticeHtml('home collection requests')}
     <form id="lab-form" novalidate>
       <div class="form-field">
         <label for="lab-name">Your name <span class="req">*</span></label>
@@ -62,6 +65,10 @@ export async function renderLabForm(mountSel) {
 
   mount.querySelector('#lab-date').min = new Date().toISOString().slice(0, 10);
   mount.querySelector('#lab-form').addEventListener('submit', (e) => onSubmit(e, mount));
+  if (!available) {
+    const submit = mount.querySelector('#lab-submit');
+    if (submit) { submit.disabled = true; submit.setAttribute('aria-disabled', 'true'); submit.textContent = 'Submission unavailable'; }
+  }
 }
 
 async function onSubmit(e, mount) {
@@ -86,14 +93,15 @@ async function onSubmit(e, mount) {
   btn.disabled = true; btn.textContent = 'Sending…';
   try {
     const res = await api.submitLabRequest(payload);
-    if (!res.success) throw new Error(res.error);
+    if (!res || !res.success || !res.data || !res.data.lab_request_id) { const e = new Error((res && res.error) || 'Request failed'); e.code = res && res.code; throw e; }
     analytics.labRequestSubmit(res.data.lab_request_id);
     form.classList.add('hide');
     show(result, 'form-success',
       `<h3>Request received</h3><p>Our team will contact you to confirm pickup. Reference: ${res.data.lab_request_id}</p>`, true);
   } catch (err) {
     btn.disabled = false; btn.textContent = 'Request home collection';
-    show(result, 'notice notice--err', 'Something went wrong. Please call us and we\'ll arrange it.');
+    // Honest failure: no "Request received" unless the backend confirmed the save.
+    show(result, 'notice notice--err', failureHtml(err), true);
   }
 }
 

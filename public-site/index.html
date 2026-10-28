@@ -33,13 +33,13 @@
       <div class="hero__grid-lines" aria-hidden="true"></div>
       <div class="hero__aura" aria-hidden="true"></div>
       <div class="container hero__inner">
-        <p class="eyebrow">Psychiatry &amp; mental health · Chandragiri · Tirupati</p>
-        <h1>Calm, capable care for <em>your peace of mind</em>.</h1>
-        <p class="lede">JS Neurominds and Diagnostic Center offers compassionate, evidence-based mental health care for individuals and families — in clinic and online, with privacy you can trust.</p>
+        <p class="eyebrow" data-copy="hero_eyebrow">Psychiatry &amp; mental health · Chandragiri · Tirupati</p>
+        <h1 data-copy="hero_title">Calm, capable care for <em>your peace of mind</em>.</h1>
+        <p class="lede" data-copy="hero_lede">JS Neurominds and Diagnostic Center offers compassionate, evidence-based mental health care for individuals and families — in clinic and online, with privacy you can trust.</p>
         <div class="hero__cta">
-          <a class="btn btn--primary btn--lg" href="/booking.html#confirmed">Book confirmed appointment</a>
+          <a class="btn btn--primary btn--lg" href="/booking#confirmed" data-copy="hero_cta_label">Book confirmed appointment</a>
         </div>
-        <div class="hero__trust">
+        <div class="hero__trust" id="hero-trust">
           <div class="hero__trust-item"><b>10+</b><span>Years of care</span></div>
           <div class="hero__trust-item"><b>All ages</b><span>Child to senior</span></div>
           <div class="hero__trust-item"><b>Private</b><span>Judgement-free</span></div>
@@ -51,7 +51,7 @@
     <!-- Assurance strip -->
     <section class="section--tight">
       <div class="container">
-        <div class="assurance" data-reveal>
+        <div class="assurance" data-reveal id="home-assurance">
           <div class="assurance__item"><span class="ico">🔒</span> Confidential &amp; private</div>
           <div class="assurance__item"><span class="ico">🩺</span> Led by Dr. Jayapriya T, MD</div>
           <div class="assurance__item"><span class="ico">💬</span> Telugu · Tamil · English · Hindi</div>
@@ -64,9 +64,9 @@
     <section class="section">
       <div class="container">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">How we help</p>
-          <h2>Conditions we support</h2>
-          <p class="lede">Whatever you're facing, you don't have to face it alone. Explore common concerns and how we can help.</p>
+          <p class="eyebrow" data-copy="conditions_eyebrow">How we help</p>
+          <h2 data-copy="conditions_title">Conditions we support</h2>
+          <p class="lede" data-copy="conditions_lede">Whatever you're facing, you don't have to face it alone. Explore common concerns and how we can help.</p>
         </div>
         <div class="grid grid--3" id="home-conditions" data-reveal="2"></div>
       </div>
@@ -76,17 +76,17 @@
     <section class="section section--alt">
       <div class="container">
         <div class="section-head section-head--center" data-reveal>
-          <p class="eyebrow eyebrow--center">Ready to start</p>
-          <h2>Book a confirmed appointment</h2>
-          <p class="lede" style="margin-inline:auto">Check live availability, choose a slot, and confirm securely online — in just a few minutes.</p>
+          <p class="eyebrow eyebrow--center" data-copy="booking_eyebrow">Ready to start</p>
+          <h2 data-copy="booking_title">Book a confirmed appointment</h2>
+          <p class="lede" style="margin-inline:auto" data-copy="booking_lede">Check live availability, choose a slot, and confirm securely online — in just a few minutes.</p>
         </div>
         <div data-reveal="2" style="max-width:520px;margin-inline:auto">
           <div class="choice choice--accent" style="text-align:center; align-items:center">
-            <span class="tag tag--blue choice__badge">Ready to book</span>
-            <h2>Confirmed appointment</h2>
-            <p>Check live availability, choose a slot, and confirm securely through our trusted booking partner, PWeNS.</p>
-            <a class="btn btn--primary btn--lg btn--block" href="/booking.html#confirmed">Book confirmed appointment</a>
-            <p class="choice__note">Payment &amp; confirmation handled securely by PWeNS.</p>
+            <span class="tag tag--blue choice__badge" data-copy="booking_card_badge">Ready to book</span>
+            <h2 data-copy="booking_card_title">Confirmed appointment</h2>
+            <p data-copy="booking_card_text">Check live availability, choose a slot, and confirm securely through our trusted booking partner, PWeNS.</p>
+            <a class="btn btn--primary btn--lg btn--block" href="/booking#confirmed" data-copy="booking_card_cta">Book confirmed appointment</a>
+            <p class="choice__note" data-copy="booking_card_note">Payment &amp; confirmation handled securely by PWeNS.</p>
           </div>
         </div>
       </div>
@@ -96,8 +96,8 @@
     <section class="section">
       <div class="container">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">Our services</p>
-          <h2>Care that fits your life</h2>
+          <p class="eyebrow" data-copy="services_eyebrow">Our services</p>
+          <h2 data-copy="services_title">Care that fits your life</h2>
         </div>
         <div class="grid grid--4" id="home-services" data-reveal="2"></div>
       </div>
@@ -107,8 +107,8 @@
     <section class="section section--alt">
       <div class="container">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">Your clinician</p>
-          <h2>Meet your doctor</h2>
+          <p class="eyebrow" data-copy="doctor_eyebrow">Your clinician</p>
+          <h2 data-copy="doctor_title">Meet your doctor</h2>
         </div>
         <div id="home-doctor" data-reveal="2"></div>
       </div>
@@ -119,16 +119,16 @@
       <div class="container">
         <div class="grid grid--2" style="align-items:center; gap:var(--sp-7)" data-reveal>
           <div>
-            <p class="eyebrow">Diagnostics</p>
-            <h2>Lab tests, collected at home</h2>
-            <p class="lede">Skip the queue. Request home sample collection around Chandragiri (within ~10 km), with reports usually ready within 24 hours, subject to availability.</p>
-            <a class="btn btn--ghost" href="/lab.html">Explore lab packages</a>
+            <p class="eyebrow" data-copy="lab_eyebrow">Diagnostics</p>
+            <h2 data-copy="lab_title">Lab tests, collected at home</h2>
+            <p class="lede" data-copy="lab_lede">Skip the queue. Request home sample collection around Chandragiri (within ~10 km), with reports usually ready within 24 hours, subject to availability.</p>
+            <a class="btn btn--ghost" href="/lab" data-copy="lab_cta">Explore lab packages</a>
           </div>
           <div class="card" style="background:linear-gradient(160deg,var(--lavender-50),var(--surface))">
             <div class="card__icon">🏠</div>
-            <h3>Home sample collection</h3>
-            <p>Door pickup at your preferred time. Our team confirms availability before every collection. No prescriptions or clinical data needed to request.</p>
-            <a class="card__link" href="/lab.html">Request collection</a>
+            <h3 data-copy="lab_card_title">Home sample collection</h3>
+            <p data-copy="lab_card_text">Door pickup at your preferred time. Our team confirms availability before every collection. No prescriptions or clinical data needed to request.</p>
+            <a class="card__link" href="/lab">Request collection</a>
           </div>
         </div>
       </div>
@@ -138,12 +138,12 @@
     <section class="section section--tight">
       <div class="container">
         <div class="cta-strip" data-reveal>
-          <p class="eyebrow eyebrow--center">Take the first step</p>
-          <h2>Your wellbeing is worth a conversation</h2>
-          <p>Reach out today — gently, privately, at your own pace.</p>
+          <p class="eyebrow eyebrow--center" data-copy="final_eyebrow">Take the first step</p>
+          <h2 data-copy="final_title">Your wellbeing is worth a conversation</h2>
+          <p data-copy="final_text">Reach out today — gently, privately, at your own pace.</p>
           <div class="hero__cta" style="justify-content:center; margin-top:var(--sp-5)">
-            <a class="btn btn--primary btn--lg" href="/booking.html#confirmed">Book confirmed appointment</a>
-            <a class="btn btn--ghost btn--lg" href="/contact.html">Call or WhatsApp us</a>
+            <a class="btn btn--primary btn--lg" href="/booking#confirmed" data-copy="final_cta_primary">Book confirmed appointment</a>
+            <a class="btn btn--ghost btn--lg" href="/contact" data-copy="final_cta_secondary">Call or WhatsApp us</a>
           </div>
         </div>
       </div>
@@ -152,11 +152,11 @@
 
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
-    import { hydrateHome } from '/assets/js/pages.js';
+    import { hydrateHome, applyPageCopy, applyHomeLists } from '/assets/js/pages.js';
     import '/assets/js/feedback.js';
     (async () => {
       await mountShell();
-      await hydrateHome();
+      await Promise.all([hydrateHome(), applyPageCopy('home'), applyHomeLists()]);
       // Show the lab home-collection section only if Lab Tests are publicly enabled.
       const flags = (window.__JSNM__ && window.__JSNM__.flags) || {};
       const labSection = document.getElementById('home-lab-section');

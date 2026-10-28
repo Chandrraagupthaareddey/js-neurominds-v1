@@ -25,9 +25,9 @@
     <section class="section">
       <div class="container">
         <div class="section-head section-head--center" data-reveal>
-          <p class="eyebrow eyebrow--center">Trust &amp; care</p>
-          <h1>What our patients say</h1>
-          <p class="lede" style="margin-inline:auto">Real experiences from individuals and families we've supported. Every story reflects an individual experience, not a guarantee of outcomes.</p>
+          <p class="eyebrow eyebrow--center" data-copy="eyebrow">Trust &amp; care</p>
+          <h1 data-copy="title">What our patients say</h1>
+          <p class="lede" style="margin-inline:auto" data-copy="lede">Real experiences from individuals and families we've supported. Every story reflects an individual experience, not a guarantee of outcomes.</p>
         </div>
 
         <div class="grid grid--3" id="testimonials-wrap" data-reveal="2"></div>
@@ -37,8 +37,8 @@
     <section class="section section--alt" id="reviews-section">
       <div class="container">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">Google reviews</p>
-          <h2>Verified on Google</h2>
+          <p class="eyebrow" data-copy="reviews_eyebrow">Google reviews</p>
+          <h2 data-copy="reviews_title">Verified on Google</h2>
         </div>
         <div id="reviews-wrap" data-reveal="2"></div>
       </div>
@@ -47,8 +47,8 @@
     <section class="section">
       <div class="container">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">Visit us</p>
-          <h2>Find the clinic</h2>
+          <p class="eyebrow" data-copy="map_eyebrow">Visit us</p>
+          <h2 data-copy="map_title">Find the clinic</h2>
         </div>
         <div id="map-card" data-reveal="2"></div>
       </div>
@@ -57,11 +57,11 @@
     <section class="section section--tight">
       <div class="container">
         <div class="cta-strip" data-reveal>
-          <p class="eyebrow eyebrow--center">Ready when you are</p>
-          <h2>Start with a conversation</h2>
-          <p>Book a confirmed appointment online in minutes.</p>
+          <p class="eyebrow eyebrow--center" data-copy="cta_eyebrow">Ready when you are</p>
+          <h2 data-copy="cta_title">Start with a conversation</h2>
+          <p data-copy="cta_text">Book a confirmed appointment online in minutes.</p>
           <div class="hero__cta" style="justify-content:center; margin-top:var(--sp-5)">
-            <a class="btn btn--primary btn--lg" href="/booking.html#confirmed">Book confirmed appointment</a>
+            <a class="btn btn--primary btn--lg" href="/booking#confirmed" data-copy="cta_label">Book confirmed appointment</a>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
-    import { hydrateTestimonials, hydrateGoogleReviews, hydrateMapCard } from '/assets/js/pages.js';
+    import { hydrateTestimonials, hydrateGoogleReviews, hydrateMapCard, applyPageCopy } from '/assets/js/pages.js';
     (async () => {
       await mountShell();
       const flags = (window.__JSNM__ && window.__JSNM__.flags) || {};
@@ -82,6 +82,7 @@
         await hydrateGoogleReviews('#reviews-wrap');
       }
       hydrateMapCard('#map-card');
+      await applyPageCopy('testimonials');
     })();
   </script>
 </body>

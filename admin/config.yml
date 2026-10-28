@@ -1,176 +1,643 @@
-# JS Neurominds V1 — Sveltia CMS configuration
-# Edits commit to GitHub -> Cloudflare rebuilds -> site updates in ~2 min.
-# The OAuth base_url is the small auth Worker set up in Session 2c.
-
+# =============================================================================
+# JS Neurominds — Admin CMS configuration (Sveltia CMS, git-based, free)
+#
+# How publishing works:
+#   Editor saves in the admin  →  commit to GitHub (main)  →  Cloudflare Pages
+#   rebuilds the site (~2 min)  →  change is live on https://neurominds.in
+# No database, no server, no Apps Script involved for content.
+#
+# Sign-in:
+#   Default = "Sign in with Token": one-time paste of a GitHub fine-grained
+#   personal access token for the clinic's GitHub account (see docs/ADMIN_CMS.md).
+#   Zero infrastructure. To switch to the friendlier "Sign in with GitHub"
+#   button, deploy the free Sveltia CMS Authenticator Worker and fill in
+#   base_url below + set auth_methods: [oauth, token].
+# =============================================================================
 backend:
   name: github
   repo: Chandrraagupthaareddey/js-neurominds-v1
   branch: main
-  base_url: https://REPLACE_WITH_OAUTH_WORKER_URL
+  auth_methods: [token]
+  # base_url: https://sveltia-cms-auth.<your-subdomain>.workers.dev
+  # auth_methods: [oauth, token]
   commit_messages:
     create: 'Content: create {{collection}} "{{slug}}"'
     update: 'Content: update {{collection}} "{{slug}}"'
     delete: 'Content: delete {{collection}} "{{slug}}"'
+    uploadMedia: 'Media: upload "{{path}}"'
+    deleteMedia: 'Media: delete "{{path}}"'
 
-# Where uploaded images go (kept minimal — mostly a static, image-light site).
+# Images uploaded from the admin (doctor photos, article images, logo).
 media_folder: public-site/assets/img
 public_folder: /assets/img
 
-# Small UX niceties
-publish_mode: simple
 site_url: https://neurominds.in
+display_url: https://neurominds.in
+logo_url: https://neurominds.in/assets/brand/logo.png
+
+# Simple workflow: Save = publish (commit). Set to editorial_workflow for a
+# draft → review → publish board (uses GitHub pull requests, still free).
+publish_mode: simple
+
+# Shared field snippets -------------------------------------------------------
+_status: &status
+  { name: status, label: Status, widget: select, options: [{ label: Published (visible on site), value: published }, { label: Draft (hidden from site), value: draft }], default: published }
+_seo_title: &seo_title
+  { name: seo_title, label: SEO title, widget: string, required: false, hint: 'Shown in Google / browser tab. Aim for ≤ 60 characters. Leave blank to use the name.' }
+_seo_description: &seo_description
+  { name: seo_description, label: SEO description, widget: text, required: false, hint: 'Google snippet. Aim for 120–160 characters.' }
 
 collections:
+  # ===========================================================================
+  # 1. SITE SETTINGS (single files)
+  # ===========================================================================
+  - name: settings
+    label: Site Settings
+    icon: settings
+    description: Clinic details, navigation, feature switches, buttons, SEO defaults.
+    editor: { preview: false }
+    files:
+      - name: clinic
+        label: Clinic details & header/footer
+        file: content/clinic.json
+        format: json
+        fields:
+          - { name: clinic_name, label: Clinic name, widget: string }
+          - { name: clinic_short, label: Short name (header logo text), widget: string }
+          - { name: tagline, label: Header tagline (under the name), widget: string, required: false }
+          - { name: doctor_lead, label: Lead doctor, widget: string, required: false }
+          - { name: display_phone, label: Phone (as displayed), widget: string }
+          - { name: cta_phone, label: Phone (for call links, with +91), widget: string }
+          - { name: call_link, label: Call link, widget: string, hint: 'tel:+91XXXXXXXXXX' }
+          - { name: whatsapp_link, label: WhatsApp link, widget: string, hint: 'https://wa.me/91XXXXXXXXXX' }
+          - { name: email_support, label: Support email, widget: string, required: false }
+          - { name: address, label: Address, widget: text }
+          - { name: opening_hours_text, label: Opening hours (display text), widget: string, required: false }
+          - { name: maps_url, label: Google Maps link, widget: string }
+          - { name: maps_embed_url, label: Google Maps embed URL (optional), widget: string, required: false, hint: 'Maps → Share → Embed a map → copy the src="…" URL only. Leave blank to show a "Open Google Maps" button instead.' }
+          - { name: google_review_url, label: Google review link, widget: string, required: false }
+          - { name: pwens_booking_url, label: PWeNS booking URL, widget: string }
+          - { name: nav_cta_label, label: Header button label, widget: string, required: false, default: Book now }
+          - { name: emergency_bar_text, label: Emergency bar text (HTML allowed), widget: text, required: false }
+          - { name: footer, label: Footer credit (HTML allowed), widget: string, required: false }
+          - { name: logo_url, label: Logo, widget: image, required: false, allow_multiple: false }
+          - { name: footer_logo_url, label: Footer logo, widget: image, required: false, allow_multiple: false }
+          - { name: social_preview_url, label: Social share image (1200×630), widget: image, required: false, allow_multiple: false }
+          - { name: ga4_measurement_id, label: GA4 measurement ID, widget: string, required: false }
+          - { name: domain, label: Site domain, widget: string, default: 'https://neurominds.in', hint: 'Used for canonical URLs and the sitemap.' }
+
+      - name: navigation
+        label: Navigation menu
+        file: content/navigation.json
+        format: json
+        fields:
+          - name: items
+            label: Menu items
+            widget: list
+            summary: '{{fields.label}} → {{fields.route}}'
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: route, label: Route, widget: select, options: ['/', '/about', '/doctors', '/conditions', '/treatments', '/services', '/lab', '/knowledge', '/faq', '/contact', '/testimonials', '/booking', '/emergency'] }
+              - { name: order, label: Order, widget: number, value_type: int, default: 1 }
+              - { name: is_enabled, label: Show in menu, widget: boolean, default: true }
+
+      - name: feature_flags
+        label: Feature switches
+        file: content/settings/feature_flags.json
+        format: json
+        fields:
+          - { name: public_lab_tests_enabled, label: Show Lab Tests (page, menu, home section), widget: boolean, default: false }
+          - { name: public_callback_enabled, label: Show "Request clinic callback" form on Booking, widget: boolean, default: false }
+          - { name: public_testimonials_enabled, label: Show Testimonials, widget: boolean, default: true }
+          - { name: public_reviews_enabled, label: Show Google reviews block, widget: boolean, default: true }
+          - { name: public_knowledge_enabled, label: Show Knowledge articles, widget: boolean, default: true }
+          - { name: public_announcements_enabled, label: Announcements (reserved), widget: boolean, default: false }
+          - { name: floating_cta_enabled, label: Show floating Call / WhatsApp / Enquire buttons, widget: boolean, default: true }
+          - { name: emergency_bar_enabled, label: Show the red emergency bar, widget: boolean, default: true, required: false }
+
+      - name: floating_cta
+        label: Floating buttons (Call / WhatsApp / Enquire)
+        file: content/settings/floating_cta.json
+        format: json
+        fields:
+          - name: items
+            label: Buttons
+            widget: list
+            summary: '{{fields.label}} ({{fields.kind}})'
+            fields:
+              - { name: cta_id, label: ID, widget: string, hint: 'Any short unique id, e.g. fab_call' }
+              - { name: kind, label: Type, widget: select, options: [{ label: Call, value: call }, { label: WhatsApp, value: whatsapp }, { label: 'Enquire / feedback form', value: feedback }] }
+              - { name: label, label: Label, widget: string }
+              - { name: value, label: Link, widget: string, required: false, hint: 'tel:+91… for Call, https://wa.me/91… for WhatsApp, blank for Enquire' }
+              - { name: whatsapp_text, label: Pre-filled WhatsApp message, widget: string, required: false }
+              - { name: is_enabled, label: Enabled, widget: boolean, default: true }
+              - { name: display_order, label: Order, widget: number, value_type: int, default: 1 }
+              - { name: device_visibility, label: Show on, widget: select, options: [all, mobile, desktop], default: all }
+
+      - name: social_links
+        label: Social links (footer)
+        file: content/social_links.json
+        format: json
+        fields:
+          - name: items
+            label: Links
+            widget: list
+            summary: '{{fields.label}}'
+            fields:
+              - { name: social_id, label: ID, widget: string }
+              - { name: platform, label: Platform (icon), widget: select, options: [instagram, whatsapp, google, youtube, facebook, linkedin] }
+              - { name: label, label: Label, widget: string }
+              - { name: url, label: URL, widget: string, required: false }
+              - { name: aria_label, label: Accessible label, widget: string, required: false }
+              - { name: is_enabled, label: Show, widget: boolean, default: true }
+              - { name: open_in_new_tab, label: Open in new tab, widget: boolean, default: true }
+              - { name: display_order, label: Order, widget: number, value_type: int, default: 1 }
+
+      - name: google_reviews
+        label: Google reviews block
+        file: content/settings/google_reviews.json
+        format: json
+        fields:
+          - { name: rating, label: Overall rating, widget: number, value_type: float, min: 1, max: 5, step: 0.1 }
+          - { name: review_count, label: Number of reviews, widget: number, value_type: int }
+          - { name: profile_url, label: Google profile URL, widget: string }
+          - { name: write_review_url, label: "Write a review" URL, widget: string, required: false }
+          - name: reviews
+            label: Highlighted reviews
+            widget: list
+            summary: '{{fields.author_display}} — {{fields.rating}}★'
+            fields:
+              - { name: review_id, label: ID, widget: string }
+              - { name: author_display, label: Reviewer name (as shown on Google), widget: string }
+              - { name: rating, label: Rating, widget: number, value_type: int, min: 1, max: 5, default: 5 }
+              - { name: relative_time, label: When (e.g. "a month ago"), widget: string, required: false }
+              - { name: text, label: Review text, widget: text }
+              - { name: review_url, label: Link to review, widget: string, required: false }
+              - { name: status, label: Status, widget: select, options: [approved, pending], default: approved }
+
+      - name: callback_options
+        label: Callback form dropdown options
+        file: content/settings/callback_options.json
+        format: json
+        fields:
+          - { name: time_slots, label: Preferred time slots, widget: list }
+          - { name: consultation_for, label: "Consultation for" options, widget: list }
+          - { name: patient_type, label: Patient type options, widget: list }
+          - { name: consultation_mode, label: Consultation mode options, widget: list }
+          - { name: concern_categories, label: Concern categories, widget: list }
+
+      - name: seo
+        label: SEO defaults & verification
+        file: content/settings/seo.json
+        format: json
+        fields:
+          - { name: site_name, label: Site name, widget: string }
+          - { name: default_title_suffix, label: Default title suffix, widget: string, required: false }
+          - { name: default_description, label: Default description, widget: text }
+          - { name: social_preview_url, label: Default share image, widget: image, required: false, allow_multiple: false }
+          - { name: google_site_verification, label: Google Search Console verification code, widget: string, required: false, hint: 'Only the content="…" value from the meta tag Google gives you.' }
+          - { name: bing_site_verification, label: Bing Webmaster verification code, widget: string, required: false }
+          - { name: opening_hours, label: Opening hours (schema.org format), widget: list, required: false, hint: 'e.g. Mo-Sa 09:00-20:00' }
+          - { name: price_range, label: Price range (e.g. ₹₹), widget: string, required: false }
+          - { name: geo_latitude, label: Latitude, widget: string, required: false }
+          - { name: geo_longitude, label: Longitude, widget: string, required: false }
+          - { name: same_as, label: Official profile URLs (Instagram, Google, etc.), widget: list, required: false }
+
+  # ===========================================================================
+  # 2. PAGE TEXT (headings, intros, buttons on each static page)
+  # ===========================================================================
+  - name: pages
+    label: Page Text
+    icon: article
+    description: Headlines, intros and button labels for each page. Lists/cards come from the collections below.
+    editor: { preview: false }
+    files:
+      - name: home
+        label: Home page
+        file: content/pages/home.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: home }
+          - *seo_title
+          - *seo_description
+          - { name: hero_eyebrow, label: Hero small heading, widget: string }
+          - { name: hero_title, label: Hero headline (use <em>…</em> for the green part), widget: string }
+          - { name: hero_lede, label: Hero paragraph, widget: text }
+          - { name: hero_cta_label, label: Hero button label, widget: string }
+          - { name: trust_items, label: Trust strip (4 items), widget: list, summary: '{{fields.value}} — {{fields.label}}', fields: [{ name: value, label: Big text, widget: string }, { name: label, label: Small text, widget: string }] }
+          - { name: assurance_items, label: Assurance strip, widget: list, summary: '{{fields.icon}} {{fields.text}}', fields: [{ name: icon, label: Emoji/icon, widget: string }, { name: text, label: Text, widget: string }] }
+          - { name: conditions_eyebrow, label: Conditions — small heading, widget: string }
+          - { name: conditions_title, label: Conditions — heading, widget: string }
+          - { name: conditions_lede, label: Conditions — intro, widget: text }
+          - { name: booking_eyebrow, label: Booking — small heading, widget: string }
+          - { name: booking_title, label: Booking — heading, widget: string }
+          - { name: booking_lede, label: Booking — intro, widget: text }
+          - { name: booking_card_badge, label: Booking card — badge, widget: string }
+          - { name: booking_card_title, label: Booking card — title, widget: string }
+          - { name: booking_card_text, label: Booking card — text, widget: text }
+          - { name: booking_card_cta, label: Booking card — button, widget: string }
+          - { name: booking_card_note, label: Booking card — note, widget: string }
+          - { name: services_eyebrow, label: Services — small heading, widget: string }
+          - { name: services_title, label: Services — heading, widget: string }
+          - { name: doctor_eyebrow, label: Doctor — small heading, widget: string }
+          - { name: doctor_title, label: Doctor — heading, widget: string }
+          - { name: lab_eyebrow, label: Lab section — small heading, widget: string }
+          - { name: lab_title, label: Lab section — heading, widget: string }
+          - { name: lab_lede, label: Lab section — intro, widget: text }
+          - { name: lab_cta, label: Lab section — button, widget: string }
+          - { name: lab_card_title, label: Lab card — title, widget: string }
+          - { name: lab_card_text, label: Lab card — text, widget: text }
+          - { name: final_eyebrow, label: Final CTA — small heading, widget: string }
+          - { name: final_title, label: Final CTA — heading, widget: string }
+          - { name: final_text, label: Final CTA — text, widget: string }
+          - { name: final_cta_primary, label: Final CTA — primary button, widget: string }
+          - { name: final_cta_secondary, label: Final CTA — secondary button, widget: string }
+
+      - name: about
+        label: About page
+        file: content/pages/about.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: about }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+          - { name: approach_title, label: Section 1 title, widget: string }
+          - { name: approach_text, label: Section 1 text, widget: text }
+          - { name: offer_title, label: Section 2 title, widget: string }
+          - { name: offer_text, label: Section 2 text, widget: text }
+          - { name: cta_primary, label: Primary button, widget: string }
+          - { name: cta_secondary, label: Secondary button, widget: string }
+
+      - name: booking
+        label: Booking page
+        file: content/pages/booking.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: booking }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+          - { name: card_badge, label: Card badge, widget: string }
+          - { name: card_title, label: Card title, widget: string }
+          - { name: card_text, label: Card text, widget: text }
+          - { name: card_cta, label: Card button, widget: string }
+          - { name: card_note, label: Card note, widget: string }
+          - { name: sticky_cta, label: Mobile sticky button, widget: string }
+          - { name: callback_eyebrow, label: Callback section — small heading, widget: string, required: false }
+          - { name: callback_title, label: Callback section — heading, widget: string, required: false }
+          - { name: callback_text, label: Callback section — intro, widget: text, required: false }
+
+      - name: contact
+        label: Contact page
+        file: content/pages/contact.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: contact }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+          - { name: cta_eyebrow, label: CTA — small heading, widget: string }
+          - { name: cta_title, label: CTA — heading, widget: string }
+          - { name: cta_text, label: CTA — text, widget: string }
+          - { name: cta_label, label: CTA — button, widget: string }
+
+      - name: emergency
+        label: Emergency help page
+        file: content/pages/emergency.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: emergency }
+          - *seo_title
+          - *seo_description
+          - { name: banner, label: Red banner text (HTML allowed), widget: text }
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+          - { name: steps_title, label: Steps heading, widget: string }
+          - { name: steps, label: Steps (one per line), widget: list }
+          - { name: closing, label: Closing paragraph, widget: text }
+          - { name: cta_label, label: Button, widget: string }
+
+      - name: conditions
+        label: Conditions page
+        file: content/pages/conditions.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: conditions }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+          - { name: disclaimer, label: Disclaimer notice, widget: text }
+
+      - name: treatments
+        label: Treatments page
+        file: content/pages/treatments.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: treatments }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+
+      - name: services
+        label: Services page
+        file: content/pages/services.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: services }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+
+      - name: doctors
+        label: Doctors page
+        file: content/pages/doctors.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: doctors }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+
+      - name: knowledge
+        label: Knowledge page
+        file: content/pages/knowledge.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: knowledge }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+
+      - name: faq
+        label: FAQ page
+        file: content/pages/faq.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: faq }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+
+      - name: lab
+        label: Lab Tests page
+        file: content/pages/lab.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: lab }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+          - { name: assurance_items, label: Assurance strip, widget: list, summary: '{{fields.icon}} {{fields.text}}', fields: [{ name: icon, label: Emoji/icon, widget: string }, { name: text, label: Text, widget: string }] }
+          - { name: form_eyebrow, label: Form — small heading, widget: string }
+          - { name: form_title, label: Form — heading, widget: string }
+          - { name: form_lede, label: Form — intro, widget: text }
+
+      - name: testimonials
+        label: Testimonials page
+        file: content/pages/testimonials.json
+        format: json
+        fields:
+          - { name: page, widget: hidden, default: testimonials }
+          - *seo_title
+          - *seo_description
+          - { name: eyebrow, label: Small heading, widget: string }
+          - { name: title, label: Heading, widget: string }
+          - { name: lede, label: Intro, widget: text }
+          - { name: reviews_eyebrow, label: Reviews — small heading, widget: string }
+          - { name: reviews_title, label: Reviews — heading, widget: string }
+          - { name: map_eyebrow, label: Map — small heading, widget: string }
+          - { name: map_title, label: Map — heading, widget: string }
+          - { name: cta_eyebrow, label: CTA — small heading, widget: string }
+          - { name: cta_title, label: CTA — heading, widget: string }
+          - { name: cta_text, label: CTA — text, widget: string }
+          - { name: cta_label, label: CTA — button, widget: string }
+
+  # ===========================================================================
+  # 3. CONTENT COLLECTIONS (one file per entry)
+  # ===========================================================================
   - name: conditions
     label: Conditions
     label_singular: Condition
+    icon: psychology
     folder: content/conditions
     identifier_field: name
     create: true
     slug: '{{slug}}'
     format: json
+    extension: json
     summary: '{{name}} — {{status}}'
+    preview_path: 'conditions/{{slug}}'
+    sortable_fields: [name, category, status]
+    view_filters:
+      - { label: Published, field: status, pattern: published }
+      - { label: Draft, field: status, pattern: draft }
+      - { label: Featured on home, field: is_featured, pattern: true }
+    view_groups:
+      - { label: Category, field: category }
     fields:
-      - { name: condition_id, label: ID, widget: string, required: false }
-      - { name: slug, label: Slug (URL), widget: string, hint: 'Lowercase, dashes. Changing this changes the page URL.' }
+      - { name: condition_id, label: ID, widget: string, required: false, hint: 'Optional internal id, e.g. cond_anxiety' }
+      - { name: slug, label: Page URL (slug), widget: string, pattern: ['^[a-z0-9-]+$', 'Lowercase letters, numbers and dashes only'], hint: 'Becomes neurominds.in/conditions/<slug>. Changing it changes the URL.' }
       - { name: name, label: Name, widget: string }
+      - { name: category, label: Category, widget: string, required: false, hint: 'e.g. Anxiety, Mood, Sleep, Child & Teen' }
       - { name: one_line_summary, label: One-line summary, widget: text }
-      - { name: symptoms, label: Symptoms (separate with ;), widget: text, required: false }
+      - { name: symptoms, label: Common signs, widget: list, required: false, hint: 'One per item' }
       - { name: when_to_consult, label: When to consult, widget: text, required: false }
-      - { name: treatment_approach, label: Treatment approach, widget: text, required: false }
-      - { name: category, label: Category, widget: string, required: false }
-      - { name: is_emergency, label: 'Emergency condition?', widget: boolean, default: false, required: false }
-      - { name: is_featured, label: 'Feature on homepage?', widget: boolean, default: false, required: false }
-      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
-      - { name: seo_title, label: SEO title, widget: string, required: false }
-      - { name: seo_description, label: SEO description, widget: text, required: false }
-      - { name: related_conditions, label: Related conditions, widget: list, required: false }
-      - { name: faqs, label: FAQs, widget: list, required: false, fields: [ { name: question, widget: string }, { name: answer, widget: text } ] }
+      - { name: treatment_approach, label: How we help, widget: text, required: false }
+      - { name: related_conditions, label: Related concerns, widget: list, required: false }
+      - { name: faqs, label: FAQs, widget: list, required: false, summary: '{{fields.question}}', fields: [{ name: question, label: Question, widget: string }, { name: answer, label: Answer, widget: text }] }
+      - { name: is_emergency, label: Show emergency notice on this page, widget: boolean, default: false }
+      - { name: is_featured, label: Feature on home page (first 6 shown), widget: boolean, default: false }
+      - *status
+      - *seo_title
+      - *seo_description
 
   - name: treatments
     label: Treatments
     label_singular: Treatment
+    icon: healing
     folder: content/treatments
     identifier_field: name
     create: true
     slug: '{{slug}}'
     format: json
+    extension: json
     summary: '{{name}} — {{status}}'
+    preview_path: 'treatments/{{slug}}'
     fields:
       - { name: treatment_id, label: ID, widget: string, required: false }
-      - { name: slug, label: Slug (URL), widget: string }
+      - { name: slug, label: Page URL (slug), widget: string, pattern: ['^[a-z0-9-]+$', 'Lowercase letters, numbers and dashes only'] }
       - { name: name, label: Name, widget: string }
       - { name: one_line_summary, label: One-line summary, widget: text }
       - { name: overview, label: Overview, widget: text, required: false }
       - { name: what_to_expect, label: What to expect, widget: text, required: false }
-      - { name: conditions_treated, label: Conditions treated (separate with ;), widget: text, required: false }
-      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
-      - { name: seo_title, label: SEO title, widget: string, required: false }
-      - { name: seo_description, label: SEO description, widget: text, required: false }
+      - { name: conditions_treated, label: Conditions this helps with, widget: list, required: false }
+      - { name: faqs, label: FAQs, widget: list, required: false, summary: '{{fields.question}}', fields: [{ name: question, label: Question, widget: string }, { name: answer, label: Answer, widget: text }] }
+      - *status
+      - *seo_title
+      - *seo_description
 
   - name: services
     label: Services
     label_singular: Service
+    icon: medical_services
     folder: content/services
     identifier_field: name
     create: true
     slug: '{{slug}}'
     format: json
+    extension: json
+    summary: '{{name}} — {{status}}'
     fields:
       - { name: service_id, label: ID, widget: string, required: false }
-      - { name: slug, label: Slug (URL), widget: string }
+      - { name: slug, label: Slug, widget: string, pattern: ['^[a-z0-9-]+$', 'Lowercase letters, numbers and dashes only'] }
       - { name: name, label: Name, widget: string }
       - { name: summary, label: Summary, widget: text }
-      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
-
-  - name: lab_packages
-    label: Lab Packages
-    label_singular: Lab Package
-    folder: content/lab_packages
-    identifier_field: name
-    create: true
-    slug: '{{slug}}'
-    format: json
-    fields:
-      - { name: lab_package_id, label: ID, widget: string, required: false }
-      - { name: slug, label: Slug (URL), widget: string }
-      - { name: name, label: Name, widget: string }
-      - { name: summary, label: Summary, widget: text }
-      - { name: turnaround, label: Turnaround, widget: string, required: false }
-      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
-
-  - name: blogs
-    label: Knowledge Articles
-    label_singular: Article
-    folder: content/blogs
-    identifier_field: title
-    create: true
-    slug: '{{slug}}'
-    format: json
-    summary: '{{title}} — {{status}}'
-    fields:
-      - { name: blog_id, label: ID, widget: string, required: false }
-      - { name: slug, label: Slug (URL), widget: string }
-      - { name: title, label: Title, widget: string }
-      - { name: excerpt, label: Excerpt, widget: text }
-      - { name: author, label: Author, widget: string, required: false }
-      - { name: category, label: Category, widget: string, required: false }
-      - { name: body, label: Body, widget: markdown }
-      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
-      - { name: seo_title, label: SEO title, widget: string, required: false }
-      - { name: seo_description, label: SEO description, widget: text, required: false }
-
-  - name: faqs
-    label: FAQs
-    label_singular: FAQ
-    folder: content/faqs
-    identifier_field: question
-    create: true
-    slug: '{{fields.faq_id}}'
-    format: json
-    summary: '{{question}}'
-    fields:
-      - { name: faq_id, label: ID, widget: string, required: false }
-      - { name: scope, label: Scope, widget: string, required: false }
-      - { name: question, label: Question, widget: string }
-      - { name: answer, label: Answer, widget: text }
-      - { name: order, label: Display order, widget: number, default: 1, value_type: int }
-      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+      - *status
 
   - name: doctors
     label: Doctors
     label_singular: Doctor
+    icon: stethoscope
     folder: content/doctors
     identifier_field: full_name
     create: true
     slug: '{{slug}}'
     format: json
-    summary: '{{full_name}}'
+    extension: json
+    summary: '{{full_name}} — {{status}}'
+    preview_path: 'doctors/{{slug}}'
     fields:
       - { name: doctor_id, label: ID, widget: string, required: false }
-      - { name: slug, label: Slug (URL), widget: string }
+      - { name: slug, label: Page URL (slug), widget: string, pattern: ['^[a-z0-9-]+$', 'Lowercase letters, numbers and dashes only'] }
       - { name: full_name, label: Full name, widget: string }
       - { name: qualification, label: Qualification, widget: string, required: false }
       - { name: specialization, label: Specialization, widget: string, required: false }
       - { name: experience_years, label: Years of experience, widget: number, required: false, value_type: int }
-      - { name: languages, label: Languages, widget: string, required: false }
+      - { name: languages, label: Languages (comma separated), widget: string, required: false }
+      - { name: consultation_type, label: Consultation types (display text), widget: string, required: false }
+      - { name: conditions_handled, label: Areas of care, widget: list, required: false }
       - { name: short_bio, label: Short bio, widget: text, required: false }
-      - { name: status, label: Status, widget: select, options: [draft, published], default: published }
+      - { name: photo_url, label: Photo, widget: image, required: false, allow_multiple: false, hint: 'Square photo works best (e.g. 600×600).' }
+      - { name: profile_photo_link, label: Photo link (external, optional), widget: string, required: false }
+      - { name: online_consultation_enabled, label: Offers online consultation, widget: boolean, default: true }
+      - { name: clinic_visit_enabled, label: Offers clinic visits, widget: boolean, default: true }
+      - { name: support_booking_enabled, label: Callback requests allowed, widget: boolean, default: true }
+      - { name: direct_booking_enabled, label: Direct (PWeNS) booking allowed, widget: boolean, default: true }
+      - { name: pwens_booking_url, label: PWeNS booking URL (this doctor), widget: string, required: false }
+      - *status
+      - *seo_title
+      - *seo_description
+
+  - name: lab_packages
+    label: Lab Packages
+    label_singular: Lab Package
+    icon: biotech
+    folder: content/lab_packages
+    identifier_field: name
+    create: true
+    slug: '{{slug}}'
+    format: json
+    extension: json
+    summary: '{{name}} — {{status}}'
+    fields:
+      - { name: lab_package_id, label: ID, widget: string, required: false }
+      - { name: slug, label: Slug, widget: string, pattern: ['^[a-z0-9-]+$', 'Lowercase letters, numbers and dashes only'] }
+      - { name: name, label: Name, widget: string }
+      - { name: summary, label: Summary, widget: text }
+      - { name: turnaround, label: Turnaround, widget: string, required: false }
+      - { name: price_text, label: Price (display text, optional), widget: string, required: false }
+      - *status
+
+  - name: blogs
+    label: Knowledge Articles
+    label_singular: Article
+    icon: menu_book
+    folder: content/blogs
+    identifier_field: title
+    create: true
+    slug: '{{slug}}'
+    format: json
+    extension: json
+    summary: '{{title}} — {{status}}'
+    preview_path: 'knowledge/{{slug}}'
+    sortable_fields: [title, published_at, status]
+    fields:
+      - { name: blog_id, label: ID, widget: string, required: false }
+      - { name: slug, label: Page URL (slug), widget: string, pattern: ['^[a-z0-9-]+$', 'Lowercase letters, numbers and dashes only'] }
+      - { name: title, label: Title, widget: string }
+      - { name: excerpt, label: Excerpt, widget: text }
+      - { name: author, label: Author, widget: string, required: false, default: JS Neurominds }
+      - { name: category, label: Category, widget: string, required: false }
+      - { name: published_at, label: Published date, widget: datetime, required: false, format: 'YYYY-MM-DD', date_format: 'YYYY-MM-DD', time_format: false }
+      - { name: cover_image, label: Cover image, widget: image, required: false, allow_multiple: false }
+      - { name: body, label: Article body, widget: markdown, hint: 'Headings, bold, lists and links are supported.' }
+      - { name: tags, label: Tags, widget: list, required: false }
+      - *status
+      - *seo_title
+      - *seo_description
+
+  - name: faqs
+    label: FAQs
+    label_singular: FAQ
+    icon: help
+    folder: content/faqs
+    identifier_field: question
+    create: true
+    slug: '{{fields.faq_id}}'
+    format: json
+    extension: json
+    summary: '{{order}}. {{question}}'
+    sortable_fields: [order, question]
+    fields:
+      - { name: faq_id, label: ID, widget: string, hint: 'Short unique id, e.g. faq-5 (becomes the file name)' }
+      - { name: scope, label: Scope, widget: select, options: [general, booking, privacy, lab], default: general, required: false }
+      - { name: question, label: Question, widget: string }
+      - { name: answer, label: Answer, widget: text }
+      - { name: order, label: Display order, widget: number, default: 1, value_type: int }
+      - *status
 
   - name: testimonials
     label: Testimonials
     label_singular: Testimonial
+    icon: format_quote
     folder: content/testimonials
     identifier_field: quote
     create: true
     slug: '{{fields.testimonial_id}}'
     format: json
-    summary: '{{author_display}} — {{rating}}★'
+    extension: json
+    summary: '{{author_display}} — {{rating}}★ — {{status}}'
+    view_filters:
+      - { label: Approved (shown), field: status, pattern: approved }
+      - { label: Pending, field: status, pattern: pending }
     fields:
-      - { name: testimonial_id, label: ID, widget: string, required: false }
-      - { name: author_display, label: Author (display), widget: string }
+      - { name: testimonial_id, label: ID, widget: string, hint: 'Short unique id, e.g. tst-5 (becomes the file name)' }
+      - { name: author_display, label: Name (as displayed, e.g. "R. K."), widget: string }
       - { name: area, label: Area, widget: string, required: false }
       - { name: rating, label: Rating, widget: number, min: 1, max: 5, default: 5, value_type: int }
       - { name: quote, label: Quote, widget: text }
       - { name: display_order, label: Display order, widget: number, default: 1, value_type: int }
-      - { name: status, label: Status, widget: select, options: [pending, approved], default: pending }
+      - { name: created_at, label: Date, widget: datetime, required: false, format: 'YYYY-MM-DD', date_format: 'YYYY-MM-DD', time_format: false }
+      - { name: status, label: Status, widget: select, options: [{ label: Approved (shown on site), value: approved }, { label: Pending (hidden), value: pending }], default: pending }

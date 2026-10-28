@@ -3,14 +3,32 @@
   "slug": "anxiety",
   "name": "Anxiety",
   "one_line_summary": "Excessive worry or fear that is hard to control and interferes with daily life.",
-  "symptoms": "Constant worry;Restlessness;Racing heart;Tense muscles;Sleep trouble",
+  "symptoms": [
+    "Constant worry",
+    "Restlessness",
+    "Racing heart",
+    "Tense muscles",
+    "Sleep trouble"
+  ],
   "when_to_consult": "When worry feels uncontrollable or causes physical symptoms or avoidance.",
   "treatment_approach": "Cognitive behavioural therapy, relaxation techniques, and medication where appropriate.",
-  "related_conditions": "Panic Disorder;Social Anxiety",
-  "is_emergency": "NO",
-  "faqs": "What is anxiety?|Excessive worry that interferes with daily life.||Is anxiety treatable?|Yes, with therapy and support most people improve.",
+  "related_conditions": [
+    "Panic Disorder",
+    "Social Anxiety"
+  ],
+  "is_emergency": false,
+  "faqs": [
+    {
+      "question": "What is anxiety?",
+      "answer": "Excessive worry that interferes with daily life."
+    },
+    {
+      "question": "Is anxiety treatable?",
+      "answer": "Yes, with therapy and support most people improve."
+    }
+  ],
   "category": "Anxiety",
-  "is_featured": "YES",
+  "is_featured": true,
   "status": "published",
   "seo_title": "Anxiety Treatment in Tirupati | JS Neurominds",
   "seo_description": "Calm, supportive anxiety care in Tirupati and Chandragiri."

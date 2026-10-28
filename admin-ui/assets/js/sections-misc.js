@@ -8,6 +8,7 @@ import { can } from './auth.js';
 import { CLINIC } from '../../../shared/constants.js';
 import { bars, donut } from './charts.js';
 import { toast } from './admin-app.js';
+import { describeApiError } from './api-envelope.js';
 
 const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
 
@@ -23,7 +24,8 @@ export async function renderSimple(mount, key) {
 
 async function booking(mount) {
   const res = await api.dashboard();
-  const ga = res.data.ga4;
+  const ga = (res.data && res.data.ga4) || {};
+  ga.events = ga.events || {};
   mount.innerHTML = `
     <div class="kpi-grid">
       <div class="kpi"><div class="kpi__label">Support booking clicks</div><div class="kpi__value">${ga.events.support_booking_click}</div></div>
@@ -41,7 +43,7 @@ async function booking(mount) {
 
 async function feedback(mount) {
   const res = await api.feedback();
-  const rows = res.data;
+  const rows = Array.isArray(res.data) ? res.data : [];
   const canMod = can('moderate_feedback');
   mount.innerHTML = `
     <div class="panel"><div class="panel__head"><h3>Feedback Center</h3><span class="badge pending">${rows.filter((r) => r.status === 'pending').length} pending</span></div>
@@ -61,8 +63,13 @@ async function feedback(mount) {
       </div></div>`;
   if (canMod) {
     const act = async (i, status) => {
-      const r = rows[i]; const res = await api.updateFeedbackStatus(r.feedback_id, status);
-      if (res.success) { r.status = status; toast(`Feedback ${status}`); feedback(mount); }
+      const r = rows[i];
+      try {
+        await api.updateFeedbackStatus(r.feedback_id, status); // throws ApiError on failure
+        r.status = status; toast(`Feedback ${status}`); feedback(mount);
+      } catch (err) {
+        toast('Could not update feedback: ' + describeApiError(err).title);
+      }
     };
     mount.querySelectorAll('.fb-approve').forEach((b) => b.addEventListener('click', () => act(b.dataset.i, 'approved')));
     mount.querySelectorAll('.fb-reject').forEach((b) => b.addEventListener('click', () => act(b.dataset.i, 'rejected')));
@@ -71,7 +78,9 @@ async function feedback(mount) {
 
 async function marketing(mount) {
   const res = await api.dashboard();
-  const ga = res.data.ga4;
+  const ga = (res.data && res.data.ga4) || {};
+  ga.by_source = Array.isArray(ga.by_source) ? ga.by_source : [];
+  ga.by_device = Array.isArray(ga.by_device) ? ga.by_device : [];
   mount.innerHTML = `
     <div class="panel"><div class="panel__head"><h3>Marketing · GA4</h3><span class="badge ok">GA4 Data API</span></div>
       <div class="panel__body">
@@ -112,7 +121,7 @@ function backup(mount) {
 async function settings(mount) {
   const canEdit = can('edit_settings');
   const res = await api.config();
-  const c = res.data;
+  const c = res.data || {};
   const row = (label, val) => `<div class="field"><label>${label}</label><input value="${esc(val)}" ${canEdit ? '' : 'disabled'} /></div>`;
   mount.innerHTML = `
     <div class="panel"><div class="panel__head"><h3>Settings</h3>${canEdit ? '<button class="btn btn--primary btn--sm" id="save-settings">Save</button>' : '<span class="badge closed">read-only for your role</span>'}</div>

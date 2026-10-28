@@ -1,5 +1,11 @@
 # API reference
 
+> **Update (v2.0, Oct 2026):** the public site is now fully static — content is bundled from `/content/**.json`
+> at build time and edited through the git-based admin CMS (`admin/`, see `docs/ADMIN_CMS.md`). Apps Script is used
+> **only** by the website forms (`gas-public-api/`). `gas-admin-cms/` and `admin-ui/` are archived and not deployed.
+> Sections below that describe Sheets-backed content reads or the Apps Script admin are historical.
+
+
 Two Google Apps Script web apps. Requests use `?action=` (GET) or a JSON body `{ action, payload }` posted as `text/plain` (POST) to avoid CORS preflight. All responses are JSON: `{ success, data }` or `{ success: false, error, code }`.
 
 ## Public API (`gas-public-api`)

@@ -5,7 +5,11 @@
   "one_line_summary": "Careful, monitored use of medication when clinically appropriate.",
   "overview": "Medication is considered thoughtfully and reviewed regularly.",
   "what_to_expect": "Assessment, discussion of options, and ongoing follow-up.",
-  "conditions_treated": "Depression;Bipolar Disorder;Anxiety",
+  "conditions_treated": [
+    "Depression",
+    "Bipolar Disorder",
+    "Anxiety"
+  ],
   "status": "published",
   "seo_title": "Psychiatric Medication Management in Tirupati | JS Neurominds",
   "seo_description": "Safe, monitored psychiatric medication management in Tirupati."

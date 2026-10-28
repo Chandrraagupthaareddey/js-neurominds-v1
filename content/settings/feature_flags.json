@@ -1,0 +1,9 @@
+{
+  "public_lab_tests_enabled": false,
+  "public_callback_enabled": false,
+  "public_testimonials_enabled": true,
+  "public_reviews_enabled": true,
+  "public_knowledge_enabled": true,
+  "public_announcements_enabled": false,
+  "floating_cta_enabled": true
+}

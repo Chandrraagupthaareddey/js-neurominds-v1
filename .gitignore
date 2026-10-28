@@ -12,9 +12,18 @@ dist-test/
 .cache/
 .vite/
 
-# Generated SEO stubs (built by Cloudflare at deploy time, never committed)
+# Generated pages (built by Cloudflare at deploy time, never committed)
 public-site/p/
 public-site/sitemap.xml
+public-site/robots.txt
+public-site/conditions/
+public-site/treatments/
+public-site/doctors/
+public-site/knowledge/
+public-site/lab/
+
+# Local backups
+_backup/
 
 # Local environment files
 .env

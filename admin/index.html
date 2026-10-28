@@ -3,12 +3,30 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex" />
-    <title>JS Neurominds — Content Editor</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <title>JS Neurominds — Admin (Content Editor)</title>
+    <link rel="icon" href="/assets/brand/favicon-32x32.png" sizes="32x32" type="image/png" />
+    <meta name="theme-color" content="#0e1b2a" />
+    <style>
+      /* Shown only until the CMS script loads (or if it cannot). */
+      #jsnm-fallback { font: 15px/1.5 system-ui, sans-serif; max-width: 560px; margin: 12vh auto; padding: 0 20px; color: #334; }
+      #jsnm-fallback h1 { font-size: 20px; margin: 0 0 8px; }
+      #jsnm-fallback code { background: #eef; padding: 2px 6px; border-radius: 4px; }
+    </style>
   </head>
   <body>
-    <!-- Sveltia CMS: a modern, drop-in Decap/Netlify CMS replacement.
-         Loads its config from ./config.yml in this same folder. -->
+    <div id="jsnm-fallback">
+      <h1>JS Neurominds — Admin</h1>
+      <p>Loading the content editor… If this message stays, check your internet connection or that <code>config.yml</code> is present next to this page.</p>
+    </div>
+    <!-- Sveltia CMS: a modern, open-source, git-based CMS (free). Loads ./config.yml from this folder.
+         Every save becomes a commit on GitHub → Cloudflare Pages rebuilds → live in ~2 minutes. -->
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+    <script>
+      // Remove the fallback once the CMS has rendered.
+      new MutationObserver((m, obs) => {
+        if (document.querySelector('sveltia-cms, .sveltia-cms, [class*="sveltia"]')) { const f = document.getElementById('jsnm-fallback'); if (f) f.remove(); obs.disconnect(); }
+      }).observe(document.body, { childList: true, subtree: true });
+    </script>
   </body>
 </html>

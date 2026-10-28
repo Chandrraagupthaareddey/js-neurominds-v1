@@ -8,12 +8,18 @@
   "call_link": "tel:+918553665381",
   "maps_url": "https://share.google/FINrIJ0bVg0GX5D08",
   "address": "Beside Suzuki showroom, Hero PVR Motors Building, 10-1060, Ramachandra Nagar, Chandragiri, Thondavada, Andhra Pradesh 517101",
-  "footer": "Built and maintained by tcgr.in",
+  "footer": "Built and maintained by <a href=\"https://tcgr.in/\" target=\"_blank\" rel=\"noopener\">tcgr.in</a>",
   "pwens_booking_url": "https://jsneurominds.pwens.com/waselffollowuppage",
   "ga4_measurement_id": "G-WKLHEDHC5D",
   "email_support": "jsneurominds5@gmail.com",
   "logo_url": "/assets/brand/logo.png",
   "footer_logo_url": "/assets/brand/logo.png",
   "social_preview_url": "/assets/brand/social-preview.png",
-  "google_review_url": "https://share.google/FINrIJ0bVg0GX5D08"
+  "google_review_url": "https://share.google/FINrIJ0bVg0GX5D08",
+  "tagline": "Psychiatry &amp; Diagnostics",
+  "nav_cta_label": "Book now",
+  "emergency_bar_text": "<strong>In a crisis?</strong> <a href=\"/emergency\">Get emergency help</a> — this website is not an emergency service.",
+  "opening_hours_text": "Mon–Sat, 9:00 am – 8:00 pm",
+  "maps_embed_url": "",
+  "domain": "https://neurominds.in"
 }

@@ -9,7 +9,7 @@ const esc = (s) => String(s == null ? '' : s);
 
 export async function renderSystemHealth(mount) {
   const res = await api.health();
-  const h = res.data;
+  const h = res.data || {};
   const dot = (ok) => `<span class="badge ${ok ? 'ok' : 'error'}">${ok ? 'ok' : 'attention'}</span>`;
 
   mount.innerHTML = `

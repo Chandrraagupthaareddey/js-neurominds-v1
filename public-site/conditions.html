@@ -29,13 +29,13 @@
     <section class="section">
       <div class="container">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">JS Neurominds</p>
-          <h1>Conditions we support</h1>
-          <p class="lede">Clear, caring information about the mental health concerns we help with. Browse or search the full list below.</p>
+          <p class="eyebrow" data-copy="eyebrow">JS Neurominds</p>
+          <h1 data-copy="title">Conditions we support</h1>
+          <p class="lede" data-copy="lede">Clear, caring information about the mental health concerns we help with. Browse or search the full list below.</p>
         </div>
         <div id="conditions-toolbar" data-reveal="2"></div>
         <div class="grid grid--3" id="conditions-hub" data-reveal="2"></div>
-        <div class="notice notice--privacy" style="margin-top:var(--sp-6)">
+        <div class="notice notice--privacy" style="margin-top:var(--sp-6)" data-copy="disclaimer">
           This information is for general awareness only and is not a diagnosis or a guarantee of treatment outcomes. Please consult a qualified clinician for advice specific to you.
         </div>
       </div>
@@ -45,7 +45,8 @@
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
     import { hydrateConditionsHub } from '/assets/js/pages.js';
-    (async () => { await mountShell(); await hydrateConditionsHub(); })();
+    import { applyPageCopy } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await Promise.all([hydrateConditionsHub(), applyPageCopy('conditions')]); })();
   </script>
 </body>
 </html>

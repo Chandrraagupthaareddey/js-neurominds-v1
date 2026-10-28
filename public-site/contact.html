@@ -22,19 +22,22 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <main id="main">
     <section class="section"><div class="container container--prose">
-      <div class="section-head" data-reveal><p class="eyebrow">Get in touch</p><h1>Contact us</h1><p class="lede">We're here to help. Call, message, or visit — whatever feels easiest.</p></div>
+      <div class="section-head" data-reveal><p class="eyebrow" data-copy="eyebrow">Get in touch</p><h1 data-copy="title">Contact us</h1><p class="lede" data-copy="lede">We're here to help. Call, message, or visit — whatever feels easiest.</p></div>
       <div class="card" id="contact-card" data-reveal="2" style="box-shadow:var(--shadow-md)"></div>
+      <div id="map-card" data-reveal="2" style="margin-top:var(--sp-6)"></div>
       <div class="cta-strip" style="margin-top:var(--sp-7)" data-reveal>
-        <p class="eyebrow eyebrow--center">Ready to start?</p>
-        <h2>Book a confirmed appointment</h2>
-        <p>Check live availability and confirm your appointment securely online.</p>
-        <a class="btn btn--primary btn--lg" href="/booking.html#confirmed" style="margin-top:var(--sp-4)">Book confirmed appointment</a>
+        <p class="eyebrow eyebrow--center" data-copy="cta_eyebrow">Ready to start?</p>
+        <h2 data-copy="cta_title">Book a confirmed appointment</h2>
+        <p data-copy="cta_text">Check live availability and confirm your appointment securely online.</p>
+        <a class="btn btn--primary btn--lg" href="/booking#confirmed" style="margin-top:var(--sp-4)" data-copy="cta_label">Book confirmed appointment</a>
       </div></div></section>
   </main>
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
-    (async () => { await mountShell(); const { renderContact } = await import('/assets/js/static.js'); document.addEventListener('jsnm:shell-ready', (e)=>renderContact(e.detail.cfg)); })();
+    import { applyPageCopy, hydrateMapCard } from '/assets/js/pages.js';
+    import { renderContact } from '/assets/js/static.js';
+    (async () => { const cfg = await mountShell(); renderContact(cfg); hydrateMapCard('#map-card'); await applyPageCopy('contact'); })();
   </script>
 </body>
 </html>

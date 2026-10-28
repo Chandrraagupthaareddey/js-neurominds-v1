@@ -22,23 +22,24 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <main id="main">
     <section class="section"><div class="container container--prose">
-      <div class="section-head" data-reveal><p class="eyebrow">About us</p><h1>Care rooted in compassion</h1></div>
+      <div class="section-head" data-reveal><p class="eyebrow" data-copy="eyebrow">About us</p><h1 data-copy="title">Care rooted in compassion</h1></div>
       <div class="prose" data-reveal="2">
-        <p class="lede">JS Neurominds and Diagnostic Center is a psychiatry and mental health clinic in Chandragiri, Tirupati, offering evidence-based care for individuals and families across all ages.</p>
-        <h3>Our approach</h3>
-        <p>We believe mental health care should be private, respectful, and free of judgement. Every person who walks through our doors is met with warmth and a personalised plan.</p>
-        <h3>What we offer</h3>
-        <p>Consultations for adults, children, and seniors; online consultation; de-addiction support; counselling and psychotherapy; and convenient diagnostic services with home sample collection.</p>
+        <p class="lede" data-copy="lede">JS Neurominds and Diagnostic Center is a psychiatry and mental health clinic in Chandragiri, Tirupati, offering evidence-based care for individuals and families across all ages.</p>
+        <h3 data-copy="approach_title">Our approach</h3>
+        <p data-copy="approach_text">We believe mental health care should be private, respectful, and free of judgement. Every person who walks through our doors is met with warmth and a personalised plan.</p>
+        <h3 data-copy="offer_title">What we offer</h3>
+        <p data-copy="offer_text">Consultations for adults, children, and seniors; online consultation; de-addiction support; counselling and psychotherapy; and convenient diagnostic services with home sample collection.</p>
         <div class="hero__cta" style="margin-top:var(--sp-6)">
-          <a class="btn btn--primary" href="/booking.html#confirmed">Book confirmed appointment</a>
-          <a class="btn btn--ghost" href="/doctors.html">Meet our team</a>
+          <a class="btn btn--primary" href="/booking#confirmed" data-copy="cta_primary">Book confirmed appointment</a>
+          <a class="btn btn--ghost" href="/doctors" data-copy="cta_secondary">Meet our team</a>
         </div>
       </div></div></section>
   </main>
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
-    (async () => { await mountShell();  })();
+    import { applyPageCopy } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await applyPageCopy('about'); })();
   </script>
 </body>
 </html>

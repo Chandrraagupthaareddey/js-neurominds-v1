@@ -1,0 +1,12 @@
+{
+  "time_slots": ["Morning (9am–12pm)", "Afternoon (12pm–4pm)", "Evening (4pm–8pm)"],
+  "consultation_for": ["Myself", "Family member", "Someone I care for"],
+  "patient_type": ["New patient", "Follow-up"],
+  "consultation_mode": ["Clinic visit", "Online", "Either"],
+  "concern_categories": [
+    "Appointment booking", "Anxiety/stress support", "Sleep concern",
+    "Child/teen concern", "Addiction support", "Follow-up consultation",
+    "Online consultation", "Lab/home collection enquiry", "General enquiry",
+    "Prefer to discuss on call"
+  ]
+}

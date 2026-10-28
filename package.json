@@ -1,24 +1,28 @@
 {
   "name": "js-neurominds-v1",
   "version": "1.0.0",
-  "description": "JS Neurominds and Diagnostic Center — V1 production monorepo. Public website + Admin CMS + Google Apps Script backend. Built by TCGR Technologies (tcgr.in).",
+  "description": "JS Neurominds and Diagnostic Center — production monorepo. Static public website (Cloudflare Pages) + git-based admin CMS (Sveltia) + Apps Script forms backend. Built by TCGR Technologies (tcgr.in).",
   "private": true,
   "type": "module",
   "scripts": {
-    "local:public": "vite --config vite.public.config.js --host 127.0.0.1 --port 5173",
-    "local:admin": "vite --config vite.admin.config.js --host 127.0.0.1 --port 5174",
-    "dev:public": "vite --config vite.public.config.js --host 127.0.0.1 --port 5173",
-    "dev:admin": "vite --config vite.admin.config.js --host 127.0.0.1 --port 5174",
-    "validate": "node scripts/build-content-index.js && node scripts/validate-schemas.js && node scripts/validate-seed.js",
+    "local:public": "npm run pages && vite --config vite.public.config.js --host 127.0.0.1 --port 5173",
+    "dev:public": "npm run pages && vite --config vite.public.config.js --host 127.0.0.1 --port 5173",
+    "validate": "node scripts/build-content-index.js && node scripts/validate-schemas.js && node scripts/validate-seed.js && node scripts/validate-cms-config.js",
     "check:env": "node scripts/check-env.js",
+    "test": "node --test \"tests/**/*.test.js\"",
     "clean": "node scripts/clean-dist.js",
-    "build": "node scripts/build-content-index.js && node scripts/clean-dist.js && node scripts/build-stubs.js && vite build --config vite.public.config.js && node scripts/copy-static.js",
-    "build:admin": "node scripts/build-content-index.js && vite build --config vite.admin.config.js && node scripts/copy-static.js admin",
+    "build": "node scripts/build-content-index.js && node scripts/clean-dist.js && node scripts/build-pages.js && vite build --config vite.public.config.js && node scripts/copy-static.js",
+    "build:admin": "node scripts/build-admin.js",
     "prod:public": "npm run build && vite preview --config vite.public.config.js --host 127.0.0.1 --port 8080",
-    "prod:admin": "npm run build:admin && vite preview --config vite.admin.config.js --host 127.0.0.1 --port 8081",
+    "prod:admin": "npm run build:admin && npx vite preview --config vite.admin.config.js --outDir dist-admin --host 127.0.0.1 --port 8081",
     "preview:public": "vite preview --config vite.public.config.js --port 5173",
     "deploy:gas:admin": "cd gas-admin-cms && clasp push",
-    "deploy:gas:public": "cd gas-public-api && clasp push"
+    "deploy:gas:public": "cd gas-public-api && clasp push",
+    "content:index": "node scripts/build-content-index.js",
+    "content:migrate": "node scripts/migrate-content-types.js",
+    "pages": "node scripts/build-content-index.js && node scripts/build-pages.js",
+    "legacy:dev:admin": "vite --config vite.admin.config.js --host 127.0.0.1 --port 5174",
+    "legacy:build:admin": "node scripts/build-content-index.js && vite build --config vite.admin.config.js && node scripts/copy-static.js admin"
   },
   "devDependencies": {
     "vite": "^8.2.0"

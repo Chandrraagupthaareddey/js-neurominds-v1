@@ -28,7 +28,7 @@
   <main id="main">
     <section class="section">
       <div class="container container--prose">
-        <div class="section-head section-head--center" data-reveal><p class="eyebrow eyebrow--center">Help</p><h1>Frequently asked questions</h1><p class="lede" style="margin-inline:auto">Everything you might want to know before reaching out.</p></div>
+        <div class="section-head section-head--center" data-reveal><p class="eyebrow eyebrow--center" data-copy="eyebrow">Help</p><h1 data-copy="title">Frequently asked questions</h1><p class="lede" style="margin-inline:auto" data-copy="lede">Everything you might want to know before reaching out.</p></div>
         <div id="faq-wrap" data-reveal="2"></div>
       </div>
     </section>
@@ -37,7 +37,8 @@
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
     import { hydrateFaq } from '/assets/js/pages.js';
-    (async () => { await mountShell(); await hydrateFaq(); })();
+    import { applyPageCopy } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await Promise.all([hydrateFaq(), applyPageCopy('faq')]); })();
   </script>
 </body>
 </html>

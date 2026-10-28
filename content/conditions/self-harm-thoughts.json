@@ -3,14 +3,30 @@
   "slug": "self-harm-thoughts",
   "name": "Self-Harm Thoughts",
   "one_line_summary": "Thoughts of hurting oneself that need caring support.",
-  "symptoms": "Thoughts of self-harm;Distress;Withdrawal",
+  "symptoms": [
+    "Thoughts of self-harm",
+    "Distress",
+    "Withdrawal"
+  ],
   "when_to_consult": "Reach out promptly for support; you do not have to cope alone.",
   "treatment_approach": "If you are in immediate danger, use the Emergency Help page now. Compassionate assessment and a safety-focused support plan.",
-  "related_conditions": "Depression;Anxiety",
-  "is_emergency": "YES",
-  "faqs": "I am having these thoughts, what now?|Please reach out for help right away.||Is support available?|Yes, caring help is available.",
+  "related_conditions": [
+    "Depression",
+    "Anxiety"
+  ],
+  "is_emergency": true,
+  "faqs": [
+    {
+      "question": "I am having these thoughts, what now?",
+      "answer": "Please reach out for help right away."
+    },
+    {
+      "question": "Is support available?",
+      "answer": "Yes, caring help is available."
+    }
+  ],
   "category": "Crisis Support",
-  "is_featured": "YES",
+  "is_featured": true,
   "status": "published",
   "seo_title": "Mental Health Crisis Support in Tirupati | JS Neurominds",
   "seo_description": "Caring support for distress. If in danger now, see Emergency Help."

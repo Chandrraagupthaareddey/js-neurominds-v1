@@ -8,25 +8,27 @@
 - **Root directory:** repository root
 - Node version: 18+
 
-The admin portal can be deployed as a second Pages project (build `npm run build:admin`, output `dist-admin`) or served behind an access-restricted path.
+The admin CMS ships inside the public build at `/admin/` (so `https://neurominds.in/admin/` just works). For
+`admin.neurominds.in` either add that custom domain to the same project + a redirect rule to `/admin/`, or deploy a
+second Pages project from the same repo with build `npm run build:admin`, output `dist-admin`. Details: `docs/ADMIN_CMS.md`.
+
+Clean URLs: Cloudflare Pages serves `about.html` at `/about` (and redirects `/about.html` → `/about`). The site now
+links to and declares canonical clean URLs everywhere. `public-site/_headers` and `public-site/_redirects` are copied
+into `dist/` (security headers, asset caching, redirects from the old `/p/...` stub URLs).
 
 ## Environment variables (Cloudflare dashboard)
 Set production values here (NOT in `.env`):
 ```
 VITE_API_MODE=live
 VITE_ENV=production
-VITE_PUBLIC_API_URL=<public GAS /exec URL>
-VITE_ADMIN_API_URL=<admin GAS /exec URL>
+VITE_PUBLIC_API_URL=<Apps Script forms /exec URL>   # only for Enquire/Callback/Lab form submissions
 VITE_GA4_MEASUREMENT_ID=G-WKLHEDHC5D
 ```
+(`VITE_ADMIN_API_URL`, `VITE_GOOGLE_CLIENT_ID`, `VITE_ALLOWED_ADMIN_EMAILS` are no longer used.)
 
-## Deploy Hook (content sync)
-1. In Cloudflare Pages → Settings → Builds & deployments → **Deploy hooks**, create a hook (e.g. `content-sync`).
-2. Copy the hook URL.
-3. Store it as a **secret** in the Admin CMS Script Properties under `CLOUDFLARE_DEPLOY_HOOK_URL`.
-4. Never put the hook URL in code, `.env`, or any committed file.
-
-When an admin clicks **Sync approved content**, the CMS calls this hook; Cloudflare rebuilds, and `scripts/build-stubs.js` regenerates SEO stubs + the sitemap from approved content.
+## Deploy Hook (no longer needed)
+Content is committed to GitHub by the admin, so the normal push-triggered build publishes it. The former
+"Sync approved content" deploy hook is obsolete; if one exists it can be deleted.
 
 ## Custom domain
 Map `neurominds.in` to the Pages project in Cloudflare DNS.

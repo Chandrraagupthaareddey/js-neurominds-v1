@@ -24,25 +24,25 @@
     <section class="section">
       <div class="container" style="max-width:960px">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">Diagnostics</p>
-          <h1>Lab tests &amp; home sample collection</h1>
-          <p class="lede">Convenient door pickup around Chandragiri (within ~10 km). Reports are usually ready within 24 hours, depending on the test, package, and lab availability.</p>
+          <p class="eyebrow" data-copy="eyebrow">Diagnostics</p>
+          <h1 data-copy="title">Lab tests &amp; home sample collection</h1>
+          <p class="lede" data-copy="lede">Convenient door pickup around Chandragiri (within ~10 km). Reports are usually ready within 24 hours, depending on the test, package, and lab availability.</p>
         </div>
 
-        <div class="assurance" data-reveal style="margin-bottom:var(--sp-7)">
+        <div class="assurance" id="lab-assurance" data-reveal style="margin-bottom:var(--sp-7)">
           <div class="assurance__item"><span class="ico">🏠</span> Door pickup</div>
           <div class="assurance__item"><span class="ico">⏱</span> Reports usually &lt; 24 hrs</div>
           <div class="assurance__item"><span class="ico">📍</span> ~10 km around Chandragiri</div>
           <div class="assurance__item"><span class="ico">✓</span> Staff-verified before pickup</div>
         </div>
 
-        <div class="grid grid--3" id="list-wrap" data-reveal="2" style="margin-bottom:var(--sp-8)"></div>
+        <div class="grid grid--3" id="list-wrap" data-list="lab" data-reveal="2" style="margin-bottom:var(--sp-8)"></div>
 
         <div style="max-width:580px; margin:0 auto">
           <div class="section-head section-head--center" data-reveal>
-            <p class="eyebrow eyebrow--center">Home collection</p>
-            <h2>Request a pickup</h2>
-            <p class="lede" style="margin-inline:auto">Tell us where and when — our team will confirm before pickup.</p>
+            <p class="eyebrow eyebrow--center" data-copy="form_eyebrow">Home collection</p>
+            <h2 data-copy="form_title">Request a pickup</h2>
+            <p class="lede" style="margin-inline:auto" data-copy="form_lede">Tell us where and when — our team will confirm before pickup.</p>
           </div>
           <div class="card" style="box-shadow:var(--shadow-md)">
             <div id="lab-mount"></div>
@@ -53,7 +53,7 @@
   </main>
 
   <div class="sticky-cta">
-    <a class="btn btn--ghost" href="/contact.html">Call us</a>
+    <a class="btn btn--ghost" href="/contact">Call us</a>
     <a class="btn btn--primary" href="#lab-mount">Request pickup</a>
   </div>
 
@@ -61,11 +61,12 @@
     import { mountShell } from '/assets/js/app.js';
     import { hydrateList } from '/assets/js/pages.js';
     import { renderLabForm } from '/assets/js/lab.js';
+    import { applyPageCopy } from '/assets/js/pages.js';
     import '/assets/js/feedback.js';
     (async () => {
       document.body.classList.add('has-sticky-cta');
       await mountShell();
-      await hydrateList('lab');
+      await Promise.all([hydrateList('lab'), applyPageCopy('lab')]);
       await renderLabForm('#lab-mount');
     })();
   </script>

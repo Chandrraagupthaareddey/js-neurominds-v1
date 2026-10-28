@@ -14,10 +14,10 @@ const GA_BADGE = CONFIG.ANALYTICS_CONNECTED
 const esc = (s) => String(s == null ? '' : s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
 export async function renderDashboard(mount) {
-  const res = await api.dashboard();
-  const d = res.data;
-  const k = d.kpis;
-  const ga = d.ga4;
+  const res = await api.dashboard(); // api wrapper guarantees success + data (JP-001)
+  const d = res.data || {};
+  const k = { callbacks_new: 0, followups: 0, lab_new: 0, pwens_clicks_7d: 0, feedback_pending: 0, ...(d.kpis || {}) };
+  const ga = { range: '', totals: {}, events: {}, by_source: [], by_device: [], daily_sessions: [], ...(d.ga4 || {}) };
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 

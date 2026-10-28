@@ -26,13 +26,23 @@ const items = target === 'admin'
       { rel: 'assets/brand', required: true }
     ]
   : [
-      { rel: 'p', required: false },                 // SEO stubs (skipped when no stubs)
       { rel: 'sitemap.xml', required: true },
+      { rel: 'robots.txt', required: true },
       { rel: 'assets/brand', required: true },
       { rel: 'assets/img', required: false },
       { rel: 'site.webmanifest', required: true },
-      { rel: 'robots.txt', required: false }
+      { rel: '_headers', required: true },           // Cloudflare Pages security/cache headers
+      { rel: '_redirects', required: true }          // Cloudflare Pages redirects (old stub URLs)
     ];
+
+// The git-based admin CMS (Sveltia) ships inside the public build at /admin/
+// so admin.neurominds.in can simply point at the same Pages project, or the
+// same files can be deployed as their own project via `npm run build:admin`.
+const adminSrc = resolve(root, 'admin');
+if (target === 'public' && existsSync(adminSrc)) {
+  cpSync(adminSrc, resolve(dist, 'admin'), { recursive: true });
+  console.log('copy-static(public): CMS admin mirrored to dist/admin/');
+}
 
 let copied = 0;
 const missing = [];

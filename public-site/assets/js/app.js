@@ -12,6 +12,8 @@
 import { api } from './api.js';
 import { initAnalytics, analytics } from './analytics.js';
 import { initUi } from './ui.js';
+import { yes } from '../../../shared/content-normalize.js';
+import { ROUTES } from '../../../shared/render.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const LOGO = '/assets/brand/logo.png';
@@ -22,8 +24,9 @@ function el(html) {
   return t.content.firstChild;
 }
 
+// Clean URLs: Cloudflare Pages (and Vite dev/preview) serve /about for about.html.
 function navHref(route) {
-  return route === '/' ? '/index.html' : route + '.html';
+  return route === '/' ? '/' : String(route || '/').replace(/\.html$/, '');
 }
 
 /* ---------------- Theme (light / dark / system) ---------------- */
@@ -66,7 +69,7 @@ function brandMark(cfg, forFooter) {
   const logo = (cfg && (forFooter ? cfg.footer_logo_url : cfg.logo_url)) || LOGO;
   return `
     <span class="brand__logo" aria-hidden="true"><img src="${logo}" alt="" width="44" height="44" loading="eager" decoding="async" /></span>
-    <span class="brand__name">${cfg.clinic_short}<span>Psychiatry &amp; Diagnostics</span></span>`;
+    <span class="brand__name">${cfg.clinic_short}<span>${cfg.tagline || 'Psychiatry &amp; Diagnostics'}</span></span>`;
 }
 
 function renderHeader(cfg, nav, currentPath) {
@@ -77,20 +80,20 @@ function renderHeader(cfg, nav, currentPath) {
   const header = el(`
     <header class="site-header">
       <div class="container">
-        <a class="brand" href="/index.html" aria-label="${cfg.clinic_name} home">
+        <a class="brand" href="/" aria-label="${cfg.clinic_name} home">
           ${brandMark(cfg, false)}
         </a>
         <nav class="nav" aria-label="Primary">
           ${links}
           <span class="theme-slot" data-theme-slot></span>
-          <a class="btn btn--primary nav__cta" href="/booking.html">Book now</a>
+          <a class="btn btn--primary nav__cta" href="${ROUTES.booking}">${cfg.nav_cta_label || 'Book now'}</a>
         </nav>
         <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
       </div>
       <nav class="mobile-nav" aria-label="Mobile">
         ${links}
         <span class="theme-slot" data-theme-slot-mobile></span>
-        <a class="btn btn--primary btn--block" href="/booking.html">Book now</a>
+        <a class="btn btn--primary btn--block" href="${ROUTES.booking}">${cfg.nav_cta_label || 'Book now'}</a>
       </nav>
     </header>
   `);
@@ -111,16 +114,15 @@ function renderHeader(cfg, nav, currentPath) {
 }
 
 function isCurrent(route, path) {
-  const file = navHref(route);
-  return path.endsWith(file) || (route === '/' && (path === '/' || path.endsWith('/index.html')));
+  const clean = String(path || '/').replace(/\.html$/, '').replace(/\/index$/, '/');
+  const href = navHref(route);
+  if (href === '/') return clean === '/';
+  return clean === href || clean.startsWith(href + '/');
 }
 
-function renderEmergencyBar() {
-  return el(`
-    <div class="emergency-bar">
-      <strong>In a crisis?</strong> <a href="/emergency.html">Get emergency help</a> — this website is not an emergency service.
-    </div>
-  `);
+function renderEmergencyBar(cfg) {
+  const text = (cfg && cfg.emergency_bar_text) || '<strong>In a crisis?</strong> <a href="/emergency">Get emergency help</a> — this website is not an emergency service.';
+  return el(`<div class="emergency-bar">${text}</div>`);
 }
 
 /* ---------------- Footer social icons ---------------- */
@@ -137,7 +139,7 @@ function renderFooterSocial(social) {
   if (!social || !social.length) return '';
   const items = social.map((s) => {
     const ico = SOCIAL_ICONS[s.platform] || SOCIAL_ICONS.google;
-    const tab = String(s.open_in_new_tab).toUpperCase() === 'YES' ? ' target="_blank" rel="noopener"' : '';
+    const tab = yes(s.open_in_new_tab) ? ' target="_blank" rel="noopener"' : '';
     return `<a class="social-link" href="${s.url}"${tab} aria-label="${s.aria_label || s.label}" data-platform="${s.platform}" title="${s.label}">${ico}</a>`;
   }).join('');
   return `<div class="footer-social" aria-label="Social media">${items}</div>`;
@@ -145,27 +147,31 @@ function renderFooterSocial(social) {
 
 function renderFooter(cfg, social, flags) {
   flags = flags || {};
-  const labLink = flags.public_lab_tests_enabled ? '<li><a href="/lab.html">Lab Tests</a></li>' : '';
-  const knowledgeLink = flags.public_knowledge_enabled === false ? '' : '<li><a href="/knowledge.html">Knowledge</a></li>';
-  const testimonialsLink = flags.public_testimonials_enabled === false ? '' : '<li><a href="/testimonials.html">Testimonials</a></li>';
+  const labLink = yes(flags.public_lab_tests_enabled) ? `<li><a href="${ROUTES.lab}">Lab Tests</a></li>` : '';
+  const knowledgeLink = flags.public_knowledge_enabled === false ? '' : `<li><a href="${ROUTES.knowledge}">Knowledge</a></li>`;
+  const testimonialsLink = flags.public_testimonials_enabled === false ? '' : `<li><a href="${ROUTES.testimonials}">Testimonials</a></li>`;
+  const callbackOn = yes(flags.public_callback_enabled);
   const footer = el(`
     <footer class="site-footer">
       <div class="container">
         <div class="footer-grid">
           <div>
-            <a class="brand" href="/index.html" style="margin-bottom:var(--sp-4)">
+            <a class="brand" href="/" style="margin-bottom:var(--sp-4)">
               ${brandMark(cfg, true)}
             </a>
             <p class="footer-contact">${cfg.address}</p>
             <p class="footer-contact">Phone: <a href="${cfg.call_link}">${cfg.display_phone}</a></p>
+            ${cfg.opening_hours_text ? `<p class="footer-contact">Hours: ${cfg.opening_hours_text}</p>` : ''}
+            ${cfg.email_support ? `<p class="footer-contact">Email: <a href="mailto:${cfg.email_support}">${cfg.email_support}</a></p>` : ''}
             ${renderFooterSocial(social)}
           </div>
           <div>
             <h4>Care</h4>
             <ul class="footer-links">
-              <li><a href="/doctors.html">Doctors</a></li>
-              <li><a href="/conditions.html">Conditions</a></li>
-              <li><a href="/treatments.html">Treatments</a></li>
+              <li><a href="${ROUTES.doctors}">Doctors</a></li>
+              <li><a href="${ROUTES.conditions}">Conditions</a></li>
+              <li><a href="${ROUTES.treatments}">Treatments</a></li>
+              <li><a href="${ROUTES.services}">Services</a></li>
               ${labLink}
               ${knowledgeLink}
             </ul>
@@ -173,25 +179,29 @@ function renderFooter(cfg, social, flags) {
           <div>
             <h4>Clinic</h4>
             <ul class="footer-links">
-              <li><a href="/about.html">About</a></li>
+              <li><a href="${ROUTES.about}">About</a></li>
               ${testimonialsLink}
-              <li><a href="/contact.html">Contact</a></li>
-              <li><a href="/faq.html">FAQ</a></li>
+              <li><a href="${ROUTES.contact}">Contact</a></li>
+              <li><a href="${ROUTES.faq}">FAQ</a></li>
+              <li><a href="${ROUTES.emergency}">Emergency help</a></li>
             </ul>
           </div>
           <div>
             <h4>Get started</h4>
-            <p class="footer-contact">${flags.public_callback_enabled ? 'Request a clinic callback or book a confirmed appointment online.' : 'Book a confirmed appointment online in minutes.'}</p>
+            <p class="footer-contact">${callbackOn ? 'Request a clinic callback or book a confirmed appointment online.' : 'Book a confirmed appointment online in minutes.'}</p>
             <div class="footer-cta">
-              ${flags.public_callback_enabled ? '<a class="btn btn--ghost btn--block footer-cta__ghost" href="/booking.html">Request Clinic Callback</a>' : ''}
-              <a class="btn btn--primary btn--block" href="/booking.html#confirmed">Book Confirmed Appointment</a>
+              ${callbackOn ? `<a class="btn btn--ghost btn--block footer-cta__ghost" href="${ROUTES.booking}#callback">Request Clinic Callback</a>` : ''}
+              <a class="btn btn--primary btn--block" href="${ROUTES.booking}#confirmed">Book Confirmed Appointment</a>
             </div>
             <a class="footer-map" href="${cfg.maps_url}" target="_blank" rel="noopener" data-map-link>📍 Get directions on Google Maps</a>
           </div>
         </div>
+        <div class="footer-legal">
+          <a href="${ROUTES.privacy}">Privacy</a> · <a href="${ROUTES.terms}">Terms</a> · <a href="${ROUTES.disclaimer}">Medical disclaimer</a>
+        </div>
         <div class="footer-bottom">
           <span>© ${new Date().getFullYear()} ${cfg.clinic_name}. All rights reserved.</span>
-          <span>Built and maintained by <a href="https://tcgr.in/" target="_blank" rel="noopener">tcgr.in</a></span>
+          <span>${cfg.footer || 'Built and maintained by <a href="https://tcgr.in/" target="_blank" rel="noopener">tcgr.in</a>'}</span>
         </div>
       </div>
     </footer>
@@ -221,7 +231,7 @@ function renderFabs(cfg, fabs) {
   const list = (fabs && fabs.length ? fabs : [
     { kind: 'call', label: 'Call Clinic', value: cfg.call_link, device_visibility: 'all' },
     { kind: 'whatsapp', label: 'WhatsApp Clinic', value: cfg.whatsapp_link, device_visibility: 'all' }
-  ]);
+  ]).filter((c) => c.is_enabled === undefined || yes(c.is_enabled));
 
   const right = el(`<div class="fab-stack fab-stack--right" aria-label="Quick contact"></div>`);
   list.forEach((c) => {
@@ -241,9 +251,10 @@ function renderFabs(cfg, fabs) {
 
   // Enquire / feedback button on the left (kept for the feedback modal hook).
   const enquire = list.find((c) => c.kind === 'feedback');
+  if (!enquire) return [right];
   const left = el(`
     <div class="fab-stack fab-stack--left">
-      <button class="fab fab--feedback" id="open-feedback" aria-label="${enquire ? enquire.label : 'Share feedback'}">★ ${enquire ? enquire.label : 'Feedback'}</button>
+      <button class="fab fab--feedback" id="open-feedback" aria-label="${enquire.label || 'Share feedback'}">★ ${enquire.label || 'Feedback'}</button>
     </div>
   `);
   return [right, left];
@@ -267,8 +278,13 @@ export async function mountShell({ currentPath = location.pathname } = {}) {
   window.__JSNM__ = { cfg, social, flags, fabs };
 
   const root = document.body;
-  root.prepend(renderEmergencyBar());
-  root.children[0].after(renderHeader(cfg, nav, currentPath));
+  const header = renderHeader(cfg, nav, currentPath);
+  if (flags.emergency_bar_enabled === false) {
+    root.prepend(header);
+  } else {
+    root.prepend(renderEmergencyBar(cfg));
+    root.children[0].after(header);
+  }
   const footerEl = renderFooter(cfg, social, flags);
   root.appendChild(footerEl);
   if (flags.floating_cta_enabled !== false) {

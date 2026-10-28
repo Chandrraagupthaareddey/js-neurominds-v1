@@ -29,11 +29,11 @@
     <section class="section">
       <div class="container">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">JS Neurominds</p>
-          <h1>Our services</h1>
-          <p class="lede">Care that fits your life.</p>
+          <p class="eyebrow" data-copy="eyebrow">JS Neurominds</p>
+          <h1 data-copy="title">Our services</h1>
+          <p class="lede" data-copy="lede">Care that fits your life.</p>
         </div>
-        <div class="grid grid--3" id="list-wrap" data-reveal="2"></div>
+        <div class="grid grid--3" id="list-wrap" data-list="services" data-reveal="2"></div>
       </div>
     </section>
   </main>
@@ -41,7 +41,8 @@
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
     import { hydrateList } from '/assets/js/pages.js';
-    (async () => { await mountShell(); await hydrateList('services'); })();
+    import { applyPageCopy } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await Promise.all([hydrateList('services'), applyPageCopy('services')]); })();
   </script>
 </body>
 </html>

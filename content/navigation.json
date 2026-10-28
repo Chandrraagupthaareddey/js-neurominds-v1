@@ -1,52 +1,64 @@
-[
-  {
-    "label": "Home",
-    "route": "/",
-    "order": 1
-  },
-  {
-    "label": "About",
-    "route": "/about",
-    "order": 2
-  },
-  {
-    "label": "Doctors",
-    "route": "/doctors",
-    "order": 3
-  },
-  {
-    "label": "Conditions",
-    "route": "/conditions",
-    "order": 4
-  },
-  {
-    "label": "Treatments",
-    "route": "/treatments",
-    "order": 5
-  },
-  {
-    "label": "Services",
-    "route": "/services",
-    "order": 6
-  },
-  {
-    "label": "Lab Tests",
-    "route": "/lab",
-    "order": 7
-  },
-  {
-    "label": "Knowledge",
-    "route": "/knowledge",
-    "order": 8
-  },
-  {
-    "label": "FAQ",
-    "route": "/faq",
-    "order": 9
-  },
-  {
-    "label": "Contact",
-    "route": "/contact",
-    "order": 10
-  }
-]
+{
+  "items": [
+    {
+      "label": "Home",
+      "route": "/",
+      "order": 1,
+      "is_enabled": true
+    },
+    {
+      "label": "About",
+      "route": "/about",
+      "order": 2,
+      "is_enabled": true
+    },
+    {
+      "label": "Doctors",
+      "route": "/doctors",
+      "order": 3,
+      "is_enabled": true
+    },
+    {
+      "label": "Conditions",
+      "route": "/conditions",
+      "order": 4,
+      "is_enabled": true
+    },
+    {
+      "label": "Treatments",
+      "route": "/treatments",
+      "order": 5,
+      "is_enabled": true
+    },
+    {
+      "label": "Services",
+      "route": "/services",
+      "order": 6,
+      "is_enabled": true
+    },
+    {
+      "label": "Lab Tests",
+      "route": "/lab",
+      "order": 7,
+      "is_enabled": true
+    },
+    {
+      "label": "Knowledge",
+      "route": "/knowledge",
+      "order": 8,
+      "is_enabled": true
+    },
+    {
+      "label": "FAQ",
+      "route": "/faq",
+      "order": 9,
+      "is_enabled": true
+    },
+    {
+      "label": "Contact",
+      "route": "/contact",
+      "order": 10,
+      "is_enabled": true
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Cloudflare Pages redirects
+# Old thin SEO stubs -> new pre-rendered pages
+/p/condition/:slug.html   /conditions/:slug   301
+/p/treatment/:slug.html   /treatments/:slug   301
+/p/doctor/:slug.html      /doctors/:slug      301
+/p/knowledge/:slug.html   /knowledge/:slug    301
+/p/condition/:slug        /conditions/:slug   301
+/p/treatment/:slug        /treatments/:slug   301
+/p/doctor/:slug           /doctors/:slug      301
+/p/knowledge/:slug        /knowledge/:slug    301
+/index.html               /                   301

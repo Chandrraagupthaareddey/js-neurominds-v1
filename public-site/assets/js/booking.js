@@ -10,6 +10,7 @@
  */
 import { api, getSlugParam } from './api.js';
 import { analytics } from './analytics.js';
+import { isSubmissionBackendAvailable, unavailableNoticeHtml, failureHtml } from './submission-status.js';
 
 const CLINICAL_WARNING =
   'Please do not enter diagnosis, prescriptions, medication details, or detailed medical history here. Our clinic team will guide you during the call.';
@@ -25,7 +26,9 @@ export async function renderCallbackForm(mountSel) {
   const doctors = (docsRes.data || []).map((d) => d.full_name);
   const doctorOptions = doctors.length ? doctors : ['Dr. Jayapriya T'];
 
+  const available = isSubmissionBackendAvailable();
   mount.innerHTML = `
+    ${available ? '' : unavailableNoticeHtml('callback requests')}
     <form id="callback-form" novalidate>
       <div class="form-field">
         <label for="cb-name">Your name <span class="req">*</span></label>
@@ -111,6 +114,10 @@ export async function renderCallbackForm(mountSel) {
   analytics.supportBookingFormOpen();
 
   const form = mount.querySelector('#callback-form');
+  if (!available) {
+    const submit = form.querySelector('#cb-submit');
+    if (submit) { submit.disabled = true; submit.setAttribute('aria-disabled', 'true'); submit.textContent = 'Submission unavailable'; }
+  }
   form.addEventListener('submit', (e) => onSubmit(e, mount));
 }
 
@@ -149,19 +156,21 @@ async function onSubmit(e, mount) {
   btn.disabled = true; btn.textContent = 'Sending…';
   try {
     const res = await api.submitCallback(payload);
-    if (res.success) {
+    if (res && res.success && res.data && res.data.callback_id) {
       analytics.supportBookingSubmit(res.data.callback_id);
       showSuccess(mount, res.data);
     } else {
-      throw new Error(res.error || 'Request failed');
+      const e = new Error((res && res.error) || 'Request failed'); e.code = res && res.code; throw e;
     }
   } catch (err) {
+    // Honest failure: the form stays visible, no success copy, verified contacts only.
     analytics.supportBookingError();
     btn.disabled = false; btn.textContent = 'Request Clinic Callback';
     const result = mount.querySelector('#cb-result');
     result.className = 'notice notice--err';
-    result.textContent = 'Sorry, something went wrong sending your request. Please call us directly and we\'ll help right away.';
+    result.innerHTML = failureHtml(err);
     result.classList.remove('hide');
+    result.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 

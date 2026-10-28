@@ -1,100 +1,88 @@
 /**
  * JS Neurominds V1 — public-site/assets/js/mock-api.js
- * Local mock of the GAS Public API. Imports the shared dataset so the public
- * site and admin UI always agree. Returns the same { success, data } envelope
- * the real API uses. Adds small latency to mimic the network.
+ * Static content API. All public READS resolve from the content bundled at
+ * build time (shared/content.js ← /content/**.json, edited in the admin CMS).
+ * There is no runtime backend for content any more — pages are fast, work
+ * offline-ish, and Google sees real HTML.
+ *
+ * WRITE paths (forms) are intentionally NOT implemented here: this module
+ * never fabricates a success (audit JP-004). api.js routes writes to the
+ * Apps Script endpoint when VITE_PUBLIC_API_URL is configured, otherwise the
+ * forms show the honest "unavailable" notice with verified contact options.
+ *
+ * Exported as `mockApi` for backwards compatibility (tests, legacy admin-ui)
+ * and as `contentApi` for new code.
  */
 import {
   CLINIC_CONFIG, NAVIGATION, DOCTORS, CONDITIONS, TREATMENTS, SERVICES,
   LAB_PACKAGES, BLOGS, FAQS, CALLBACK_OPTIONS,
-  SOCIAL_LINKS, TESTIMONIALS, GOOGLE_REVIEWS, FEATURE_FLAGS, FLOATING_CTA
-} from '../../../shared/mock-public-content.js';
+  SOCIAL_LINKS, TESTIMONIALS, GOOGLE_REVIEWS, FEATURE_FLAGS, FLOATING_CTA, PAGES, SEO
+} from '../../../shared/content.js';
+import { yes, published, approved, enabledSorted, byOrder } from '../../../shared/content-normalize.js';
+import { unavailableEnvelope } from './submission-status.js';
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const okEnv = (data) => ({ success: true, code: 200, data, error: null });
-
-const byStatus = (rows) => rows.filter((r) => r.status === 'published');
 const findSlug = (rows, slug) => rows.find((r) => r.slug === slug) || null;
+// Never print patient-entered values to the console; log only the field names.
+const redactForLog = (payload) => ({ fields: Object.keys(payload || {}) });
 
-export const mockApi = {
-  async config() { await wait(40); return okEnv(CLINIC_CONFIG); },
-  async navigation() {
-    await wait(30);
-    // Respect the public_lab_tests_enabled flag: hide the Lab nav item when off.
-    const nav = NAVIGATION.filter((n) => {
-      if (n.route === '/lab' && !FEATURE_FLAGS.public_lab_tests_enabled) return false;
-      if (n.route === '/knowledge' && !FEATURE_FLAGS.public_knowledge_enabled) return false;
-      return true;
-    });
-    return okEnv(nav);
-  },
-  async featureFlags() { await wait(20); return okEnv(FEATURE_FLAGS); },
-  async floatingCta() {
-    await wait(20);
-    const rows = FLOATING_CTA
-      .filter((c) => String(c.is_enabled).toUpperCase() === 'YES')
-      .sort((a, b) => Number(a.display_order) - Number(b.display_order));
-    return okEnv(rows);
-  },
+/** Navigation filtered by feature flags, sorted by order. */
+export function visibleNavigation(flags = FEATURE_FLAGS) {
+  return NAVIGATION.filter((n) => {
+    if (n.route === '/lab' && !yes(flags.public_lab_tests_enabled)) return false;
+    if (n.route === '/knowledge' && !yes(flags.public_knowledge_enabled)) return false;
+    if (n.route === '/testimonials' && flags.public_testimonials_enabled === false) return false;
+    if (n.is_enabled === false) return false;
+    return true;
+  }).slice().sort(byOrder('order'));
+}
 
-  async doctors() { await wait(60); return okEnv(byStatus(DOCTORS)); },
-  async doctor(slug) { await wait(50); return okEnv(findSlug(DOCTORS, slug)); },
+export const contentApi = {
+  async config() { return okEnv(CLINIC_CONFIG); },
+  async navigation() { return okEnv(visibleNavigation()); },
+  async featureFlags() { return okEnv(FEATURE_FLAGS); },
+  async floatingCta() { return okEnv(enabledSorted(FLOATING_CTA)); },
+  async page(id) { return okEnv(PAGES[id] || null); },
+  async seo() { return okEnv(SEO); },
 
-  async conditions() { await wait(60); return okEnv(byStatus(CONDITIONS)); },
-  async condition(slug) { await wait(50); return okEnv(findSlug(CONDITIONS, slug)); },
+  async doctors() { return okEnv(published(DOCTORS)); },
+  async doctor(slug) { return okEnv(findSlug(published(DOCTORS), slug)); },
 
-  async treatments() { await wait(60); return okEnv(byStatus(TREATMENTS)); },
-  async treatment(slug) { await wait(50); return okEnv(findSlug(TREATMENTS, slug)); },
+  async conditions() { return okEnv(published(CONDITIONS)); },
+  async condition(slug) { return okEnv(findSlug(published(CONDITIONS), slug)); },
 
-  async services() { await wait(50); return okEnv(byStatus(SERVICES)); },
-  async labPackages() { await wait(50); return okEnv(byStatus(LAB_PACKAGES)); },
+  async treatments() { return okEnv(published(TREATMENTS)); },
+  async treatment(slug) { return okEnv(findSlug(published(TREATMENTS), slug)); },
 
-  async blogs() { await wait(60); return okEnv(byStatus(BLOGS)); },
-  async blog(slug) { await wait(50); return okEnv(findSlug(BLOGS, slug)); },
+  async services() { return okEnv(published(SERVICES)); },
+  async labPackages() { return okEnv(published(LAB_PACKAGES)); },
 
-  async faqs() { await wait(40); return okEnv(byStatus(FAQS)); },
-  async callbackOptions() { await wait(30); return okEnv(CALLBACK_OPTIONS); },
+  async blogs() { return okEnv(published(BLOGS)); },
+  async blog(slug) { return okEnv(findSlug(published(BLOGS), slug)); },
+
+  async faqs() { return okEnv(published(FAQS).slice().sort(byOrder('order'))); },
+  async callbackOptions() { return okEnv(CALLBACK_OPTIONS); },
 
   // Trust + brand modules (only enabled/approved records surface).
-  async socialLinks() {
-    await wait(30);
-    const rows = SOCIAL_LINKS
-      .filter((s) => String(s.is_enabled).toUpperCase() === 'YES' && s.url)
-      .sort((a, b) => Number(a.display_order) - Number(b.display_order));
-    return okEnv(rows);
-  },
-  async testimonials() {
-    await wait(40);
-    const rows = TESTIMONIALS
-      .filter((t) => t.status === 'approved')
-      .sort((a, b) => Number(a.display_order) - Number(b.display_order));
-    return okEnv(rows);
-  },
+  async socialLinks() { return okEnv(enabledSorted(SOCIAL_LINKS, 'url')); },
+  async testimonials() { return okEnv(approved(TESTIMONIALS).slice().sort(byOrder('display_order'))); },
   async googleReviews() {
-    await wait(40);
-    return okEnv({
-      summary: GOOGLE_REVIEWS.summary,
-      reviews: GOOGLE_REVIEWS.reviews.filter((r) => r.status === 'approved')
-    });
+    return okEnv({ summary: GOOGLE_REVIEWS.summary, reviews: approved(GOOGLE_REVIEWS.reviews) });
   },
 
-  // Write paths echo a generated id, mirroring real API behaviour.
+  // Write paths: no persistence here. Never fabricate a success (audit JP-004).
   async submitCallback(payload) {
-    await wait(180);
-    const id = 'cb_' + Math.random().toString(36).slice(2, 8);
-    console.info('[mock] callback saved', id, payload);
-    return okEnv({ callback_id: id, internal_email_status: 'sent', patient_email_status: payload.patient_email ? 'sent' : 'skipped' });
+    console.info('[content-api] callback NOT saved — no write backend configured', redactForLog(payload));
+    return unavailableEnvelope();
   },
   async submitLabRequest(payload) {
-    await wait(180);
-    const id = 'lab_' + Math.random().toString(36).slice(2, 8);
-    console.info('[mock] lab request saved', id, payload);
-    return okEnv({ lab_request_id: id });
+    console.info('[content-api] lab request NOT saved — no write backend configured', redactForLog(payload));
+    return unavailableEnvelope();
   },
   async submitFeedback(payload) {
-    await wait(150);
-    const id = 'fb_' + Math.random().toString(36).slice(2, 8);
-    console.info('[mock] feedback saved', id, payload);
-    return okEnv({ feedback_id: id });
+    console.info('[content-api] feedback NOT saved — no write backend configured', redactForLog(payload));
+    return unavailableEnvelope();
   }
 };
+
+export const mockApi = contentApi;

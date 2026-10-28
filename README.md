@@ -2,7 +2,7 @@
 
 Production monorepo for **JS Neurominds and Diagnostic Center** — a psychiatry and mental-health clinic in Chandragiri, Tirupati. Built and maintained by **TCGR Technologies (tcgr.in)**.
 
-This repository contains a premium public website, an operations admin portal, and two Google Apps Script backends — all on free-tier Google + Cloudflare infrastructure, with strict privacy guarantees.
+This repository contains a premium **static** public website, a **git-based admin CMS** (every public page is editable), and a small Google Apps Script backend used only for the website forms — all on free tiers (Cloudflare Pages + GitHub + Apps Script), with strict privacy guarantees.
 
 ---
 
@@ -10,106 +10,88 @@ This repository contains a premium public website, an operations admin portal, a
 
 - Give patients and families a calm, trustworthy place to learn about the clinic, explore conditions and treatments, and reach out.
 - Offer two clear booking paths: a **private call back** (handled by clinic staff) and a **confirmed appointment** (via the PWeNS booking partner).
-- Give clinic staff a simple operations dashboard to manage callback requests, lab home-collection requests, feedback, content, and SEO — without touching spreadsheets directly.
+- Give clinic staff a simple admin (admin.neurominds.in) where **everything on the public site** — clinic details, menu, page text, conditions, treatments, doctors, articles, FAQs, testimonials, feature switches, SEO — can be edited; each save publishes automatically via GitHub → Cloudflare.
 - Keep analytics privacy-safe: no patient PII or clinical data ever reaches GA4 or BigQuery.
 
 ## 2. Architecture (high level)
 
 ```
-Visitor -> Cloudflare Pages (static public site)
-                |  reads content / submits requests
-                v
-        GAS Public API (web app)  -->  Google Sheets: JSNM_V1_OPERATIONS_AUDIT
-                                  +-->  Google Sheets: JSNM_V1_CONFIG_CONTENT (read)
+Editor -> admin.neurominds.in (Sveltia CMS, in-browser)
+              | commit /content/**.json
+              v
+          GitHub (main)  --push-->  Cloudflare Pages build (npm run build)
+                                        | bakes content into HTML, pre-renders
+                                        | /conditions/<slug>, /doctors/<slug>, ...
+                                        v
+Visitor -> https://neurominds.in (static, no runtime API for content)
+              | Enquire / Callback / Lab forms only
+              v
+          GAS Public API (web app) --> Google Sheet log + email
 
-Staff -> Admin Portal (static)  -->  GAS Admin CMS (web app, Google sign-in)
-                                       +-> both Sheets workbooks
-                                       +-> GA4 Data API (dashboards)
-                                       +-> BigQuery (health check only)
-                                       +-> Cloudflare Deploy Hook (content sync)
-
-Analytics: site -> GA4 (allowlisted, non-PII events) -> daily export -> BigQuery (archive only)
+Analytics: site -> GA4 (allowlisted, non-PII events)
 ```
 
-Full detail in `docs/ARCHITECTURE.md`.
+Content never comes from Apps Script or Sheets at runtime any more: `shared/content.js` imports the JSON
+under `/content` and Vite bundles it, while `scripts/build-pages.js` + `scripts/vite-plugin-content.js`
+put the content directly into the HTML (fast first paint, fully indexable). Full detail in `docs/ARCHITECTURE.md`
+and `docs/ADMIN_CMS.md`.
 
 ## 3. Folder structure
 
 ```
 js-neurominds-v1/
   public-site/      Static premium website (Vite, vanilla JS, MPA)
-  admin-ui/         Admin operations portal (Vite, vanilla JS, SPA)
-  shared/           Constants, schemas, validators, permissions, mock content
-  gas-public-api/   Google Apps Script - public read/write API
-  gas-admin-cms/    Google Apps Script - admin CMS + setup + analytics
-  scripts/          Validation, SEO stub builder, env + clean helpers
-  docs/             Architecture, deployment, runbook, security, etc.
-  .env.example      Safe example env (no secrets)
-  wrangler.toml.example
+  content/          ALL editable content (JSON) — the single source of truth
+    clinic.json, navigation.json, social_links.json
+    settings/       feature flags, floating buttons, google reviews, callback options, SEO
+    pages/          per-page text + SEO (home, about, booking, ...)
+    conditions/ treatments/ services/ doctors/ lab_packages/ blogs/ faqs/ testimonials/
+  admin/            Git-based admin CMS (Sveltia): index.html + config.yml
+  shared/           content.js (bundled content), render.js (shared HTML), normalize, markdown, constants
+  scripts/          build-pages (pre-render + sitemap + robots), vite content plugin, validators
+  gas-public-api/   Google Apps Script — website forms only (email + Sheet log)
+  docs/             Architecture, deployment, admin CMS, SEO, security, ...
+  admin-ui/, gas-admin-cms/   ARCHIVED (former Apps Script admin; not deployed)
+  .env.example, wrangler.toml.example
 ```
 
 ## 4. Local setup
 
 ```bash
 npm install
-npm run dev:public    # http://localhost:5173
-npm run dev:admin     # http://localhost:5174
-npm run validate      # schema + seed validation
-npm run build         # SEO stubs + production build of the public site
+npm run dev:public    # http://127.0.0.1:5173  (pre-renders content pages, then Vite dev server)
+npm run validate      # schema + content + CMS-config validation
+npm test              # unit/contract tests
+npm run build         # production build of the public site -> dist/ (includes dist/admin/)
+npm run build:admin   # standalone admin build -> dist-admin/
 ```
 
-Local development needs **no backend** - see Mock mode below. Full guide: `docs/LOCAL_DEVELOPMENT.md`.
+Local development needs **no backend**: content is read from `/content`. Full guide: `docs/LOCAL_DEVELOPMENT.md`.
 
-## 5. Mock mode
+## 5. Content (the only data source)
 
-By default on `localhost`, both apps run in **mock mode** (`VITE_API_MODE=mock`): the UI is driven by `shared/mock-public-content.js`, so you can develop and demo the entire experience - including the admin RBAC simulator - with no GAS, Cloudflare, or Git required.
+All public content lives in `/content` as JSON and is edited in the admin (or any editor). `npm run build`
+recombines the per-entry folders into `content/<type>.json` (`scripts/build-content-index.js`), pre-renders a
+real HTML page per entry, and bakes settings/page text into every page. `VITE_API_MODE` no longer affects reads.
 
-## 6. Live mode
+## 6. Forms backend (optional)
 
-Set `VITE_API_MODE=live` and point the apps at deployed GAS web app URLs:
+The Enquire/Feedback, Callback and Lab forms POST to the Apps Script web app when `VITE_PUBLIC_API_URL` is set
+(`VITE_API_MODE=live`). Without it the forms show an honest "submission unavailable" notice with the clinic's
+verified Call/WhatsApp options — they never fake a success. Production URLs are **never hardcoded**.
 
-```
-VITE_API_MODE=live
-VITE_PUBLIC_API_URL=https://script.google.com/macros/s/XXXX/exec
-VITE_ADMIN_API_URL=https://script.google.com/macros/s/YYYY/exec
-```
+## 6a. Admin access
 
-Production GAS URLs are **never hardcoded** - they are injected via environment at build time.
-
-## 6a. Admin access modes (Preview / OAuth / Restricted)
-
-The admin portal (`admin-ui/`) resolves access from environment variables at build time — no code change is ever needed to switch modes. Precedence:
-
-| Priority | Environment | Behavior |
-|----------|-------------|----------|
-| 1 | `VITE_ADMIN_PREVIEW=true` | **Preview Mode** — bypasses only the auth gate, auto-signs in as `super_admin`, loads the real dashboard with **full** create/update/delete/publish/save. Routing, sections, and RBAC are identical to production. |
-| 2 | `VITE_GOOGLE_CLIENT_ID=<id>` (and preview off) | **Production** — real Google OAuth sign-in (Google Identity Services → ID token → GAS verification → Users tab → role → session). |
-| 3 | none of the above | **Restricted** — clean access page: *"Admin access is restricted. Google authentication will be enabled before live admin use."* |
-
-**Going live later requires configuration only, not code:**
-
-1. Set `VITE_ADMIN_PREVIEW=false`
-2. Set `VITE_GOOGLE_CLIENT_ID` to the OAuth client ID
-3. Add authorized emails to the `Users` tab in the CONFIG_CONTENT workbook
-
-```bash
-# Preview (demo/dev before OAuth is ready)
-VITE_ADMIN_PREVIEW=true
-
-# Production (real auth)
-VITE_ADMIN_PREVIEW=false
-VITE_GOOGLE_CLIENT_ID=1234567890-abcdefg.apps.googleusercontent.com
-```
-
-
+`admin/` is the git-based CMS. Sign-in is with the clinic's GitHub account (token, or the optional
+free OAuth Worker). Setup, roles and daily use: **`docs/ADMIN_CMS.md`**.
 
 ## 7. GAS deployment
 
-`clasp login` and `clasp push` are **backend deployment steps only**. See `docs/GAS_DEPLOYMENT.md`. The admin `runSetup()` provisions the Drive folder, both Sheets workbooks, all tabs, and seed data.
+Only `gas-public-api/` (forms) is still deployed. `clasp login` and `clasp push` are backend deployment steps only. See `docs/GAS_DEPLOYMENT.md`. `gas-admin-cms/` is archived.
 
 ## 8. Cloudflare deployment
 
-`git push` is the **Cloudflare deployment step only** (Cloudflare Pages auto-builds on push). Content-only rebuilds are triggered from the admin via the Cloudflare Deploy Hook. See `docs/CLOUD_FLARE_SETUP.md`.
+`git push` (including every admin save) is the **only** deployment step: Cloudflare Pages auto-builds on push. No deploy hook is needed. See `docs/CLOUD_FLARE_SETUP.md`.
 
 ## 9. GA4 setup
 

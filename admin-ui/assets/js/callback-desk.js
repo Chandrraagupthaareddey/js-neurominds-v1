@@ -9,6 +9,7 @@ import { api } from './api.js';
 import { can } from './auth.js';
 import { CALLBACK_STATUSES } from '../../../shared/constants.js';
 import { toast, openDrawer, closeDrawer } from './admin-app.js';
+import { describeApiError } from './api-envelope.js';
 
 const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
 const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
@@ -23,7 +24,7 @@ export async function renderCallbackDesk(mount) {
   const [cbRes, chkRes, qRes] = await Promise.all([
     api.callbacks(), api.callbackChecklist(), api.callbackQuestions()
   ]);
-  allRows = cbRes.data; checklist = chkRes.data; questions = qRes.data;
+  allRows = Array.isArray(cbRes.data) ? cbRes.data : []; checklist = chkRes.data || []; questions = qRes.data || [];
 
   mount.innerHTML = `
     <div class="panel">
@@ -157,13 +158,16 @@ async function openDetail(id) {
       const status = document.getElementById('cb-status').value;
       const note = document.getElementById('cb-note').value.trim();
       saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
-      const res = await api.updateCallbackStatus(c.callback_id, status, note);
-      if (res.success) {
+      try {
+        await api.updateCallbackStatus(c.callback_id, status, note); // throws ApiError on failure
         c.status = status;
         toast('Outcome saved');
         drawTable();
         openDetail(c.callback_id); // refresh drawer with new history
-      } else { saveBtn.disabled = false; saveBtn.textContent = 'Save outcome'; toast('Could not save'); }
+      } catch (err) {
+        saveBtn.disabled = false; saveBtn.textContent = 'Save outcome';
+        toast('Could not save: ' + describeApiError(err).title);
+      }
     });
   }
 }

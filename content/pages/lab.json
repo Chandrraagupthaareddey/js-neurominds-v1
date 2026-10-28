@@ -1,0 +1,29 @@
+{
+  "page": "lab",
+  "seo_title": "Lab Tests & Home Sample Collection | JS Neurominds",
+  "seo_description": "Lab tests with home sample collection around Chandragiri, Tirupati. Door pickup, reports usually within 24 hours subject to availability.",
+  "eyebrow": "Diagnostics",
+  "title": "Lab tests & home sample collection",
+  "lede": "Convenient door pickup around Chandragiri (within ~10 km). Reports are usually ready within 24 hours, depending on the test, package, and lab availability.",
+  "assurance_items": [
+    {
+      "icon": "🏠",
+      "text": "Door pickup"
+    },
+    {
+      "icon": "⏱",
+      "text": "Reports usually < 24 hrs"
+    },
+    {
+      "icon": "📍",
+      "text": "~10 km around Chandragiri"
+    },
+    {
+      "icon": "✓",
+      "text": "Staff-verified before pickup"
+    }
+  ],
+  "form_eyebrow": "Home collection",
+  "form_title": "Request a pickup",
+  "form_lede": "Tell us where and when — our team will confirm before pickup."
+}

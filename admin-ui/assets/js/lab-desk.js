@@ -7,12 +7,13 @@ import { api } from './api.js';
 import { can } from './auth.js';
 import { LAB_STATUSES } from '../../../shared/constants.js';
 import { toast } from './admin-app.js';
+import { describeApiError } from './api-envelope.js';
 
 const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
 
 export async function renderLabDesk(mount) {
   const res = await api.labRequests();
-  const rows = res.data;
+  const rows = Array.isArray(res.data) ? res.data : [];
   const canUpdate = can('update_lab');
 
   mount.innerHTML = `
@@ -50,11 +51,13 @@ export async function renderLabDesk(mount) {
   if (canUpdate) {
     mount.querySelectorAll('.lab-status').forEach((sel) => {
       sel.addEventListener('change', async () => {
-        const res = await api.updateLabStatus(sel.dataset.id, sel.value);
-        if (res.success) {
+        try {
+          await api.updateLabStatus(sel.dataset.id, sel.value); // throws ApiError on failure
           const badge = sel.closest('tr').querySelector('.badge');
           badge.className = 'badge ' + sel.value; badge.textContent = sel.value;
           toast('Lab request updated');
+        } catch (err) {
+          toast('Could not update: ' + describeApiError(err).title);
         }
       });
     });

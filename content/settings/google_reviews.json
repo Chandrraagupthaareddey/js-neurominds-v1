@@ -1,0 +1,35 @@
+{
+  "rating": 4.9,
+  "review_count": 60,
+  "profile_url": "https://share.google/FINrIJ0bVg0GX5D08",
+  "write_review_url": "https://share.google/FINrIJ0bVg0GX5D08",
+  "reviews": [
+    {
+      "review_id": "gr_1",
+      "author_display": "Praveen K",
+      "rating": 5,
+      "relative_time": "a month ago",
+      "text": "Very professional and caring. The doctor took time to understand our concerns and guided us patiently.",
+      "review_url": "https://share.google/FINrIJ0bVg0GX5D08",
+      "status": "approved"
+    },
+    {
+      "review_id": "gr_2",
+      "author_display": "Lakshmi N",
+      "rating": 5,
+      "relative_time": "2 months ago",
+      "text": "Compassionate and trustworthy clinic. Highly recommend for mental health support in Tirupati.",
+      "review_url": "https://share.google/FINrIJ0bVg0GX5D08",
+      "status": "approved"
+    },
+    {
+      "review_id": "gr_3",
+      "author_display": "Suresh B",
+      "rating": 5,
+      "relative_time": "3 months ago",
+      "text": "Smooth booking, friendly staff, and the home sample collection was right on time.",
+      "review_url": "https://share.google/FINrIJ0bVg0GX5D08",
+      "status": "approved"
+    }
+  ]
+}

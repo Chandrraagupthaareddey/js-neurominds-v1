@@ -16,6 +16,8 @@ import {
   CONTENT_STATUSES, DEFAULT_USERS, CONCERN_CATEGORIES
 } from '../shared/constants.js';
 import { ROLES } from '../shared/permissions.js';
+import { yes, faqList, list } from '../shared/content-normalize.js';
+import { FAQS, TESTIMONIALS, SOCIAL_LINKS, NAVIGATION, FEATURE_FLAGS, PAGES } from '../shared/content.js';
 
 let errors = 0;
 const fail = (m) => { errors++; console.error('  ✗', m); };
@@ -60,7 +62,22 @@ if (CONCERN_CATEGORIES.length !== new Set(CONCERN_CATEGORIES).size) fail('Duplic
 
 // Emergency conditions must carry the emergency flag for safe rendering.
 const selfHarm = CONDITIONS.find((c) => c.slug === 'self-harm-thoughts');
-if (selfHarm && selfHarm.is_emergency !== 'YES') fail('self-harm-thoughts must be flagged is_emergency=YES');
+if (selfHarm && !yes(selfHarm.is_emergency)) fail('self-harm-thoughts must be flagged is_emergency=true');
+
+// CMS content sanity (git CMS writes typed JSON; the site also tolerates legacy strings).
+CONDITIONS.forEach((c) => {
+  faqList(c.faqs).forEach((f) => { if (!f.question || !f.answer) fail(`Conditions: empty FAQ on ${c.slug}`); });
+  if (c.faqs && !Array.isArray(c.faqs) && typeof c.faqs !== 'string') fail(`Conditions: faqs must be a list on ${c.slug}`);
+  if (!c.one_line_summary) fail(`Conditions: missing one_line_summary on ${c.slug}`);
+  if (c.seo_title && c.seo_title.length > 70) console.warn(`  ! Conditions: seo_title > 70 chars on ${c.slug}`);
+  if (c.seo_description && c.seo_description.length > 165) console.warn(`  ! Conditions: seo_description > 165 chars on ${c.slug}`);
+});
+FAQS.forEach((f) => { if (!f.question || !f.answer) fail(`FAQs: empty question/answer (${f.faq_id})`); });
+TESTIMONIALS.forEach((t) => { if (!['pending', 'approved'].includes(t.status)) fail(`Testimonials: invalid status "${t.status}" (${t.testimonial_id})`); if (Number(t.rating) < 1 || Number(t.rating) > 5) fail(`Testimonials: rating out of range (${t.testimonial_id})`); });
+SOCIAL_LINKS.forEach((s) => { if (yes(s.is_enabled) && !s.url) fail(`Social links: ${s.platform} is enabled but has no url`); });
+NAVIGATION.forEach((n) => { if (!n.label || !n.route || !n.route.startsWith('/')) fail(`Navigation: bad entry ${JSON.stringify(n)}`); });
+Object.entries(PAGES).forEach(([id, p]) => { if (!p.seo_title || !p.seo_description) fail(`Pages: ${id}.json needs seo_title and seo_description`); });
+Object.values(FEATURE_FLAGS).forEach((v, i) => { if (typeof v !== 'boolean') fail(`Feature flags: value #${i} must be true/false`); });
 
 console.log('');
 if (errors) {

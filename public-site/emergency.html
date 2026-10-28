@@ -23,25 +23,26 @@
   <main id="main">
     <section class="section"><div class="container container--prose">
       <div class="notice notice--err" data-reveal style="font-size:var(--fs-base)">
-        <div><strong>This website is not an emergency service.</strong> If life is in danger right now, contact local emergency services immediately.</div>
+        <div data-copy="banner"><strong>This website is not an emergency service.</strong> If life is in danger right now, contact local emergency services immediately.</div>
       </div>
-      <div class="section-head" data-reveal><p class="eyebrow">Emergency help</p><h1>If you need urgent help</h1></div>
+      <div class="section-head" data-reveal><p class="eyebrow" data-copy="eyebrow">Emergency help</p><h1 data-copy="title">If you need urgent help</h1></div>
       <div class="prose" data-reveal="2">
-        <p class="lede">If you or someone you know is in immediate danger or having thoughts of self-harm, please reach out for urgent help right away.</p>
-        <h3>What to do now</h3>
-        <ul>
+        <p class="lede" data-copy="lede">If you or someone you know is in immediate danger or having thoughts of self-harm, please reach out for urgent help right away.</p>
+        <h3 data-copy="steps_title">What to do now</h3>
+        <ul id="emergency-steps">
           <li>Contact your nearest hospital emergency department.</li>
           <li>Reach out to a trusted family member or friend who can be with you.</li>
-          <li>Call a local mental health helpline for immediate support.</li>
+          <li>Call a local mental health helpline for immediate support (Tele-MANAS, India: 14416 or 1-800-891-4416, 24×7, free).</li>
         </ul>
-        <p>You are not alone, and caring help is available. When you are safe, our clinic team is here to support your ongoing care.</p>
-        <div class="hero__cta" style="margin-top:var(--sp-6)"><a class="btn btn--primary" href="/booking.html#confirmed">Book confirmed appointment</a></div>
+        <p data-copy="closing">You are not alone, and caring help is available. When you are safe, our clinic team is here to support your ongoing care.</p>
+        <div class="hero__cta" style="margin-top:var(--sp-6)"><a class="btn btn--primary" href="/booking#confirmed" data-copy="cta_label">Book confirmed appointment</a></div>
       </div></div></section>
   </main>
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
-    (async () => { await mountShell();  })();
+    import { applyPageCopy } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await applyPageCopy('emergency'); })();
   </script>
 </body>
 </html>

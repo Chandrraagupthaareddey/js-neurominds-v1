@@ -8,6 +8,7 @@
 import { api } from './api.js';
 import { can } from './auth.js';
 import { toast } from './admin-app.js';
+import { describeApiError } from './api-envelope.js';
 import { CONTENT_TYPES, CONTENT_TYPE_ORDER } from './content-fields.js';
 import { openContentEditor } from './content-editor.js';
 
@@ -80,9 +81,15 @@ export async function renderContentReview(mount) {
   if (canSync) {
     document.getElementById('sync-btn').addEventListener('click', async (e) => {
       e.target.disabled = true; e.target.textContent = 'Syncing…';
-      const res = await api.syncContent();
-      e.target.disabled = false; e.target.textContent = 'Sync approved content';
-      toast(res.success ? `Deploy ${res.data.deploy_status} · ${res.data.at}` : 'Sync failed');
+      try {
+        const res = await api.syncContent(); // throws ApiError on failure
+        const d = res.data || {};
+        toast(`Deploy ${d.deploy_status || 'requested'}${d.at ? ' · ' + d.at : ''}`);
+      } catch (err) {
+        toast('Sync failed: ' + describeApiError(err).title);
+      } finally {
+        e.target.disabled = false; e.target.textContent = 'Sync approved content';
+      }
     });
   }
 }

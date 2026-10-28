@@ -8,7 +8,7 @@ const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': 
 
 export async function renderServices(mount) {
   const res = await api.content();
-  const { services, lab_packages } = res.data;
+  const { services = [], lab_packages = [] } = res.data || {};
   mount.innerHTML = `
     <div class="panel">
       <div class="panel__head"><h3>Services</h3></div>

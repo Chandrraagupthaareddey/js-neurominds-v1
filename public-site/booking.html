@@ -24,38 +24,53 @@
     <section class="section">
       <div class="container" style="max-width:960px">
         <div class="section-head section-head--center" data-reveal>
-          <p class="eyebrow eyebrow--center">Book with us</p>
-          <h1>Book a confirmed appointment</h1>
-          <p class="lede" style="margin-inline:auto">Check live availability, choose a time, and confirm your appointment securely online — in just a few minutes.</p>
+          <p class="eyebrow eyebrow--center" data-copy="eyebrow">Book with us</p>
+          <h1 data-copy="title">Book a confirmed appointment</h1>
+          <p class="lede" style="margin-inline:auto" data-copy="lede">Check live availability, choose a time, and confirm your appointment securely online — in just a few minutes.</p>
         </div>
 
         <div data-reveal="2" style="max-width:560px; margin-inline:auto">
           <div class="choice choice--accent" id="confirmed" style="text-align:center; align-items:center">
-            <span class="tag tag--blue choice__badge">Ready to book</span>
-            <h2>Book confirmed appointment</h2>
-            <p>Check live availability, choose a time, and confirm your appointment securely with our trusted booking partner. Payment and confirmation happen there.</p>
-            <button class="btn btn--primary btn--lg btn--block" id="confirmed-btn">Check availability &amp; book</button>
-            <p class="choice__note">You'll be taken to PWeNS to complete your booking securely.</p>
+            <span class="tag tag--blue choice__badge" data-copy="card_badge">Ready to book</span>
+            <h2 data-copy="card_title">Book confirmed appointment</h2>
+            <p data-copy="card_text">Check live availability, choose a time, and confirm your appointment securely with our trusted booking partner. Payment and confirmation happen there.</p>
+            <button class="btn btn--primary btn--lg btn--block" id="confirmed-btn" data-copy="card_cta">Check availability &amp; book</button>
+            <p class="choice__note" data-copy="card_note">You'll be taken to PWeNS to complete your booking securely.</p>
           </div>
         </div>
+
+        <!-- Clinic callback request (shown only when public_callback_enabled is on in Settings → Feature flags) -->
+        <section id="callback" hidden style="max-width:640px; margin:var(--sp-8) auto 0">
+          <div class="section-head section-head--center" data-reveal>
+            <p class="eyebrow eyebrow--center" data-copy="callback_eyebrow">Prefer a call?</p>
+            <h2 data-copy="callback_title">Request a clinic callback</h2>
+            <p class="lede" style="margin-inline:auto" data-copy="callback_text">Share your preferred date and time and our clinic team will call you to guide the next step. This is not a confirmed appointment.</p>
+          </div>
+          <div class="card" style="box-shadow:var(--shadow-md)"><div id="callback-mount"></div></div>
+        </section>
       </div>
     </section>
   </main>
 
   <!-- Mobile sticky actions -->
   <div class="sticky-cta">
-    <button class="btn btn--primary btn--block" id="sticky-confirmed">Book confirmed appointment</button>
+    <button class="btn btn--primary btn--block" id="sticky-confirmed" data-copy="sticky_cta">Book confirmed appointment</button>
   </div>
 
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
-    import { wireConfirmedBooking } from '/assets/js/booking.js';
+    import { wireConfirmedBooking, renderCallbackForm } from '/assets/js/booking.js';
+    import { applyPageCopy } from '/assets/js/pages.js';
     import '/assets/js/feedback.js';
     (async () => {
       document.body.classList.add('has-sticky-cta');
       const cfg = await mountShell();
+      await applyPageCopy('booking');
       wireConfirmedBooking('#confirmed-btn', { doctorId: 'doc_jayapriya', pwensUrl: cfg.pwens_booking_url });
       wireConfirmedBooking('#sticky-confirmed', { doctorId: 'doc_jayapriya', pwensUrl: cfg.pwens_booking_url });
+      const flags = (window.__JSNM__ && window.__JSNM__.flags) || {};
+      const cb = document.getElementById('callback');
+      if (cb && flags.public_callback_enabled === true) { cb.hidden = false; await renderCallbackForm('#callback-mount'); }
     })();
   </script>
 </body>

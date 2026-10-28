@@ -6,13 +6,19 @@
  *   - Real Google OAuth (VITE_GOOGLE_CLIENT_ID set)  -> Google sign-in.
  *   - Otherwise                                       -> clean restricted-access page.
  *
- * The simulated email-picker login is DEVELOPER-ONLY and never appears unless a
- * developer explicitly opts in with VITE_ENABLE_MOCK_LOGIN=true on their own
- * machine. It is OFF for every build and every preview (including prod:admin),
- * so demo/production never expose a fake login or role switcher.
+ * Authentication bypasses (audit JP-031):
+ *   The former VITE_ADMIN_PREVIEW "preview mode" and the env-var-driven mock
+ *   login have been REMOVED. Both could be switched on in any deployed build by
+ *   setting an environment variable, which made them production-accessible.
  *
- * Phase 2 wires the real flow: Google Sign-In -> ID token -> GAS verification ->
- * Users sheet lookup -> role -> secure session.
+ *   The only remaining developer sign-in lives in dev-login.js and is reachable
+ *   solely when `import.meta.env.DEV` is true, i.e. under the Vite dev server.
+ *   `vite build` replaces that constant with `false`, so the code path (and the
+ *   dynamically imported module) is excluded from every production bundle. It
+ *   cannot be enabled by configuration. tests/ asserts this.
+ *
+ * NOTE: the Google ID token is still only decoded client-side; server-side
+ * verification is the subject of the Cloudflare Access migration (JP-002/JP-007).
  */
 import { GA4, BIGQUERY } from '../../../shared/constants.js';
 
@@ -31,28 +37,23 @@ const ALLOWED_ADMIN_EMAILS = (env.VITE_ALLOWED_ADMIN_EMAILS || '')
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
-// PREVIEW MODE: highest-priority access mode. When VITE_ADMIN_PREVIEW=true the
-// admin bypasses ONLY the authentication gate and loads the real dashboard with
-// full functionality (create/update/delete/publish/save all intact). Routing,
-// sections, and RBAC behave exactly as production. Set to false + configure
-// VITE_GOOGLE_CLIENT_ID to switch to real Google OAuth — no code change needed.
-const PREVIEW = String(env.VITE_ADMIN_PREVIEW) === 'true';
+// Developer-only sign-in: dev server only (import.meta.env.DEV is a build-time
+// constant), never when real OAuth is configured, and still opt-in per machine.
+const DEV_LOGIN_ALLOWED = env.DEV === true
+  && !OAUTH_CONFIGURED
+  && String(env.VITE_ENABLE_MOCK_LOGIN) === 'true';
 
-// Developer-only escape hatch (legacy dev picker). Never set in committed env.
-const MOCK_LOGIN_ALLOWED = String(env.VITE_ENABLE_MOCK_LOGIN) === 'true' && !PREVIEW && !OAUTH_CONFIGURED;
-
-// The portal is restricted (clean access page, no dashboard, no data) ONLY when
-// none of: preview mode, real OAuth, or the dev opt-in is present.
-const AUTH_DISABLED = !PREVIEW && !OAUTH_CONFIGURED && !MOCK_LOGIN_ALLOWED;
+// The portal is restricted (clean access page, no dashboard, no data) unless
+// real OAuth is configured or the dev-server-only sign-in applies.
+const AUTH_DISABLED = !OAUTH_CONFIGURED && !DEV_LOGIN_ALLOWED;
 
 export const CONFIG = {
   API_MODE,
   USE_MOCK: API_MODE === 'mock',
-  PREVIEW,
   GOOGLE_CLIENT_ID,
   OAUTH_CONFIGURED,
   ALLOWED_ADMIN_EMAILS,
-  MOCK_LOGIN_ALLOWED,
+  DEV_LOGIN_ALLOWED,
   AUTH_DISABLED,
   ADMIN_API_URL: env.VITE_ADMIN_API_URL || '',
   GA4_PROPERTY_ID: GA4.PROPERTY_ID,

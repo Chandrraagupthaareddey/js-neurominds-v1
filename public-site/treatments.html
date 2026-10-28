@@ -29,11 +29,11 @@
     <section class="section">
       <div class="container">
         <div class="section-head" data-reveal>
-          <p class="eyebrow">JS Neurominds</p>
-          <h1>Treatments</h1>
-          <p class="lede">Evidence-based approaches, tailored to you.</p>
+          <p class="eyebrow" data-copy="eyebrow">JS Neurominds</p>
+          <h1 data-copy="title">Treatments</h1>
+          <p class="lede" data-copy="lede">Evidence-based approaches, tailored to you.</p>
         </div>
-        <div class="grid grid--3" id="list-wrap" data-reveal="2"></div>
+        <div class="grid grid--3" id="list-wrap" data-list="treatments" data-reveal="2"></div>
       </div>
     </section>
   </main>
@@ -41,7 +41,8 @@
     import { mountShell } from '/assets/js/app.js';
     import '/assets/js/feedback.js';
     import { hydrateList } from '/assets/js/pages.js';
-    (async () => { await mountShell(); await hydrateList('treatments'); })();
+    import { applyPageCopy } from '/assets/js/pages.js';
+    (async () => { await mountShell(); await Promise.all([hydrateList('treatments'), applyPageCopy('treatments')]); })();
   </script>
 </body>
 </html>

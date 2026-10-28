@@ -3,14 +3,30 @@
   "slug": "sleep-problems",
   "name": "Sleep Problems",
   "one_line_summary": "Ongoing difficulty falling or staying asleep.",
-  "symptoms": "Trouble falling asleep;Waking at night;Daytime tiredness",
+  "symptoms": [
+    "Trouble falling asleep",
+    "Waking at night",
+    "Daytime tiredness"
+  ],
   "when_to_consult": "When sleep problems persist and affect daytime functioning.",
   "treatment_approach": "Sleep-focused guidance, routine changes, and short-term medical support if needed.",
-  "related_conditions": "Anxiety;Depression",
-  "is_emergency": "NO",
-  "faqs": "Why can I not sleep?|Many causes exist, from stress to routine.||Can it be treated?|Yes, sleep difficulties usually improve with care.",
+  "related_conditions": [
+    "Anxiety",
+    "Depression"
+  ],
+  "is_emergency": false,
+  "faqs": [
+    {
+      "question": "Why can I not sleep?",
+      "answer": "Many causes exist, from stress to routine."
+    },
+    {
+      "question": "Can it be treated?",
+      "answer": "Yes, sleep difficulties usually improve with care."
+    }
+  ],
   "category": "Sleep",
-  "is_featured": "YES",
+  "is_featured": true,
   "status": "published",
   "seo_title": "Sleep Problem Treatment in Tirupati | JS Neurominds",
   "seo_description": "Help for insomnia and sleep difficulties in Tirupati."

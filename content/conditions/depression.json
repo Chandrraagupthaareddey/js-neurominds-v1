@@ -3,14 +3,32 @@
   "slug": "depression",
   "name": "Depression",
   "one_line_summary": "Persistent low mood and loss of interest that affects daily life.",
-  "symptoms": "Low mood;Loss of interest;Fatigue;Sleep changes;Poor concentration",
+  "symptoms": [
+    "Low mood",
+    "Loss of interest",
+    "Fatigue",
+    "Sleep changes",
+    "Poor concentration"
+  ],
   "when_to_consult": "If low mood lasts more than two weeks or affects work, sleep, or relationships.",
   "treatment_approach": "Evidence-based therapy, lifestyle support, and medication when needed, personalised to severity.",
-  "related_conditions": "Anxiety;Bipolar Disorder",
-  "is_emergency": "NO",
-  "faqs": "What is depression?|Persistent low mood and loss of interest.||Is depression treatable?|Yes, most people improve with the right care.",
+  "related_conditions": [
+    "Anxiety",
+    "Bipolar Disorder"
+  ],
+  "is_emergency": false,
+  "faqs": [
+    {
+      "question": "What is depression?",
+      "answer": "Persistent low mood and loss of interest."
+    },
+    {
+      "question": "Is depression treatable?",
+      "answer": "Yes, most people improve with the right care."
+    }
+  ],
   "category": "Mood",
-  "is_featured": "YES",
+  "is_featured": true,
   "status": "published",
   "seo_title": "Depression Treatment in Tirupati | JS Neurominds",
   "seo_description": "Compassionate, evidence-based depression care in Tirupati and Chandragiri."

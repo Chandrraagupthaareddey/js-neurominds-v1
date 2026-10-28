@@ -6,7 +6,11 @@
     "one_line_summary": "Talk-based therapy to understand and manage emotional difficulties.",
     "overview": "Structured, confidential sessions tailored to your needs and goals.",
     "what_to_expect": "A calm conversation, assessment, and a personalised plan.",
-    "conditions_treated": "Depression;Anxiety;Stress",
+    "conditions_treated": [
+      "Depression",
+      "Anxiety",
+      "Stress"
+    ],
     "status": "published",
     "seo_title": "Counselling & Psychotherapy in Tirupati | JS Neurominds",
     "seo_description": "Confidential counselling and psychotherapy in Tirupati."
@@ -18,7 +22,10 @@
     "one_line_summary": "Structured support to overcome substance or behavioural dependence.",
     "overview": "A supportive, judgement-free programme with relapse prevention.",
     "what_to_expect": "Confidential assessment and a step-by-step support plan.",
-    "conditions_treated": "Addiction;Alcohol Dependence",
+    "conditions_treated": [
+      "Addiction",
+      "Alcohol Dependence"
+    ],
     "status": "published",
     "seo_title": "De-Addiction Support in Tirupati | JS Neurominds",
     "seo_description": "Confidential de-addiction support in Tirupati and Chandragiri."
@@ -30,7 +37,11 @@
     "one_line_summary": "Careful, monitored use of medication when clinically appropriate.",
     "overview": "Medication is considered thoughtfully and reviewed regularly.",
     "what_to_expect": "Assessment, discussion of options, and ongoing follow-up.",
-    "conditions_treated": "Depression;Bipolar Disorder;Anxiety",
+    "conditions_treated": [
+      "Depression",
+      "Bipolar Disorder",
+      "Anxiety"
+    ],
     "status": "published",
     "seo_title": "Psychiatric Medication Management in Tirupati | JS Neurominds",
     "seo_description": "Safe, monitored psychiatric medication management in Tirupati."

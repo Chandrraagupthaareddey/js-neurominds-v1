@@ -10,7 +10,7 @@ const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': 
 
 export async function renderDoctors(mount) {
   const res = await api.doctors();
-  const docs = res.data;
+  const docs = Array.isArray(res.data) ? res.data : [];
   const editable = can('edit_content');
 
   mount.innerHTML = `
