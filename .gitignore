@@ -16,6 +16,7 @@ dist-test/
 public-site/p/
 public-site/sitemap.xml
 public-site/robots.txt
+public-site/llms.txt
 public-site/conditions/
 public-site/treatments/
 public-site/doctors/

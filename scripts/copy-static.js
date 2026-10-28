@@ -28,6 +28,7 @@ const items = target === 'admin'
   : [
       { rel: 'sitemap.xml', required: true },
       { rel: 'robots.txt', required: true },
+      { rel: 'llms.txt', required: true },
       { rel: 'assets/brand', required: true },
       { rel: 'assets/img', required: false },
       { rel: 'site.webmanifest', required: true },

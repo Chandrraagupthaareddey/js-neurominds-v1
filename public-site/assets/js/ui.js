@@ -23,20 +23,26 @@ function scrollProgress() {
   bar.className = 'scroll-progress';
   bar.setAttribute('aria-hidden', 'true');
   document.body.appendChild(bar);
+  let ticking = false;
   const onScroll = () => {
-    const h = document.documentElement;
-    const max = h.scrollHeight - h.clientHeight;
-    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
-    bar.style.transform = `scaleX(${pct / 100})`;
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+      bar.style.transform = `scaleX(${pct / 100})`;
+      ticking = false;
+    });
   };
   document.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  requestAnimationFrame(onScroll);
 }
 
 function headerElevation() {
   const header = document.querySelector('.site-header');
   if (!header) return;
-  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
+  const onScroll = () => requestAnimationFrame(() => header.classList.toggle('is-scrolled', window.scrollY > 8));
   document.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 }

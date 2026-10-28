@@ -18,7 +18,7 @@ import { mkdirSync, writeFileSync, rmSync, existsSync, readFileSync, statSync } 
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
-import { CONDITIONS, TREATMENTS, DOCTORS, LAB_PACKAGES, BLOGS, FEATURE_FLAGS, PAGES, SEO } from '../shared/content.js';
+import { CONDITIONS, TREATMENTS, DOCTORS, LAB_PACKAGES, BLOGS, FEATURE_FLAGS, PAGES, SEO, CLINIC_CONFIG } from '../shared/content.js';
 import { published, yes, faqList, esc } from '../shared/content-normalize.js';
 import { renderDetail, ROUTES } from '../shared/render.js';
 import { applyHead, breadcrumbJsonLd, faqJsonLd, DOMAIN } from './lib/html-transform.js';
@@ -147,7 +147,50 @@ Sitemap: ${DOMAIN}/sitemap.xml
 `;
   writeFileSync(resolve(site, 'robots.txt'), robots);
 
-  console.log(`Pre-rendered ${total} detail page(s); sitemap has ${urls.length} URL(s); robots.txt written.`);
+  // llms.txt — a short Markdown guide for AI assistants/agents (https://llmstxt.org): H1 + summary + links.
+  const clinic = CLINIC_CONFIG;
+  const line = (label, loc, extra) => `- [${label}](${DOMAIN}${loc})${extra ? ': ' + extra : ''}`;
+  const llms = `# ${clinic.clinic_name}
+
+> ${SEO.default_description || PAGES.home.seo_description}
+
+${clinic.clinic_name} is a psychiatry and mental health clinic in Chandragiri, Tirupati (Andhra Pradesh, India), led by ${clinic.doctor_lead || 'Dr. Jayapriya T'}. Consultations in clinic and online; languages: Telugu, Tamil, English, Hindi. Phone: ${clinic.display_phone}. This website is not an emergency service.
+
+## Main pages
+
+${line('Home', '/')}
+${line('About', ROUTES.about)}
+${line('Doctors', ROUTES.doctors)}
+${line('Conditions we support', ROUTES.conditions)}
+${line('Treatments', ROUTES.treatments)}
+${line('Services', ROUTES.services)}
+${line('Book an appointment', ROUTES.booking)}
+${line('FAQ', ROUTES.faq)}
+${line('Contact', ROUTES.contact)}
+${line('Emergency help', ROUTES.emergency)}
+
+## Conditions
+
+${published(CONDITIONS).map((c) => line(c.name, `/conditions/${c.slug}`, c.one_line_summary)).join('\n')}
+
+## Treatments
+
+${published(TREATMENTS).map((t) => line(t.name, `/treatments/${t.slug}`, t.one_line_summary)).join('\n')}
+
+## Doctors
+
+${published(DOCTORS).map((d) => line(d.full_name, `/doctors/${d.slug}`, d.specialization)).join('\n')}
+
+## Optional
+
+${line('Sitemap', '/sitemap.xml')}
+${line('Privacy policy', ROUTES.privacy)}
+${line('Terms of use', ROUTES.terms)}
+${line('Medical disclaimer', ROUTES.disclaimer)}
+`;
+  writeFileSync(resolve(site, 'llms.txt'), llms);
+
+  console.log(`Pre-rendered ${total} detail page(s); sitemap has ${urls.length} URL(s); robots.txt + llms.txt written.`);
   return { total, urls: urls.length };
 }
 

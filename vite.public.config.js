@@ -11,7 +11,7 @@ const site = resolve(__dirname, 'public-site');
 const TOP_LEVEL = [
   'index', 'about', 'doctors', 'doctor', 'conditions', 'condition', 'treatments', 'treatment',
   'services', 'lab', 'booking', 'faq', 'knowledge', 'knowledge-detail', 'testimonials', 'contact',
-  'privacy', 'terms', 'medical-disclaimer', 'emergency'
+  'privacy', 'terms', 'medical-disclaimer', 'emergency', '404'
 ];
 
 function inputs() {

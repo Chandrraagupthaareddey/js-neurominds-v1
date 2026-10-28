@@ -65,10 +65,16 @@ function themeToggle() {
 }
 
 /* ---------------- Header ---------------- */
+const SMALL_LOGO = { webp: '/assets/brand/logo-96.webp', png: '/assets/brand/logo-96.png' };
 function brandMark(cfg, forFooter) {
-  const logo = (cfg && (forFooter ? cfg.footer_logo_url : cfg.logo_url)) || LOGO;
+  const custom = cfg && (forFooter ? cfg.footer_logo_url : cfg.logo_url);
+  // The default 512px logo is served as a 96px WebP (≈3 KB instead of 200 KB) for the 44px header mark.
+  const useSmall = !custom || custom === LOGO || custom === '/assets/brand/logo.webp';
+  const img = useSmall
+    ? `<picture><source srcset="${SMALL_LOGO.webp}" type="image/webp" /><img src="${SMALL_LOGO.png}" alt="" width="44" height="44" loading="eager" decoding="async" fetchpriority="${forFooter ? 'low' : 'high'}" /></picture>`
+    : `<img src="${custom}" alt="" width="44" height="44" loading="${forFooter ? 'lazy' : 'eager'}" decoding="async" />`;
   return `
-    <span class="brand__logo" aria-hidden="true"><img src="${logo}" alt="" width="44" height="44" loading="eager" decoding="async" /></span>
+    <span class="brand__logo" aria-hidden="true">${img}</span>
     <span class="brand__name">${cfg.clinic_short}<span>${cfg.tagline || 'Psychiatry &amp; Diagnostics'}</span></span>`;
 }
 

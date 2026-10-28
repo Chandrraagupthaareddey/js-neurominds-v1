@@ -20,6 +20,7 @@ import {
   googleReviewsBlock, faqListHtml, ROUTES, COPY_LISTS
 } from '../../shared/render.js';
 
+export const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;450;500;600;700&display=swap';
 export const DOMAIN = (CLINIC_CONFIG.domain || 'https://neurominds.in').replace(/\/$/, '');
 
 /* ---------------- data-copy ---------------- */
@@ -207,6 +208,10 @@ export function applyHead(html, meta) {
   html = setTag(html, /<meta property="og:image"[^>]*>/i, `<meta property="og:image" content="${image}" />`, true);
   html = setTag(html, /<meta name="twitter:card"[^>]*>/i, `<meta name="twitter:card" content="summary_large_image" />`, true);
   html = setTag(html, /<meta name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${image}" />`, true);
+  // Fonts: one <link> in <head>, preloaded as a non-render-blocking stylesheet.
+  if (!/fonts\.googleapis\.com\/css2/.test(html)) {
+    html = html.replace(/<\/head>/i, `  <link rel="preload" as="style" href="${FONTS_URL}" />\n  <link rel="stylesheet" href="${FONTS_URL}" media="print" onload="this.media='all'" />\n  <noscript><link rel="stylesheet" href="${FONTS_URL}" /></noscript>\n</head>`);
+  }
   if (!/<meta name="robots"/i.test(html)) {
     html = html.replace(/<\/head>/i, `  <meta name="robots" content="${meta.noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'}" />\n</head>`);
   }
@@ -229,7 +234,7 @@ const PAGE_PATH = {
   conditions: ROUTES.conditions, treatments: ROUTES.treatments, services: ROUTES.services, doctors: ROUTES.doctors,
   knowledge: ROUTES.knowledge, faq: ROUTES.faq, lab: ROUTES.lab, testimonials: ROUTES.testimonials,
   privacy: ROUTES.privacy, terms: ROUTES.terms, 'medical-disclaimer': ROUTES.disclaimer,
-  condition: '/condition', treatment: '/treatment', doctor: '/doctor', 'knowledge-detail': '/knowledge-detail'
+  condition: '/condition', treatment: '/treatment', doctor: '/doctor', 'knowledge-detail': '/knowledge-detail', '404': null
 };
 
 export function pageIdFromFile(fileName) {

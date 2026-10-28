@@ -11,7 +11,7 @@
 import { transformTopLevelPage, pageIdFromFile } from './lib/html-transform.js';
 import { PAGES } from '../shared/content.js';
 
-const KNOWN = new Set([...Object.keys(PAGES), 'privacy', 'terms', 'medical-disclaimer', 'condition', 'treatment', 'doctor', 'knowledge-detail']);
+const KNOWN = new Set([...Object.keys(PAGES), 'privacy', 'terms', 'medical-disclaimer', 'condition', 'treatment', 'doctor', 'knowledge-detail', '404']);
 
 export default function jsnmContentPlugin() {
   return {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Page not found | JS Neurominds</title>
+  <meta name="robots" content="noindex, follow" />
+  <link rel="icon" href="/assets/brand/favicon-32x32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/brand/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0e1b2a" />
+  <meta name="description" content="The page you were looking for could not be found. Browse conditions, treatments, doctors or book an appointment at JS Neurominds, Tirupati." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/responsive.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <main id="main">
+    <section class="section"><div class="container container--prose">
+      <div class="empty-state" data-reveal>
+        <div class="empty-state__icon">🔍</div>
+        <p class="eyebrow eyebrow--center">Error 404</p>
+        <h1>We couldn't find that page</h1>
+        <p class="lede">The link may be out of date, or the page may have moved. Here are some places to go next.</p>
+        <div class="hero__cta" style="justify-content:center; margin-top:var(--sp-5)">
+          <a class="btn btn--primary" href="/">Go to the home page</a>
+          <a class="btn btn--ghost" href="/conditions">Browse conditions</a>
+          <a class="btn btn--ghost" href="/booking#confirmed">Book an appointment</a>
+        </div>
+        <p class="hint" style="margin-top:var(--sp-5)">Need help right now? <a href="/emergency">Emergency help</a> · <a href="/contact">Contact the clinic</a></p>
+      </div>
+    </div></section>
+  </main>
+  <script type="module">
+    import { mountShell } from '/assets/js/app.js';
+    import '/assets/js/feedback.js';
+    (async () => { await mountShell(); })();
+  </script>
+</body>
+</html>

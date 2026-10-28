@@ -12,9 +12,17 @@
 
 # Brand images change rarely but are not hashed
 /assets/brand/*
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=2592000
 
 # Admin (CMS) must never be indexed or cached
 /admin/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
+
+# Verification / crawler files
+/robots.txt
+  Cache-Control: public, max-age=3600
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+/llms.txt
+  Cache-Control: public, max-age=3600

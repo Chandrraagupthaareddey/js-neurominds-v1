@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const targets = [
-  'dist', 'dist-admin', 'public-site/p', 'public-site/sitemap.xml', 'public-site/robots.txt',
+  'dist', 'dist-admin', 'public-site/p', 'public-site/sitemap.xml', 'public-site/robots.txt', 'public-site/llms.txt',
   // pre-rendered detail pages (scripts/build-pages.js)
   'public-site/conditions', 'public-site/treatments', 'public-site/doctors', 'public-site/knowledge', 'public-site/lab'
 ];
