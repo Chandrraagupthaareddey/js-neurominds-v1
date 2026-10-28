@@ -5,10 +5,13 @@ name = "jsnm-admin-gateway"
 main = "src/index.js"
 compatibility_date = "2025-01-01"
 
-# The Worker owns the admin hostname. (Remove admin.neurominds.in from the old Pages project first.)
-routes = [
-  { pattern = "admin.neurominds.in", custom_domain = true, zone_name = "neurominds.in" }
-]
+# The gateway runs on its free workers.dev address:
+#   https://jsnm-admin-gateway.<your-subdomain>.workers.dev
+# (admin.neurominds.in keeps serving the CMS UI from Cloudflare Pages.)
+# If the neurominds.in DNS zone is ever moved into this Cloudflare account, you can
+# instead give the Worker the hostname directly:
+# routes = [{ pattern = "admin.neurominds.in", custom_domain = true, zone_name = "neurominds.in" }]
+workers_dev = true
 
 [vars]
 GITHUB_REPO = "Chandrraagupthaareddey/js-neurominds-v1"
