@@ -245,6 +245,11 @@ function visibleNav(flags) {
 /** Pre-render emergency bar + header after <body>, footer + floating buttons before the first module script. */
 export function injectShell(html, currentPath) {
   if (/class="site-header"/.test(html)) return html;
+  // Cloudflare "Email Address Obfuscation" injects a render-blocking email-decode.min.js whenever it
+  // finds an email address. Marking the page content as email_off stops the injection entirely.
+  if (!/<!--email_off-->/.test(html)) {
+    html = html.replace(/(<body[^>]*>)/i, '$1\n<!--email_off-->').replace(/<\/body>/i, '<!--/email_off-->\n</body>');
+  }
   const [top, bottom] = shellHtml({
     cfg: CLINIC, nav: visibleNav(FEATURE_FLAGS), social: enabledSorted(SOCIAL_LINKS, 'url'),
     flags: FEATURE_FLAGS, fabs: enabledSorted(FLOATING_CTA), currentPath: currentPath || '/'

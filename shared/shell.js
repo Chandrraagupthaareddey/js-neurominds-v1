@@ -110,7 +110,7 @@ export function footerHtml(cfg, social, flags) {
             <p class="footer-contact">${cfg.address}</p>
             <p class="footer-contact">Phone: <a href="${cfg.call_link}">${cfg.display_phone}</a></p>
             ${cfg.opening_hours_text ? `<p class="footer-contact">Hours: ${cfg.opening_hours_text}</p>` : ''}
-            ${cfg.email_support ? `<p class="footer-contact">Email: <a href="mailto:${cfg.email_support}">${cfg.email_support}</a></p>` : ''}
+            ${cfg.email_support ? `<!--email_off--><p class="footer-contact">Email: <a href="mailto:${cfg.email_support}">${cfg.email_support}</a></p><!--/email_off-->` : ''}
             ${renderFooterSocial(social)}
           </div>
           <div>
