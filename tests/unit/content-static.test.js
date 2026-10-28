@@ -63,3 +63,11 @@ test('build transform: copy, pre-render, head and clean links', () => {
   assert.ok(prerenderMounts('<div id="faq-wrap"></div>', 'faq').includes('<details'));
   assert.ok(applyHead('<html><head></head></html>', { title: 'T & U', description: 'D' }).includes('<title>T &amp; U</title>'));
 });
+
+test('build transform: list copy replaces the whole element (no duplicated trust items)', () => {
+  const src = `<html><head><title>x</title></head><body><div class="hero__trust" id="hero-trust"><div class="hero__trust-item"><b>a</b></div><div class="hero__trust-item"><b>b</b></div><div class="hero__trust-item"><b>c</b></div></div><ul id="emergency-steps"><li>1</li><li>2</li></ul></body></html>`;
+  const out = transformTopLevelPage(src, 'home');
+  assert.equal((out.match(/hero__trust-item/g) || []).length, PAGES.home.trust_items.length);
+  const em = transformTopLevelPage(src, 'emergency');
+  assert.equal((em.match(/<li>/g) || []).length, PAGES.emergency.steps.length);
+});

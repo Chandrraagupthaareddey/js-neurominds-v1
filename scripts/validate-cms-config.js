@@ -20,6 +20,12 @@ if (!existsSync(cfgPath)) { fail('admin/config.yml not found'); process.exit(1);
 const cfg = readFileSync(cfgPath, 'utf8');
 if (/REPLACE_WITH/.test(cfg)) fail('config.yml still contains a REPLACE_WITH placeholder');
 if (!/^\s*repo:\s*\S+\/\S+/m.test(cfg)) fail('backend.repo is not set (owner/repo)');
+// Common YAML mistakes that break the CMS at load time.
+cfg.split('\n').forEach((line, i) => {
+  if (/:\s*"[^"]*"\s*[^,}\s][^,}]*/.test(line) && !/^\s*#/.test(line)) fail(`line ${i + 1}: text after a closing quote is invalid YAML → ${line.trim().slice(0, 80)}`);
+  if (/\t/.test(line)) fail(`line ${i + 1}: tab character (YAML requires spaces)`);
+});
+if (/^\s*&|:\s*&[a-z_]+|\*[a-z_]+\s*$/m.test(cfg)) fail('config.yml uses YAML anchors; keep it plain for the CMS parser');
 
 const folders = [...cfg.matchAll(/^\s*folder:\s*(\S+)/gm)].map((m) => m[1].replace(/['"]/g, ''));
 const files = [...cfg.matchAll(/^\s*file:\s*(\S+)/gm)].map((m) => m[1].replace(/['"]/g, ''));

@@ -23,22 +23,53 @@ import {
 export const DOMAIN = (CLINIC_CONFIG.domain || 'https://neurominds.in').replace(/\/$/, '');
 
 /* ---------------- data-copy ---------------- */
+/**
+ * Replace the inner HTML of the element whose opening tag matches `openRe`
+ * (a RegExp with the `g` flag that captures [1]=tag name, [2]=attributes).
+ * Walks forward counting nested same-name tags so a <div> containing <div>s
+ * is replaced as a whole (a non-greedy regex would stop at the first child).
+ */
+export function replaceElementInner(html, openRe, replacer) {
+  let out = '';
+  let last = 0;
+  let m;
+  openRe.lastIndex = 0;
+  while ((m = openRe.exec(html))) {
+    const tag = m[1];
+    const openEnd = m.index + m[0].length;
+    const tokRe = new RegExp(`<(/?)${tag}\\b[^>]*>`, 'gi');
+    tokRe.lastIndex = openEnd;
+    let depth = 1; let t; let closeStart = -1; let closeEnd = -1;
+    while ((t = tokRe.exec(html))) {
+      if (t[1] === '/') { depth--; if (depth === 0) { closeStart = t.index; closeEnd = t.index + t[0].length; break; } }
+      else if (!/\/>$/.test(t[0])) depth++;
+    }
+    if (closeStart === -1) break; // malformed; leave untouched
+    const inner = html.slice(openEnd, closeStart);
+    const r = replacer({ tag, attrs: m[2], inner, match: m });
+    if (r == null) continue;
+    out += html.slice(last, m.index) + r;
+    last = closeEnd;
+    openRe.lastIndex = closeEnd;
+  }
+  return out + html.slice(last);
+}
+
 export function fillCopy(html, copy) {
   if (!copy) return html;
   // List-type copy (trust strip, assurance strip, steps): replace the element's children.
   for (const [id, [key, render]] of Object.entries(COPY_LISTS)) {
     if (!Array.isArray(copy[key]) || !copy[key].length) continue;
-    const re = new RegExp(`<(div|ul)([^>]*\\sid="${id}"[^>]*)>[\\s\\S]*?</\\1>`);
-    html = html.replace(re, (m, tag, attrs) => `<${tag}${attrs} data-copy-applied="1">${render(copy[key])}</${tag}>`);
+    html = replaceElementInner(html, new RegExp(`<(div|ul)([^>]*\\sid="${id}"[^>]*)>`, 'g'),
+      ({ tag, attrs }) => `<${tag}${attrs.replace(/\sdata-copy-applied="1"/, '')} data-copy-applied="1">${render(copy[key])}</${tag}>`);
   }
-  // Opening tag must contain data-copy="key"; content up to the matching close tag
-  // of the same name (non-greedy; copy targets are leaf-ish elements: h1, p, a, span, li, strong).
-  return html.replace(/<([a-zA-Z][\w-]*)([^>]*?)\sdata-copy="([^"]+)"([^>]*)>([\s\S]*?)<\/\1>/g,
-    (m, tag, pre, key, post, inner) => {
-      const v = copy[key];
-      if (typeof v !== 'string' || !v) return m;
-      return `<${tag}${pre} data-copy="${key}" data-copy-applied="1"${post}>${v}</${tag}>`;
-    });
+  // Text copy: <el data-copy="key">fallback</el>
+  return replaceElementInner(html, /<([a-zA-Z][\w-]*)((?:[^>]*?)\sdata-copy="[^"]+"[^>]*)>/g, ({ tag, attrs }) => {
+    const key = (attrs.match(/\sdata-copy="([^"]+)"/) || [])[1];
+    const v = copy[key];
+    if (typeof v !== 'string' || !v) return null;
+    return `<${tag}${attrs.replace(/\sdata-copy-applied="1"/, '')} data-copy-applied="1">${v}</${tag}>`;
+  });
 }
 
 /* ---------------- mount pre-rendering ---------------- */
