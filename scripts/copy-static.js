@@ -8,7 +8,7 @@
  *
  * Idempotent: it only copies; it never edits source. Runs after `vite build`.
  */
-import { cpSync, existsSync, mkdirSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -42,6 +42,13 @@ const adminSrc = resolve(root, 'admin');
 if (target === 'public' && existsSync(adminSrc)) {
   cpSync(adminSrc, resolve(dist, 'admin'), { recursive: true });
   console.log('copy-static(public): CMS admin mirrored to dist/admin/');
+}
+
+// Search-engine verification files (e.g. google967f….html, BingSiteAuth.xml) dropped into public-site/.
+if (target === 'public') {
+  for (const f of readdirSync(src)) {
+    if (/^google[0-9a-f]+\.html$/i.test(f) || /^BingSiteAuth\.xml$/i.test(f) || /^yandex_[0-9a-f]+\.html$/i.test(f)) { cpSync(resolve(src, f), resolve(dist, f)); console.log('copy-static(public): verification file', f); }
+  }
 }
 
 let copied = 0;

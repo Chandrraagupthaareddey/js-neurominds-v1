@@ -7,6 +7,12 @@
     <title>JS Neurominds — Admin (Content Editor)</title>
     <link rel="icon" href="/assets/brand/favicon-32x32.png" sizes="32x32" type="image/png" />
     <meta name="theme-color" content="#0e1b2a" />
+    <!-- Absolute config path: works at /, /admin/ and any deep link such as /callback -->
+    <link rel="cms-config-url" href="config.yml" id="cms-config-link" />
+    <script>
+      // Resolve config.yml next to THIS page (admin.neurominds.in/config.yml or neurominds.in/admin/config.yml), never relative to a deep path.
+      (function(){ var base = location.pathname.indexOf("/admin/") === 0 ? "/admin/" : "/"; document.getElementById("cms-config-link").href = base + "config.yml"; })();
+    </script>
     <style>
       /* Shown only until the CMS script loads (or if it cannot). */
       #jsnm-fallback { font: 15px/1.5 system-ui, sans-serif; max-width: 560px; margin: 12vh auto; padding: 0 20px; color: #334; }
