@@ -21,7 +21,7 @@ import { execSync } from 'child_process';
 import { CONDITIONS, TREATMENTS, DOCTORS, LAB_PACKAGES, BLOGS, FEATURE_FLAGS, PAGES, SEO, CLINIC_CONFIG } from '../shared/content.js';
 import { published, yes, faqList, esc } from '../shared/content-normalize.js';
 import { renderDetail, ROUTES } from '../shared/render.js';
-import { applyHead, breadcrumbJsonLd, faqJsonLd, DOMAIN } from './lib/html-transform.js';
+import { applyHead, breadcrumbJsonLd, faqJsonLd, DOMAIN, injectShell } from './lib/html-transform.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const site = resolve(root, 'public-site');
@@ -78,6 +78,7 @@ function renderPage(template, def, d) {
   html = applyHead(html, { title: titleOf(d), description: descOf(d), canonicalPath: path, type: def.kind === 'blog' ? 'article' : 'website', jsonLd: ld });
   // Clean internal links in the template.
   html = html.replace(/href="\/index\.html(#[^"]*)?"/g, 'href="/$1"').replace(/href="\/([a-z0-9-]+)\.html(#[^"]*)?"/g, 'href="/$1$2"');
+  html = injectShell(html, path);
   return html;
 }
 

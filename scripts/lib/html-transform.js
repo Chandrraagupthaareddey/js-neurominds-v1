@@ -19,6 +19,9 @@ import {
   conditionCard, serviceCard, doctorHighlight, renderList, testimonialCards,
   googleReviewsBlock, faqListHtml, ROUTES, COPY_LISTS
 } from '../../shared/render.js';
+import { shellHtml } from '../../shared/shell.js';
+import { CLINIC_CONFIG as CLINIC, NAVIGATION, SOCIAL_LINKS, FLOATING_CTA } from '../../shared/content.js';
+import { enabledSorted, byOrder as sortBy } from '../../shared/content-normalize.js';
 
 export const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;450;500;600;700&display=swap';
 export const DOMAIN = (CLINIC_CONFIG.domain || 'https://neurominds.in').replace(/\/$/, '');
@@ -228,6 +231,31 @@ export function applyHead(html, meta) {
   return html;
 }
 
+/* ---------------- site shell (header / footer / floating buttons) ---------------- */
+function visibleNav(flags) {
+  return NAVIGATION.filter((n) => {
+    if (n.route === '/lab' && !yes(flags.public_lab_tests_enabled)) return false;
+    if (n.route === '/knowledge' && !yes(flags.public_knowledge_enabled)) return false;
+    if (n.route === '/testimonials' && flags.public_testimonials_enabled === false) return false;
+    if (n.is_enabled === false) return false;
+    return true;
+  }).slice().sort(sortBy('order'));
+}
+
+/** Pre-render emergency bar + header after <body>, footer + floating buttons before the first module script. */
+export function injectShell(html, currentPath) {
+  if (/class="site-header"/.test(html)) return html;
+  const [top, bottom] = shellHtml({
+    cfg: CLINIC, nav: visibleNav(FEATURE_FLAGS), social: enabledSorted(SOCIAL_LINKS, 'url'),
+    flags: FEATURE_FLAGS, fabs: enabledSorted(FLOATING_CTA), currentPath: currentPath || '/'
+  });
+  html = html.replace(/(<body[^>]*>)/i, `$1\n${top}`);
+  // Place footer/fabs after </main> (before any sticky bars/scripts) so the DOM order matches the JS fallback.
+  if (/<\/main>/i.test(html)) html = html.replace(/<\/main>/i, `</main>\n${bottom}`);
+  else html = html.replace(/<script type="module"/i, `${bottom}\n<script type="module"`);
+  return html;
+}
+
 /* ---------------- top-level page pipeline (used by the Vite plugin) ---------------- */
 const PAGE_PATH = {
   home: '/', about: ROUTES.about, booking: ROUTES.booking, contact: ROUTES.contact, emergency: ROUTES.emergency,
@@ -260,6 +288,7 @@ export function transformTopLevelPage(html, pageId) {
     jsonLd
   });
   if (legacyDetail) html = html.replace(/\s*<link rel="canonical"[^>]*>/i, '').replace(/\s*<meta property="og:url"[^>]*>/i, '');
+  html = injectShell(html, path == null ? '' : path);
   // Clean internal links (/about.html -> /about, /index.html -> /).
   html = html.replace(/href="\/index\.html(#[^"]*)?"/g, 'href="/$1"').replace(/href="\/([a-z0-9-]+)\.html(#[^"]*)?"/g, 'href="/$1$2"');
   return html;

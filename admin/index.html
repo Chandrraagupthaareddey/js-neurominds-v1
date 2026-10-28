@@ -7,6 +7,10 @@
     <title>JS Neurominds — Admin (Content Editor)</title>
     <link rel="icon" href="/assets/brand/favicon-32x32.png" sizes="32x32" type="image/png" />
     <meta name="theme-color" content="#0e1b2a" />
+    <meta name="description" content="Content editor for the JS Neurominds website (staff only)." />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
+    <link rel="preconnect" href="https://api.github.com" />
+    <link rel="modulepreload" href="https://unpkg.com/@sveltia/cms@0.253.1/dist/sveltia-cms.js" />
     <!-- Absolute config path: works at /, /admin/ and any deep link such as /callback -->
     <link rel="cms-config-url" href="config.yml" id="cms-config-link" />
     <script>
@@ -27,7 +31,8 @@
     </div>
     <!-- Sveltia CMS: a modern, open-source, git-based CMS (free). Loads ./config.yml from this folder.
          Every save becomes a commit on GitHub → Cloudflare Pages rebuilds → live in ~2 minutes. -->
-    <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+    <!-- Pinned version: unpkg serves versioned URLs with a 1-year immutable cache (no redirect hop). Bump deliberately after testing. -->
+    <script src="https://unpkg.com/@sveltia/cms@0.253.1/dist/sveltia-cms.js" type="module"></script>
     <script>
       // Remove the fallback once the CMS has rendered, and relabel the OAuth button:
       // sign-in goes through the Admin Gateway (Google), not GitHub directly.
