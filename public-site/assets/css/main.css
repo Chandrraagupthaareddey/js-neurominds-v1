@@ -111,7 +111,7 @@ html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
 body{
   margin:0; background:var(--canvas); color:var(--text);
   font-family:var(--font-body); font-size:var(--fs-base); line-height:var(--lh-normal);
-  font-weight:450; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  font-weight:400; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
 img,svg{max-width:100%; height:auto; display:block;}
 a{color:var(--primary); text-decoration:none; transition:color var(--dur-fast) var(--ease);}

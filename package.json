@@ -11,7 +11,7 @@
     "check:env": "node scripts/check-env.js",
     "test": "node --test \"tests/**/*.test.js\"",
     "clean": "node scripts/clean-dist.js",
-    "build": "node scripts/build-content-index.js && node scripts/clean-dist.js && node scripts/build-pages.js && vite build --config vite.public.config.js && node scripts/copy-static.js",
+    "build": "node scripts/build-content-index.js && node scripts/clean-dist.js && node scripts/build-pages.js && vite build --config vite.public.config.js && node scripts/inline-css.js && node scripts/copy-static.js",
     "build:admin": "node scripts/build-admin.js",
     "prod:public": "npm run build && vite preview --config vite.public.config.js --host 127.0.0.1 --port 8080",
     "prod:admin": "npm run build:admin && npx vite preview --config vite.admin.config.js --outDir dist-admin --host 127.0.0.1 --port 8081",

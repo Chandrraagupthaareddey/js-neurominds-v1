@@ -36,7 +36,8 @@ function scrollProgress() {
     });
   };
   document.addEventListener('scroll', onScroll, { passive: true });
-  requestAnimationFrame(onScroll);
+  // Measure only after the first paint so the initial read never forces a synchronous layout.
+  requestAnimationFrame(() => requestAnimationFrame(onScroll));
 }
 
 function headerElevation() {
@@ -44,7 +45,7 @@ function headerElevation() {
   if (!header) return;
   const onScroll = () => requestAnimationFrame(() => header.classList.toggle('is-scrolled', window.scrollY > 8));
   document.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  requestAnimationFrame(() => requestAnimationFrame(onScroll));
 }
 
 function smoothAnchors() {
