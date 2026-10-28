@@ -278,8 +278,8 @@ export function renderDoctor(d, flags) {
       <article class="prose">
         <p class="lede">${esc(d.short_bio)}</p>
         <div class="grid grid--2" style="margin:var(--sp-5) 0">
-          <div class="card"><h4>Languages</h4><p class="mb-0">${esc(d.languages)}</p></div>
-          <div class="card"><h4>Consultation</h4><p class="mb-0">${esc(consult)}</p></div>
+          <div class="card"><h2 style="font-size:var(--fs-lg)">Languages</h2><p class="mb-0">${esc(d.languages)}</p></div>
+          <div class="card"><h2 style="font-size:var(--fs-lg)">Consultation</h2><p class="mb-0">${esc(consult)}</p></div>
         </div>
         ${handled.length ? `<h2>Areas of care</h2><div class="chip-row">${handled.map((t) => `<span class="chip">${esc(t)}</span>`).join('')}</div>` : ''}
         ${ctaPair(flags)}

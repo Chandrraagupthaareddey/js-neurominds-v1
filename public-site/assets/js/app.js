@@ -172,7 +172,7 @@ function renderFooter(cfg, social, flags) {
             ${renderFooterSocial(social)}
           </div>
           <div>
-            <h4>Care</h4>
+            <p class="footer-heading">Care</p>
             <ul class="footer-links">
               <li><a href="${ROUTES.doctors}">Doctors</a></li>
               <li><a href="${ROUTES.conditions}">Conditions</a></li>
@@ -183,7 +183,7 @@ function renderFooter(cfg, social, flags) {
             </ul>
           </div>
           <div>
-            <h4>Clinic</h4>
+            <p class="footer-heading">Clinic</p>
             <ul class="footer-links">
               <li><a href="${ROUTES.about}">About</a></li>
               ${testimonialsLink}
@@ -193,7 +193,7 @@ function renderFooter(cfg, social, flags) {
             </ul>
           </div>
           <div>
-            <h4>Get started</h4>
+            <p class="footer-heading">Get started</p>
             <p class="footer-contact">${callbackOn ? 'Request a clinic callback or book a confirmed appointment online.' : 'Book a confirmed appointment online in minutes.'}</p>
             <div class="footer-cta">
               ${callbackOn ? `<a class="btn btn--ghost btn--block footer-cta__ghost" href="${ROUTES.booking}#callback">Request Clinic Callback</a>` : ''}
