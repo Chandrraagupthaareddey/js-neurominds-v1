@@ -16,7 +16,7 @@ workers_dev = true
 [vars]
 GITHUB_REPO = "Chandrraagupthaareddey/js-neurominds-v1"
 ADMIN_UI_ORIGIN = "https://neurominds.in/admin"
-ALLOWED_ORIGINS = "https://admin.neurominds.in,https://neurominds.in"
+ALLOWED_ORIGINS = "https://admin.neurominds.in,https://neurominds.in,https://jsnm-admin-gateway.tcgr-8553665381.workers.dev"
 SESSION_HOURS = "12"
 # Roles — edit these lists to add/remove people (then `npx wrangler deploy`).
 SUPER_ADMIN_EMAILS = "tcgr.8553665381@gmail.com"

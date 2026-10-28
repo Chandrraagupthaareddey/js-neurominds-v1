@@ -56,7 +56,7 @@ To add/remove a person: edit `SUPER_ADMIN_EMAILS` / `ADMIN_EMAILS` in `wrangler.
 ### Step 1 — Google OAuth client (5 min, Google Cloud Console, free)
 1. https://console.cloud.google.com → create project **JS Neurominds Admin**.
 2. **APIs & Services → OAuth consent screen**: External → App name `JS Neurominds Admin`, support email `jsneurominds5@gmail.com`, developer email yours → Save. Scopes: none to add (email/profile are default). Under **Audience**, click **Publish app** (these scopes need no Google review).
-3. **APIs & Services → Credentials → Create credentials → OAuth client ID** → *Web application* → Name `admin.neurominds.in` → **Authorized redirect URIs**: `https://admin.neurominds.in/callback` → Create.
+3. **APIs & Services → Credentials → Create credentials → OAuth client ID** → *Web application* → Name `admin.neurominds.in` → **Authorized redirect URIs**: `https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/callback` → Create.
 4. Copy the **Client ID** and **Client secret**.
 
 ### Step 2 — Free the hostname
@@ -84,11 +84,11 @@ Open https://admin.neurominds.in → **Sign in with Google** → pick the accoun
 An email that is not in either list sees: *"… is not an admin of this website."*
 
 Troubleshooting:
-- `redirect_uri_mismatch` from Google → the redirect URI in Step 1 must be exactly `https://admin.neurominds.in/callback`.
+- `redirect_uri_mismatch` from Google → the redirect URI in Step 1 must be exactly `https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/callback`.
 - "GOOGLE_CLIENT_ID is not configured" → the secret was not set; re-run `wrangler secret put`.
 - Saves fail with 401/403 from GitHub → the GITHUB_TOKEN expired or lacks Contents RW; create a new one and `wrangler secret put GITHUB_TOKEN`.
 - Admin sees "Your role (admin) cannot change …" → that file is super-admin-only by design.
-- `https://admin.neurominds.in/healthz` should return `{"ok":true}`; `/api/me` shows your session/role after login.
+- `https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/healthz` should return `{"ok":true}`; `https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/api/me` shows your session/role after login.
 
 ## Daily use
 

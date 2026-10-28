@@ -17,9 +17,9 @@ backend:
   branch: main
   # Google sign-in + email roles via the Admin Gateway Worker (cloudflare/admin-gateway).
   # The Worker swaps in the single server-held GitHub token; editors never need GitHub.
-  base_url: https://admin.neurominds.in
+  base_url: https://jsnm-admin-gateway.tcgr-8553665381.workers.dev
   auth_endpoint: auth
-  api_root: https://admin.neurominds.in/gh/api/v3
+  api_root: https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/gh/api/v3
   auth_methods:
     - oauth
   commit_messages:
