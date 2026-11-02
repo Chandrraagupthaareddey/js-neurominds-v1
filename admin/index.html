@@ -77,10 +77,24 @@
         var btn = document.getElementById('jl-google');
         var label = document.getElementById('jl-label');
         var status = document.getElementById('jl-status');
-        var done = false, busy = false;
+        var GATEWAY = 'https://jsnm-admin-gateway.tcgr-8553665381.workers.dev';
+        var hidden = false, busy = false, seenSignIn = false, authOk = false, backAgain = 0;
 
-        // Walk the document (including any shadow roots) for the CMS's own sign-in button.
+        // Sveltia keeps the signed-in user in localStorage; a saved session means "skip the screen".
+        function hasSession() {
+          try {
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (/^sveltia-cms\.user$/.test(k) || (/sveltia/i.test(k) && /user/i.test(k))) {
+                var v = localStorage.getItem(k) || '';
+                if (/"token"\s*:\s*"[^"]{8,}/.test(v)) return true;
+              }
+            }
+          } catch (ignore) { /* storage blocked */ }
+          return false;
+        }
         function walk(root, fn) {
+          if (!root || !root.querySelectorAll) return false;
           var all = root.querySelectorAll('*');
           for (var i = 0; i < all.length; i++) { if (fn(all[i]) === true) return true; if (all[i].shadowRoot && walk(all[i].shadowRoot, fn)) return true; }
           return false;
@@ -88,61 +102,81 @@
         function cmsSignInButton() {
           var found = null;
           walk(document, function (el) {
-            if ((el.tagName === 'BUTTON' || el.tagName === 'A') && /sign\s*in/i.test(el.textContent || '') && !el.closest('#jsnm-login')) { found = el; return true; }
+            if ((el.tagName === 'BUTTON' || el.tagName === 'A') && /sign\s*in/i.test(el.textContent || '') && !overlay.contains(el)) { found = el; return true; }
           });
           return found;
-        }
-        // True once the CMS has painted something visible of its own (not our overlay, not <script>s).
-        function cmsRendered() {
-          var kids = document.body.children;
-          for (var i = 0; i < kids.length; i++) {
-            var k = kids[i];
-            if (k.id === 'jsnm-login' || k.tagName === 'SCRIPT' || k.tagName === 'STYLE' || k.tagName === 'LINK') continue;
-            if ((k.textContent || '').trim() || k.querySelector('button, input, a, svg, img')) return true;
-            if (k.shadowRoot && (k.shadowRoot.textContent || '').trim()) return true;
-          }
-          return false;
         }
         function cmsErrorText() {
           var txt = '';
           walk(document, function (el) {
-            if (el.getAttribute && el.getAttribute('role') === 'alert' && !el.closest('#jsnm-login') && (el.textContent || '').trim()) { txt = el.textContent.trim(); return true; }
+            if (el.getAttribute && el.getAttribute('role') === 'alert' && !overlay.contains(el) && (el.textContent || '').trim()) { txt = el.textContent.trim(); return true; }
           });
           return txt;
         }
-        function hideOverlay() {
-          if (done) return; done = true;
+        function hide() {
+          if (hidden) return; hidden = true;
           overlay.classList.add('is-hidden');
-          setTimeout(function () { overlay.hidden = true; }, 300);
+          setTimeout(function () { if (hidden) overlay.hidden = true; }, 300);
         }
+        function show() {
+          if (!hidden) return; hidden = false; authOk = false; busy = false; backAgain = 0;
+          overlay.hidden = false; overlay.classList.remove('is-hidden');
+          btn.disabled = false; label.textContent = 'Continue with Google'; status.textContent = ''; status.className = 'jl-status';
+        }
+        function setStatus(txt, isError) {
+          if (status.textContent !== txt) { status.textContent = txt; status.className = 'jl-status' + (isError ? ' is-error' : ''); }
+        }
+
         function tick() {
-          if (done) return;
           var signIn = cmsSignInButton();
-          var err = cmsErrorText();
+          if (hidden) {
+            // Signed out (Sveltia shows its login again, and no saved session) → bring our screen back.
+            // Require it to persist ~1s so a brief flash during auth doesn't re-open the screen.
+            backAgain = (signIn && !hasSession()) ? backAgain + 1 : 0;
+            if (backAgain >= 3) show();
+            return;
+          }
           if (signIn) {
+            seenSignIn = true;
             if (btn.disabled && !busy) { btn.disabled = false; label.textContent = 'Continue with Google'; }
-            if (err && !/aborted/i.test(err) && status.textContent !== err) { status.textContent = err; status.className = 'jl-status is-error'; }
-          } else if (cmsRendered()) {
-            // CMS rendered real UI with no sign-in button → user is signed in.
-            hideOverlay();
+            var err = cmsErrorText();
+            if (err && !/aborted/i.test(err)) setStatus(err, true);
+          } else if (authOk || hasSession() || seenSignIn) {
+            // Login UI gone after a successful auth / with a saved session → the editor is up.
+            hide();
           }
         }
-        var timer = setInterval(tick, 250);
+
+        if (hasSession()) hide(); // returning user: never flash the sign-in screen
+
+        // The gateway popup posts Decap/Sveltia's success message to this window.
+        window.addEventListener('message', function (e) {
+          if (e.origin !== GATEWAY || typeof e.data !== 'string') return;
+          if (e.data.indexOf('authorization:github:success') === 0) { authOk = true; busy = false; setStatus('Signed in — opening the editor…'); setTimeout(tick, 1200); }
+          else if (e.data.indexOf('authorization:github:error') === 0) {
+            var msg = 'Sign-in failed.'; try { msg = JSON.parse(e.data.replace(/^authorization:github:error:/, '')).message || msg; } catch (ignore) { /* keep default */ }
+            busy = false; btn.disabled = false; label.textContent = 'Continue with Google'; setStatus(msg, true);
+          }
+        });
+
+        var timer = setInterval(tick, 400);
         new MutationObserver(function (records) {
-          // Ignore mutations we caused inside our own overlay (otherwise we'd loop on our own writes).
           for (var i = 0; i < records.length; i++) { if (!overlay.contains(records[i].target)) { tick(); return; } }
         }).observe(document.body, { childList: true, subtree: true });
-        // Safety: if the CMS never rendered a sign-in button (e.g. config error), reveal its screen after 8s.
-        setTimeout(function () { if (!done && !cmsSignInButton()) { hideOverlay(); clearInterval(timer); } }, 8000);
+        // Safety: CMS never rendered a sign-in button (e.g. config error) → reveal its screen so the error is visible.
+        setTimeout(function () { if (!hidden && !seenSignIn && !cmsSignInButton()) hide(); }, 12000);
 
         btn.addEventListener('click', function () {
           var signIn = cmsSignInButton();
-          if (!signIn) { status.textContent = 'Still loading the editor… please try again in a moment.'; return; }
-          status.textContent = 'Opening Google sign-in…'; status.className = 'jl-status';
+          if (!signIn) { setStatus('Still loading the editor… please try again in a moment.'); return; }
+          setStatus('Opening Google sign-in…');
           busy = true; btn.disabled = true; label.innerHTML = '<span class="jl-spinner" aria-hidden="true"></span>';
-          signIn.click(); // same user gesture → the Google popup is allowed
-          // Re-enable after a while in case the popup was closed.
-          setTimeout(function () { busy = false; if (!done) { btn.disabled = false; label.textContent = 'Continue with Google'; var e = cmsErrorText(); if (e && !/aborted/i.test(e)) { status.textContent = e; status.className = 'jl-status is-error'; } else if (!e) status.textContent = ''; } }, 6000);
+          signIn.click(); // same user gesture → the popup is allowed
+          setTimeout(function () {
+            if (hidden || authOk) return;
+            busy = false; btn.disabled = false; label.textContent = 'Continue with Google';
+            var e = cmsErrorText(); if (e && !/aborted/i.test(e)) setStatus(e, true); else setStatus('');
+          }, 8000);
         });
       })();
     </script>
