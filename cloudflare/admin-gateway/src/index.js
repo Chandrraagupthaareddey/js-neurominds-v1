@@ -372,6 +372,12 @@ async function deniedPaths(session, env, url, method, bodyText, repo) {
 
 /* ------------------------------------------------- static admin UI proxy */
 async function serveAdminUi(request, env, url) {
+  // The gateway's own address (workers.dev) is only for /auth, /callback and /gh. If someone lands
+  // on the UI here, send them to the friendly admin hostname so the address bar stays clean.
+  const publicUrl = (env.ADMIN_PUBLIC_URL || 'https://admin.neurominds.in').replace(/\/$/, '');
+  if (publicUrl && !url.origin.toLowerCase().startsWith(new URL(publicUrl).origin.toLowerCase())) {
+    return new Response(null, { status: 302, headers: { location: publicUrl + (url.pathname === '/' ? '/' : url.pathname) + url.search } });
+  }
   // The CMS UI itself (index.html, config.yml, brand assets) is built by Cloudflare Pages
   // with the public site at <ADMIN_UI_ORIGIN>; we proxy it so everything is same-origin.
   const base = (env.ADMIN_UI_ORIGIN || 'https://neurominds.in/admin').replace(/\/$/, '');

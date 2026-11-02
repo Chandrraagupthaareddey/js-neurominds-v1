@@ -113,3 +113,12 @@
   .brand__name span{font-size:.6rem; letter-spacing:.05em;}
   .fab--feedback{height:40px; padding:0 var(--sp-3);}
 }
+
+/* Doctor cards on phones: photo on top, details underneath, larger photo */
+@media (max-width: 720px){
+  .doctor-card{flex-direction:column; align-items:center; text-align:center;}
+  .doctor-card .doctor-card__photo, .doctor-card .doctor-card__avatar{width:132px; height:132px; border-radius:28px; margin-inline:auto;}
+  .doctor-card .chip-row{justify-content:center;}
+  .doctor-card > div{width:100%;}
+  .doctor-card .btn{width:100%; justify-content:center;}
+}
