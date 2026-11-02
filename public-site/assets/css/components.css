@@ -368,3 +368,14 @@ select{appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='h
 .doctor-card__qual{font-size:var(--fs-sm); color:var(--primary); font-weight:600; margin:0 0 2px;}
 .doctor-card__spec{font-size:var(--fs-sm); color:var(--text-soft); margin:0 0 var(--sp-3);}
 .doctor-card--list .chip-row{margin-bottom:var(--sp-4);}
+
+/* ---------------- Installable app hint ---------------- */
+.install-banner{position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:var(--z-header); display:flex; gap:12px; align-items:center; padding:12px 14px; background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:var(--r-lg,16px); box-shadow:var(--shadow-md); transform:translateY(120%); opacity:0; transition:transform .35s var(--ease), opacity .35s var(--ease);}
+.install-banner.is-visible{transform:none; opacity:1;}
+.install-banner img{border-radius:10px; flex:0 0 auto;}
+.install-banner__text{display:flex; flex-direction:column; gap:2px; font-size:var(--fs-sm); line-height:1.35; flex:1 1 auto; min-width:0;}
+.install-banner__text span{color:var(--text-soft);}
+.install-banner__actions{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+.btn--sm{padding:.5rem .9rem; min-height:36px; font-size:var(--fs-xs);}
+@media (min-width:720px){.install-banner{left:auto; right:24px; max-width:460px;}}
+body.footer-in-view .install-banner{transform:translateY(120%); opacity:0;}

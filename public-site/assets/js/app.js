@@ -13,6 +13,7 @@ import { api } from './api.js';
 import { initAnalytics, analytics } from './analytics.js';
 import { initUi } from './ui.js';
 import { emergencyBarHtml, headerHtml, footerHtml, fabsHtml } from '../../../shared/shell.js';
+import { initPwa } from './pwa.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -164,5 +165,6 @@ export async function mountShell({ currentPath = location.pathname } = {}) {
 
   document.dispatchEvent(new CustomEvent('jsnm:shell-ready', { detail: { cfg, social, flags, fabs } }));
   initUi();
+  try { initPwa(); } catch (e) { /* installable-app extras are optional */ }
   return cfg;
 }

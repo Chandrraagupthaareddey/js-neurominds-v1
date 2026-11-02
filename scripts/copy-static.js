@@ -8,7 +8,7 @@
  *
  * Idempotent: it only copies; it never edits source. Runs after `vite build`.
  */
-import { cpSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -50,6 +50,13 @@ if (target === 'public') {
   for (const f of readdirSync(src)) {
     if (/^google[0-9a-f]+\.html$/i.test(f) || /^BingSiteAuth\.xml$/i.test(f) || /^yandex_[0-9a-f]+\.html$/i.test(f)) { cpSync(resolve(src, f), resolve(dist, f)); console.log('copy-static(public): verification file', f); }
   }
+}
+
+// Service worker: stamp a build id so every deploy invalidates the previous cache.
+if (target === 'public' && existsSync(resolve(src, 'sw.js'))) {
+  const build = process.env.CF_PAGES_COMMIT_SHA ? process.env.CF_PAGES_COMMIT_SHA.slice(0, 10) : new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
+  writeFileSync(resolve(dist, 'sw.js'), readFileSync(resolve(src, 'sw.js'), 'utf8').replace(/__BUILD__/g, build));
+  console.log(`copy-static(public): service worker stamped with build ${build}`);
 }
 
 let copied = 0;

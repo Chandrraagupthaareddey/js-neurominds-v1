@@ -1,14 +1,29 @@
 {
+  "id": "/",
   "name": "JS Neurominds and Diagnostic Center",
   "short_name": "JS Neurominds",
-  "description": "Compassionate psychiatry, mental health, and diagnostic care in Chandragiri and Tirupati.",
-  "start_url": "/",
+  "description": "Psychiatry and mental health care in Chandragiri, Tirupati. Explore conditions, treatments and book a confirmed appointment.",
+  "lang": "en-IN",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#0e1b2a",
   "theme_color": "#0e1b2a",
+  "categories": ["health", "medical", "lifestyle"],
   "icons": [
-    { "src": "/assets/brand/favicon-192x192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/assets/brand/favicon-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/assets/brand/favicon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/brand/favicon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/brand/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/brand/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
     { "src": "/assets/brand/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
-  ]
+  ],
+  "shortcuts": [
+    { "name": "Book appointment", "short_name": "Book", "url": "/booking?source=pwa#confirmed", "icons": [{ "src": "/assets/brand/favicon-192x192.png", "sizes": "192x192" }] },
+    { "name": "Conditions we support", "short_name": "Conditions", "url": "/conditions?source=pwa", "icons": [{ "src": "/assets/brand/favicon-192x192.png", "sizes": "192x192" }] },
+    { "name": "Contact the clinic", "short_name": "Contact", "url": "/contact?source=pwa", "icons": [{ "src": "/assets/brand/favicon-192x192.png", "sizes": "192x192" }] },
+    { "name": "Emergency help", "short_name": "Emergency", "url": "/emergency?source=pwa", "icons": [{ "src": "/assets/brand/favicon-192x192.png", "sizes": "192x192" }] }
+  ],
+  "prefer_related_applications": false
 }

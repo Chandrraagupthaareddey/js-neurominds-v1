@@ -90,6 +90,19 @@ Troubleshooting:
 - Admin sees "Your role (admin) cannot change …" → that file is super-admin-only by design.
 - `https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/healthz` should return `{"ok":true}`; `https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/api/me` shows your session/role after login.
 
+## Install as an app (free, no App Store)
+
+Both the website and the admin are installable web apps (PWA):
+
+- **iPhone / iPad (Safari):** open the site → tap **Share** (square with arrow) → **Add to Home Screen** → Add.
+  Do this on https://neurominds.in for the public app and on https://admin.neurominds.in for the **JSNM Admin** app.
+- **Android (Chrome):** open the site → tap the **Install app** banner (or ⋮ menu → *Install app*).
+- **Mac / Windows (Chrome, Edge):** click the install icon in the address bar.
+
+Installed apps open full-screen with their own icon, cache pages for instant/offline opening, and update
+themselves automatically on every deploy. If Google sign-in inside the installed admin app on iPad does not
+return to the app, sign in once in Safari at admin.neurominds.in and then reopen the app.
+
 ## Daily use
 
 1. Open https://admin.neurominds.in → **Sign in with Google** with an allowed email.

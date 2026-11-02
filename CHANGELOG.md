@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.0 — 2026-11-02 — Installable apps (PWA), Google sign-in gateway, performance
+- **Installable web apps**: public site (`site.webmanifest`, `sw.js`, offline page, install hint, iOS tags,
+  maskable icons, app shortcuts) and admin (`admin/manifest.webmanifest`, separate icon). Free, no store.
+- **Admin Gateway Worker** (`cloudflare/admin-gateway`): Google sign-in with email roles (super_admin/admin),
+  single server-held GitHub token, role-based write guard, `/healthz`.
+- Pre-rendered site shell on every page (CLS ≈ 0), inlined CSS, lazy fonts, 96px WebP logo, real 404 page,
+  `llms.txt`, `email_off` markers (no Cloudflare email-decode script), a11y fixes (contrast, link underlines,
+  heading order). Lighthouse: desktop 99/100/100/100, mobile 89–96/100/100/100.
+
 ## 2.0.0 — 2026-10-28 — Static + git-based admin
 - **Content is now bundled at build time** from `/content/**.json`; the public site no longer calls Apps Script /
   Google Sheets for content (faster, works without a backend, fully indexable).
