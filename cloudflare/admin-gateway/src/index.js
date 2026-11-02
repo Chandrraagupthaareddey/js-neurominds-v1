@@ -163,6 +163,7 @@ function startGoogleLogin(request, env, url) {
   // Sveltia sends ?provider=github&site_id=<host>&scope=repo — we ignore provider and do Google.
   const siteId = url.searchParams.get('site_id') || '';
   const state = b64u(crypto.getRandomValues(new Uint8Array(16)));
+  const popup = url.searchParams.has('provider');
   const redirect = `${url.origin}/callback`;
   const g = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   g.searchParams.set('client_id', env.GOOGLE_CLIENT_ID);
@@ -171,19 +172,29 @@ function startGoogleLogin(request, env, url) {
   g.searchParams.set('scope', 'openid email profile');
   g.searchParams.set('prompt', 'select_account');
   g.searchParams.set('state', state);
-  const cookie = `jsnm_oauth=${encodeURIComponent(JSON.stringify({ state, siteId, popup: url.searchParams.has('provider') }))}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`;
+  // Keep the last few pending sign-in attempts so a second click / second tab does not
+  // invalidate the first one (each attempt is still a single-use random state).
+  let pending = [];
+  try { pending = (JSON.parse(getCookie(request, 'jsnm_oauth') || '{}').pending) || []; } catch (e) { pending = []; }
+  pending = pending.filter((p) => p && p.state && Date.now() - (p.t || 0) < 10 * 60 * 1000).slice(-4);
+  pending.push({ state, siteId, popup, t: Date.now() });
+  const cookie = `jsnm_oauth=${encodeURIComponent(JSON.stringify({ pending }))}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`;
   return new Response(null, { status: 302, headers: { location: g.toString(), 'set-cookie': cookie } });
 }
 
 async function googleCallback(request, env, url) {
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');
-  let saved = {};
-  try { saved = JSON.parse(getCookie(request, 'jsnm_oauth') || '{}'); } catch (e) { saved = {}; }
+  let pending = [];
+  try { pending = (JSON.parse(getCookie(request, 'jsnm_oauth') || '{}').pending) || []; } catch (e) { pending = []; }
+  const saved = pending.find((p) => p && p.state === state) || {};
+  // Default to the popup protocol when we cannot tell: Sveltia always opens a popup.
+  if (saved.popup === undefined) saved.popup = true;
   const clearOauth = 'jsnm_oauth=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0';
   const fail = (msg) => popupOrPage(saved.popup, { error: msg }, url, clearOauth);
 
-  if (!code || !state || state !== saved.state) return fail('Sign-in could not be verified (state mismatch). Please try again.');
+  if (url.searchParams.get('error')) return fail(`Google sign-in was cancelled or refused: ${url.searchParams.get('error')}`);
+  if (!code || !state || !saved.state) return fail('Sign-in could not be verified (state mismatch). Please close this window, go back to the admin and click "Sign in with Google" once more.');
 
   const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
