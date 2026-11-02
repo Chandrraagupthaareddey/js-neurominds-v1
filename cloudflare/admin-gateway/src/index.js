@@ -35,7 +35,9 @@ const DEFAULT_SUPER_ONLY = [
 const GITHUB_API = 'https://api.github.com';
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, rawEnv) {
+    // Secrets pasted/piped from a terminal often carry a trailing newline or spaces — trim them all.
+    const env = Object.fromEntries(Object.entries(rawEnv || {}).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v]));
     const url = new URL(request.url);
     const path = url.pathname;
     try {
@@ -45,7 +47,18 @@ export default {
       if (path === '/logout') return logout(url);
       if (path === '/api/me') return cors(request, env, await whoAmI(request, env));
       if (path.startsWith('/gh/')) return cors(request, env, await proxyGitHub(request, env, url));
-      if (path === '/healthz') return json({ ok: true, service: 'jsnm-admin-gateway' });
+      if (path === '/healthz') {
+        return json({
+          ok: true, service: 'jsnm-admin-gateway',
+          configured: {
+            GOOGLE_CLIENT_ID: !!env.GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET: !!env.GOOGLE_CLIENT_SECRET,
+            GITHUB_TOKEN: !!env.GITHUB_TOKEN, SESSION_SECRET: !!env.SESSION_SECRET
+          },
+          google_client_id_hint: env.GOOGLE_CLIENT_ID ? `${env.GOOGLE_CLIENT_ID.slice(0, 12)}…${env.GOOGLE_CLIENT_ID.slice(-22)} (${env.GOOGLE_CLIENT_ID.length} chars)` : null,
+          redirect_uri: `${url.origin}/callback`,
+          super_admins: listEnv(env.SUPER_ADMIN_EMAILS).length, admins: listEnv(env.ADMIN_EMAILS).length
+        });
+      }
       return serveAdminUi(request, env, url);
     } catch (e) {
       return json({ error: 'gateway_error', message: String(e && e.message || e) }, 500);
