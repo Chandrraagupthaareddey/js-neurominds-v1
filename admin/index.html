@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>JS Neurominds — Admin (Content Editor)</title>
+    <title>JS Neurominds Admin</title>
     <link rel="icon" href="/assets/brand/favicon-32x32.png" sizes="32x32" type="image/png" />
     <meta name="theme-color" content="#0f6f6a" />
     <!-- Installable admin app (free): Share → Add to Home Screen on iPad/iPhone, "Install app" on Android/desktop Chrome -->
@@ -25,46 +25,126 @@
       (function(){ var base = location.pathname.indexOf("/admin/") === 0 ? "/admin/" : "/"; document.getElementById("cms-config-link").href = base + "config.yml"; })();
     </script>
     <style>
-      /* Shown only until the CMS script loads (or if it cannot). */
-      #jsnm-fallback { font: 15px/1.5 system-ui, sans-serif; max-width: 560px; margin: 12vh auto; padding: 0 20px; color: #334; }
-      #jsnm-fallback h1 { font-size: 20px; margin: 0 0 8px; }
-      #jsnm-fallback code { background: #eef; padding: 2px 6px; border-radius: 4px; }
+      :root { color-scheme: dark; }
+      /* Branded sign-in screen shown in front of the CMS until the editor is ready. */
+      #jsnm-login { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center;
+        background: radial-gradient(1200px 600px at 50% -10%, #12403c 0%, #0e1b2a 55%, #0a1420 100%); color: #e9eef5;
+        font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 24px; transition: opacity .25s ease; }
+      #jsnm-login.is-hidden { opacity: 0; pointer-events: none; }
+      #jsnm-login[hidden] { display: none; }
+      .jl-card { width: min(420px, 100%); background: rgba(19, 33, 47, .92); border: 1px solid rgba(255,255,255,.08); border-radius: 20px;
+        padding: 28px 32px 28px; box-shadow: 0 24px 60px rgba(0,0,0,.45); text-align: center; backdrop-filter: blur(10px); }
+      .jl-logo { width: 160px; height: 160px; display: block; margin: 0 auto 14px; filter: drop-shadow(0 10px 24px rgba(0,0,0,.45)); }
+      .jl-card h1 { font-size: 22px; margin: 0 0 4px; font-weight: 600; letter-spacing: -.01em; }
+      .jl-card p { margin: 0 0 22px; color: #a9b7c6; font-size: 14px; }
+      .jl-google { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 48px; border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.14); background: #fff; color: #1f2937; font-weight: 600; font-size: 15px; cursor: pointer;
+        transition: transform .12s ease, box-shadow .2s ease; }
+      .jl-google:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+      .jl-google:disabled { opacity: .7; cursor: progress; transform: none; }
+      .jl-google svg { width: 20px; height: 20px; flex: none; }
+      .jl-status { min-height: 22px; margin-top: 14px; font-size: 13px; color: #a9b7c6; }
+      .jl-status.is-error { color: #ffb4a8; }
+      .jl-foot { margin-top: 22px; font-size: 12px; color: #7f91a3; }
+      .jl-foot a { color: #9fd6cf; }
+      .jl-spinner { width: 18px; height: 18px; border: 2px solid rgba(31,41,55,.25); border-top-color: #1f2937; border-radius: 50%; animation: jl-spin .8s linear infinite; }
+      @keyframes jl-spin { to { transform: rotate(360deg); } }
     </style>
   </head>
   <body>
-    <div id="jsnm-fallback">
-      <h1>JS Neurominds — Admin</h1>
-      <p>Loading the content editor… If this message stays, check your internet connection or that <code>config.yml</code> is present next to this page.</p>
+    <!-- Our sign-in screen. The CMS (Sveltia) loads underneath; its own login button is driven from here. -->
+    <div id="jsnm-login" role="dialog" aria-labelledby="jl-title" aria-describedby="jl-desc">
+      <div class="jl-card">
+        <img class="jl-logo" src="/assets/brand/logo-transparent.webp" alt="" width="160" height="160" />
+        <h1 id="jl-title">JS Neurominds Admin</h1>
+        <p id="jl-desc">Edit the website — clinic details, pages, conditions, doctors, articles. Sign in with your clinic Google account.</p>
+        <button class="jl-google" type="button" id="jl-google" disabled>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.5 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.8 6C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6C6.5 42.6 14.6 48 24 48z"/></svg>
+          <span id="jl-label">Loading…</span>
+        </button>
+        <div class="jl-status" id="jl-status" aria-live="polite"></div>
+        <div class="jl-foot">Access is limited to approved clinic emails. <a href="https://neurominds.in" rel="noopener">Back to website</a></div>
+      </div>
     </div>
+
     <!-- Sveltia CMS: a modern, open-source, git-based CMS (free). Loads ./config.yml from this folder.
-         Every save becomes a commit on GitHub → Cloudflare Pages rebuilds → live in ~2 minutes. -->
-    <!-- Pinned version: unpkg serves versioned URLs with a 1-year immutable cache (no redirect hop). Bump deliberately after testing. -->
+         Every save becomes a commit on GitHub → Cloudflare Pages rebuilds → live in ~2 minutes.
+         Pinned version: unpkg serves versioned URLs with a 1-year immutable cache (no redirect hop). Bump deliberately after testing. -->
     <script src="https://unpkg.com/@sveltia/cms@0.253.1/dist/sveltia-cms.js" type="module"></script>
     <script>
-      // Remove the fallback once the CMS has rendered, and relabel the OAuth button:
-      // sign-in goes through the Admin Gateway (Google), not GitHub directly.
-      const LABEL = 'Sign in with Google';
-      const walk = (root, fn) => {
-        root.querySelectorAll('*').forEach((el) => {
-          fn(el);
-          if (el.shadowRoot) walk(el.shadowRoot, fn);
-        });
-      };
-      const relabel = () => {
-        walk(document, (el) => {
-          if ((el.tagName === 'BUTTON' || el.tagName === 'A') && /sign\s*in\s*with\s*github/i.test(el.textContent || '')) {
-            el.querySelectorAll('*').forEach((c) => { if (/github/i.test(c.textContent || '') && c.children.length === 0) c.textContent = LABEL; });
-            if (/github/i.test(el.textContent || '')) el.textContent = LABEL;
-            el.setAttribute('aria-label', LABEL);
+      (function () {
+        var overlay = document.getElementById('jsnm-login');
+        var btn = document.getElementById('jl-google');
+        var label = document.getElementById('jl-label');
+        var status = document.getElementById('jl-status');
+        var done = false, busy = false;
+
+        // Walk the document (including any shadow roots) for the CMS's own sign-in button.
+        function walk(root, fn) {
+          var all = root.querySelectorAll('*');
+          for (var i = 0; i < all.length; i++) { if (fn(all[i]) === true) return true; if (all[i].shadowRoot && walk(all[i].shadowRoot, fn)) return true; }
+          return false;
+        }
+        function cmsSignInButton() {
+          var found = null;
+          walk(document, function (el) {
+            if ((el.tagName === 'BUTTON' || el.tagName === 'A') && /sign\s*in/i.test(el.textContent || '') && !el.closest('#jsnm-login')) { found = el; return true; }
+          });
+          return found;
+        }
+        // True once the CMS has painted something visible of its own (not our overlay, not <script>s).
+        function cmsRendered() {
+          var kids = document.body.children;
+          for (var i = 0; i < kids.length; i++) {
+            var k = kids[i];
+            if (k.id === 'jsnm-login' || k.tagName === 'SCRIPT' || k.tagName === 'STYLE' || k.tagName === 'LINK') continue;
+            if ((k.textContent || '').trim() || k.querySelector('button, input, a, svg, img')) return true;
+            if (k.shadowRoot && (k.shadowRoot.textContent || '').trim()) return true;
           }
+          return false;
+        }
+        function cmsErrorText() {
+          var txt = '';
+          walk(document, function (el) {
+            if (el.getAttribute && el.getAttribute('role') === 'alert' && !el.closest('#jsnm-login') && (el.textContent || '').trim()) { txt = el.textContent.trim(); return true; }
+          });
+          return txt;
+        }
+        function hideOverlay() {
+          if (done) return; done = true;
+          overlay.classList.add('is-hidden');
+          setTimeout(function () { overlay.hidden = true; }, 300);
+        }
+        function tick() {
+          if (done) return;
+          var signIn = cmsSignInButton();
+          var err = cmsErrorText();
+          if (signIn) {
+            if (btn.disabled && !busy) { btn.disabled = false; label.textContent = 'Continue with Google'; }
+            if (err && !/aborted/i.test(err) && status.textContent !== err) { status.textContent = err; status.className = 'jl-status is-error'; }
+          } else if (cmsRendered()) {
+            // CMS rendered real UI with no sign-in button → user is signed in.
+            hideOverlay();
+          }
+        }
+        var timer = setInterval(tick, 250);
+        new MutationObserver(function (records) {
+          // Ignore mutations we caused inside our own overlay (otherwise we'd loop on our own writes).
+          for (var i = 0; i < records.length; i++) { if (!overlay.contains(records[i].target)) { tick(); return; } }
+        }).observe(document.body, { childList: true, subtree: true });
+        // Safety: if the CMS never rendered a sign-in button (e.g. config error), reveal its screen after 8s.
+        setTimeout(function () { if (!done && !cmsSignInButton()) { hideOverlay(); clearInterval(timer); } }, 8000);
+
+        btn.addEventListener('click', function () {
+          var signIn = cmsSignInButton();
+          if (!signIn) { status.textContent = 'Still loading the editor… please try again in a moment.'; return; }
+          status.textContent = 'Opening Google sign-in…'; status.className = 'jl-status';
+          busy = true; btn.disabled = true; label.innerHTML = '<span class="jl-spinner" aria-hidden="true"></span>';
+          signIn.click(); // same user gesture → the Google popup is allowed
+          // Re-enable after a while in case the popup was closed.
+          setTimeout(function () { busy = false; if (!done) { btn.disabled = false; label.textContent = 'Continue with Google'; var e = cmsErrorText(); if (e && !/aborted/i.test(e)) { status.textContent = e; status.className = 'jl-status is-error'; } else if (!e) status.textContent = ''; } }, 6000);
         });
-      };
-      new MutationObserver(() => {
-        const f = document.getElementById('jsnm-fallback');
-        if (f && document.body.children.length > 2) f.remove();
-        relabel();
-      }).observe(document.body, { childList: true, subtree: true });
-      [500, 1500, 3000, 6000].forEach((t) => setTimeout(relabel, t));
+      })();
     </script>
   </body>
 </html>

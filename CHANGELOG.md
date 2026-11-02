@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0 — 2026-11-02
+
+### Admin
+- **Branded sign-in screen.** admin.neurominds.in now opens on a JS Neurominds screen with a single **Continue with Google** button (no "Sveltia CMS" title, no GitHub button). The button drives the CMS's existing Google OAuth flow via the gateway; the screen disappears automatically once signed in, and users with a live session never see it.
+- New transparent-background logo (`assets/brand/logo-transparent.{png,webp}`) for dark surfaces.
+
 ## 2.2.0 — 2026-11-02 — Own booking + payments (disabled by default), single CTA, compact footer
 - **Own appointment booking** (Admin → Site Settings → Booking & payments): configurable slots, closed days,
   fees, texts; WhatsApp hand-off always works; optional save to Sheet + email via Apps Script `submitBooking`.
