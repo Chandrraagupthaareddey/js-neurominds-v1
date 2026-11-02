@@ -113,6 +113,26 @@ Admin → **Site Settings → Booking & payments**:
 
 Everything is free: no payment gateway account is needed for UPI/QR; a Razorpay/PhonePe link is optional.
 
+### Live availability + Google Calendar sync (jsneurominds5@gmail.com)
+
+With the Apps Script forms backend in place, the booking form shows **"— Booked"** on slots that already have
+an event in the clinic's Google Calendar (including anything the clinic blocks by hand — holidays, lunch, a
+manually added patient), re-checks the slot at submit time (no double booking), and **creates a calendar
+event** "Appointment · Name · JSNM-ref" the moment a patient books. Setup, once:
+
+1. Deploy `gas-public-api` from the **jsneurominds5@gmail.com** Google account (`clasp login` as that
+   account, then `npm run deploy:gas:public`; or open the script at script.google.com and paste the files).
+   Deploying from another account also works if that account is given "Make changes to events" on the
+   jsneurominds5 calendar and the property below points at it.
+2. Apps Script → Project Settings → **Script Properties**: `BOOKING_CALENDAR_ID = jsneurominds5@gmail.com`
+   (optional: `BOOKING_SLOT_MINUTES = 30`). The first run asks you to allow Calendar access.
+3. Deploy → **New deployment → Web app**, *Execute as: me*, *Access: Anyone* → copy the `/exec` URL into
+   Cloudflare Pages → Settings → Environment variables → `VITE_PUBLIC_API_URL`, and `VITE_API_MODE = live`.
+4. Admin → Booking & payments → *Live availability from the clinic Google Calendar* = on (default).
+
+Quotas are generous for a clinic (Calendar reads are cached 60 s; Apps Script allows ~20,000 calendar calls/day)
+and it is all on Google's free tier.
+
 ## Install as an app (free, no App Store)
 
 Both the website and the admin are installable web apps (PWA):

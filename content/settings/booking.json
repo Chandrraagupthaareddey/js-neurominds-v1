@@ -9,10 +9,32 @@
     "title": "Book your appointment",
     "intro": "Choose a date and time that suits you. We will confirm your slot on WhatsApp or by phone.",
     "days_ahead": 14,
-    "closed_weekdays": ["Sunday"],
-    "slots": ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00"],
-    "consultation_modes": ["Clinic visit", "Online (video)"],
-    "visit_types": ["New consultation", "Follow-up"],
+    "closed_weekdays": [
+      "Sunday"
+    ],
+    "slots": [
+      "10:00",
+      "10:30",
+      "11:00",
+      "11:30",
+      "12:00",
+      "12:30",
+      "16:00",
+      "16:30",
+      "17:00",
+      "17:30",
+      "18:00",
+      "18:30",
+      "19:00"
+    ],
+    "consultation_modes": [
+      "Clinic visit",
+      "Online (video)"
+    ],
+    "visit_types": [
+      "New consultation",
+      "Follow-up"
+    ],
     "consultation_fee": 800,
     "followup_fee": 500,
     "currency": "INR",
@@ -22,7 +44,9 @@
     "success_title": "Request received",
     "success_message": "Thank you. Our team will confirm your appointment shortly. You can also send the details to us on WhatsApp right now.",
     "whatsapp_handoff": true,
-    "terms_text": "I agree to be contacted by the clinic to confirm this appointment and accept the privacy policy."
+    "terms_text": "I agree to be contacted by the clinic to confirm this appointment and accept the privacy policy.",
+    "slot_minutes": 30,
+    "calendar_sync": true
   },
   "payments": {
     "enabled": false,

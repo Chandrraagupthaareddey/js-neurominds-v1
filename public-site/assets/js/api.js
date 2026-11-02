@@ -30,8 +30,18 @@ async function realPost(action, payload) {
 const write = (action) => async (payload) =>
   hasWriteBackend() ? realPost(action, payload) : contentApi[action] ? contentApi[action](payload) : unavailableEnvelope();
 
+async function realGet(action, params = {}) {
+  const url = new URL(CONFIG.PUBLIC_API_URL);
+  url.searchParams.set('action', action);
+  Object.keys(params).forEach((k) => url.searchParams.set(k, params[k]));
+  const res = await fetch(url.toString(), { method: 'GET' });
+  return res.json();
+}
+
 export const api = {
   ...contentApi,
+  /** Live calendar availability for the own-booking form (needs the Apps Script backend). */
+  availability: (from, to) => hasWriteBackend() ? realGet('availability', { from, to: to || from }) : Promise.resolve({ success: true, data: { from, to: to || from, busy: [], offline: true } }),
   submitCallback: write('submitCallback'),
   submitLabRequest: write('submitLabRequest'),
   submitFeedback: write('submitFeedback'),

@@ -52,3 +52,22 @@ test('WhatsApp hand-off message contains the essentials and no HTML', () => {
   assert.ok(msg.includes('JSNM-1') && msg.includes('9000000001') && msg.includes('10:30') && msg.includes('Payment: done via UPI'));
   assert.ok(!/[<>]/.test(msg));
 });
+
+test('bookedSlots marks slots overlapping calendar events (and all-day blocks)', () => {
+  const busy = [{ start: '2026-11-03T10:30:00+05:30', end: '2026-11-03T11:00:00+05:30' }];
+  // Compare in local time: build the same instant the browser would.
+  const local = new Date('2026-11-03T10:30:00'); const localEnd = new Date('2026-11-03T11:00:00');
+  const booked = ob.bookedSlots('2026-11-03', [{ start: local.toISOString(), end: localEnd.toISOString() }], 30);
+  assert.ok(booked.has('10:30'), '10:30 overlaps the event');
+  assert.ok(booked.has('10:05'), 'a 30-min slot starting 10:05 would still overlap');
+  assert.ok(!booked.has('11:00') && !booked.has('10:00'), 'adjacent slots stay free');
+  const allDay = ob.bookedSlots('2026-11-03', [{ start: new Date('2026-11-03T00:00:00').toISOString(), end: new Date('2026-11-04T00:00:00').toISOString(), all_day: true }], 30);
+  assert.ok(allDay.has('*'), 'holiday blocks the whole day');
+  assert.equal(ob.bookedSlots('2026-11-04', busy, 30).size, 0, 'other days unaffected');
+});
+
+test('availableDates skips today once all slots have passed', () => {
+  const own = { days_ahead: 3, closed_weekdays: [], slots: ['10:00'] };
+  const late = new Date('2026-11-02T20:00:00');
+  assert.equal(ob.availableDates(own, late)[0], '2026-11-03');
+});

@@ -41,6 +41,8 @@ export function availableDates(own, from = new Date()) {
   for (let i = 0; i < days && out.length < days; i++) {
     const d = new Date(from); d.setDate(from.getDate() + i);
     if (closed.has(WEEKDAYS[d.getDay()].toLowerCase().slice(0, 3))) continue;
+    // Skip today once all of today's slots have passed.
+    if (i === 0 && own.slots && own.slots.length && slotsFor(own, isoDate(d), from).length === 0) continue;
     out.push(isoDate(d));
   }
   return out;
@@ -52,6 +54,26 @@ export function slotsFor(own, dateIso, now = new Date()) {
   // Today: hide slots that have already started (plus a 30-minute buffer).
   const cutoff = now.getHours() * 60 + now.getMinutes() + 30;
   return slots.filter((s) => { const [h, m] = s.split(':').map(Number); return h * 60 + m > cutoff; });
+}
+
+/** Slots (HH:MM) on `dateIso` that overlap any busy interval from the clinic calendar. */
+export function bookedSlots(dateIso, busy, slotMinutes = 30) {
+  const out = new Set();
+  const dayStart = new Date(dateIso + 'T00:00:00');
+  const dayEnd = new Date(dateIso + 'T23:59:59');
+  for (const b of busy || []) {
+    const bs = new Date(b.start), be = new Date(b.end);
+    if (be <= dayStart || bs >= dayEnd) continue;
+    if (b.all_day) { out.add('*'); continue; }
+    // Any slot whose [start, start+len) intersects [bs, be).
+    const probe = new Date(dayStart);
+    for (let m = 0; m < 24 * 60; m += 5) {
+      probe.setHours(0, m, 0, 0);
+      const pe = new Date(probe.getTime() + slotMinutes * 60000);
+      if (probe < be && pe > bs) out.add(`${pad(probe.getHours())}:${pad(probe.getMinutes())}`);
+    }
+  }
+  return out;
 }
 
 export function feeFor(own, visitType) {
@@ -142,12 +164,36 @@ export async function renderOwnBooking(mountSel, { settings, cfg, doctors = [] }
   const slotEl = form.querySelector('#ob-slot');
   const typeEl = form.querySelector('#ob-type');
   const feeEl = form.querySelector('[data-fee]');
-  const fillSlots = () => {
-    const slots = slotsFor(own, dateEl.value);
+  const slotMinutes = Number(own.slot_minutes) > 0 ? Number(own.slot_minutes) : 30;
+  const availCache = new Map();
+  const fillSlots = async () => {
+    const date = dateEl.value;
+    const slots = slotsFor(own, date);
     slotEl.innerHTML = slots.length ? slots.map((s) => `<option value="${s}">${fmtTime(s)}</option>`).join('') : '<option value="">No slots left this day</option>';
+    if (!yes(own.calendar_sync)) return;
+    slotEl.disabled = true;
+    try {
+      if (!availCache.has(date)) availCache.set(date, api.availability(date));
+      const res = await availCache.get(date);
+      const data = (res && res.data) || {};
+      const booked = bookedSlots(date, data.busy || [], data.slot_minutes || slotMinutes);
+      const allDay = booked.has('*');
+      let firstFree = '';
+      slotEl.querySelectorAll('option').forEach((o) => {
+        if (!o.value) return;
+        if (allDay || booked.has(o.value)) { o.disabled = true; o.textContent = `${fmtTime(o.value)} — Booked`; }
+        else if (!firstFree) firstFree = o.value;
+      });
+      if (dateEl.value === date) slotEl.value = firstFree;
+      if (!firstFree && slots.length) slotEl.insertAdjacentHTML('afterbegin', '<option value="" selected>All slots booked — choose another date</option>');
+      mount.querySelector('[data-live-note]')?.remove();
+      if (!data.offline) slotEl.insertAdjacentHTML('afterend', '<p class="hint" data-live-note>Live availability from the clinic calendar.</p>');
+    } catch (e) { /* availability is a convenience; the clinic still confirms manually */ }
+    finally { slotEl.disabled = false; }
   };
   fillSlots();
   dateEl.addEventListener('change', fillSlots);
+  mount.refreshSlots = () => { availCache.clear(); return fillSlots(); };
   if (typeEl && feeEl) typeEl.addEventListener('change', () => { const f = feeFor(own, typeEl.value); feeEl.textContent = f != null ? money(f, own.currency) : ''; });
 
   form.addEventListener('submit', (e) => onSubmit(e, { mount, form, own, settings, cfg }));
@@ -184,6 +230,12 @@ async function onSubmit(e, { mount, form, own, settings, cfg }) {
   if (isSubmissionBackendAvailable()) {
     try {
       const res = await api.submitBooking({ ...booking, consent: true });
+      if (res && res.code === 'SLOT_TAKEN') {
+        btn.disabled = false; btn.textContent = 'Request appointment';
+        show('notice notice--err', res.message || 'Sorry, that time was just booked. Please choose another slot.');
+        if (mount.refreshSlots) await mount.refreshSlots();
+        return;
+      }
       saved = !!(res && res.success);
       if (saved && res.data && res.data.booking_id) booking.server_id = res.data.booking_id;
     } catch (err) { saved = false; }

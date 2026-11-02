@@ -427,6 +427,8 @@ collections:
               - { name: days_ahead, label: Days bookable ahead, widget: number, value_type: int, min: 1, max: 60, default: 14 }
               - { name: closed_weekdays, label: Closed days, widget: select, multiple: true, options: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday] }
               - { name: slots, label: 'Time slots (24h, e.g. 10:30)', widget: list, hint: 'One slot per item. Past slots are hidden automatically on the current day.' }
+              - { name: slot_minutes, label: 'Appointment length (minutes)', widget: number, value_type: int, min: 10, max: 120, default: 30 }
+              - { name: calendar_sync, label: 'Live availability from the clinic Google Calendar (show Booked slots, create events)', widget: boolean, default: true, hint: 'Needs the Apps Script forms backend with BOOKING_CALENDAR_ID = jsneurominds5@gmail.com (see docs/ADMIN_CMS.md).' }
               - { name: consultation_modes, label: Consultation options, widget: list }
               - { name: visit_types, label: Visit types, widget: list }
               - { name: consultation_fee, label: 'Fee — new consultation (₹)', widget: number, value_type: int, required: false }

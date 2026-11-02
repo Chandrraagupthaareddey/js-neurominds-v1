@@ -107,12 +107,23 @@ var BookingService = {
       updated_at: now
     };
 
+    // Live calendar guard: the slot may have been taken since the page loaded.
+    var calendarOk = true;
+    try {
+      if (!CalendarService.isFree(record.appointment_date, record.appointment_slot)) {
+        return { success: false, error: 'slot_taken', code: 'SLOT_TAKEN', message: 'Sorry, that time was just booked. Please choose another slot.' };
+      }
+    } catch (e) { calendarOk = false; /* calendar not configured → fall back to sheet-only */ }
+
     var opId = getOperationsAuditId_();
-    BookingService._ensureTab(opId, 'Appointment_Requests', Object.keys(record));
+    BookingService._ensureTab(opId, 'Appointment_Requests', Object.keys(record).concat(['calendar_event_id']));
+    if (calendarOk) {
+      try { record.calendar_event_id = CalendarService.createEvent(record); } catch (e) { record.calendar_event_id = ''; }
+    }
     SheetService.append(opId, 'Appointment_Requests', record);
 
     try { EmailService.notifyNewBooking(record); } catch (e) { EmailService.logEmailFailure('booking_new', id, e && e.message); }
-    return { success: true, data: { booking_id: id, reference: record.reference } };
+    return { success: true, data: { booking_id: id, reference: record.reference, calendar_synced: !!record.calendar_event_id } };
   },
 
   /** Create a tab with a header row if it does not exist yet (first own-booking request). */

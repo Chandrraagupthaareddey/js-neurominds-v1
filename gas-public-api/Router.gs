@@ -26,6 +26,7 @@ var Router = {
       case 'treatment': return Utils.ok(ContentService_.treatmentBySlug(params.slug));
       case 'doctor': return Utils.ok(ContentService_.doctorBySlug(params.slug));
       case 'blog': return Utils.ok(ContentService_.blogBySlug(params.slug));
+      case 'availability': return Utils.ok(CalendarService.availability(params.from, params.to));
       case 'health': return Utils.ok(HealthService.check());
       default: return Utils.fail('Unknown action: ' + action, 'UNKNOWN_ACTION');
     }
