@@ -64,5 +64,69 @@ var BookingService = {
     }
 
     return { success: true, data: { callback_id: id } };
+  },
+
+  /**
+   * Own appointment request (website booking form, Admin → Booking & payments).
+   * Writes to the "Appointment_Requests" tab (created on first use) and emails the clinic.
+   * Payment is NOT processed here — the website hands the patient to UPI / a hosted payment
+   * link and the clinic confirms manually; this record carries the reference to match against.
+   */
+  submitBooking: function (payload) {
+    payload = payload || {};
+    var errors = [];
+    var name = Utils.sanitizeText(payload.name, 80);
+    if (name.length < 2) errors.push('name');
+    if (!Utils.isValidMobile(payload.mobile)) errors.push('mobile');
+    if (!Utils.isValidEmail(payload.email)) errors.push('email');
+    if (!Utils.isFutureOrToday(payload.date)) errors.push('date');
+    if (!/^\d{2}:\d{2}$/.test(String(payload.slot || ''))) errors.push('slot');
+    if (!payload.consent) errors.push('consent');
+    if (errors.length) return { success: false, error: 'validation_failed', fields: errors };
+
+    var id = Utils.genId('BK');
+    var now = Utils.nowIso();
+    var record = {
+      booking_id: id,
+      reference: Utils.sanitizeText(payload.reference, 40),
+      created_at: now,
+      patient_name: name,
+      mobile_number: String(payload.mobile).replace(/\D/g, '').slice(-10),
+      patient_email: Utils.sanitizeText(payload.email, 120),
+      appointment_date: Utils.sanitizeText(payload.date, 20),
+      appointment_slot: Utils.sanitizeText(payload.slot, 10),
+      visit_type: Utils.sanitizeText(payload.visit_type, 40),
+      consultation_mode: Utils.sanitizeText(payload.mode, 40),
+      doctor: Utils.sanitizeText(payload.doctor, 80),
+      fee: payload.fee != null ? Number(payload.fee) || '' : '',
+      notes: Utils.sanitizeText(payload.notes, 200),
+      payment_status: 'pending',
+      payment_ref: '',
+      status: 'new',
+      source_hint: Utils.sanitizeText(payload.source_hint || 'website', 40),
+      updated_at: now
+    };
+
+    var opId = getOperationsAuditId_();
+    BookingService._ensureTab(opId, 'Appointment_Requests', Object.keys(record));
+    SheetService.append(opId, 'Appointment_Requests', record);
+
+    try { EmailService.notifyNewBooking(record); } catch (e) { EmailService.logEmailFailure('booking_new', id, e && e.message); }
+    return { success: true, data: { booking_id: id, reference: record.reference } };
+  },
+
+  /** Create a tab with a header row if it does not exist yet (first own-booking request). */
+  _ensureTab: function (spreadsheetId, tabName, headers) {
+    var ss = SpreadsheetApp.openById(spreadsheetId);
+    if (ss.getSheetByName(tabName)) return;
+    var lock = LockService.getScriptLock();
+    lock.waitLock(20000);
+    try {
+      if (!ss.getSheetByName(tabName)) {
+        var sh = ss.insertSheet(tabName);
+        sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
+        sh.setFrozenRows(1);
+      }
+    } finally { lock.releaseLock(); }
   }
 };

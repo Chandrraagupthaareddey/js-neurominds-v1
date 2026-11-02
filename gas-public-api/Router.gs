@@ -37,6 +37,7 @@ var Router = {
 
     switch (action) {
       case 'submitCallback': return Utils.json(BookingService.submitCallback(payload));
+      case 'submitBooking': return Utils.json(BookingService.submitBooking(payload));
       case 'submitLabRequest': return Utils.json(LabService.submitLabRequest(payload));
       case 'submitFeedback': return Utils.json(FeedbackService.submitFeedback(payload));
       default: return Utils.fail('Unknown action: ' + action, 'UNKNOWN_ACTION');

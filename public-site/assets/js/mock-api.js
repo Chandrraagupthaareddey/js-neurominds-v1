@@ -16,7 +16,7 @@
 import {
   CLINIC_CONFIG, NAVIGATION, DOCTORS, CONDITIONS, TREATMENTS, SERVICES,
   LAB_PACKAGES, BLOGS, FAQS, CALLBACK_OPTIONS,
-  SOCIAL_LINKS, TESTIMONIALS, GOOGLE_REVIEWS, FEATURE_FLAGS, FLOATING_CTA, PAGES, SEO
+  SOCIAL_LINKS, TESTIMONIALS, GOOGLE_REVIEWS, FEATURE_FLAGS, FLOATING_CTA, PAGES, SEO, BOOKING
 } from '../../../shared/content.js';
 import { yes, published, approved, enabledSorted, byOrder } from '../../../shared/content-normalize.js';
 import { unavailableEnvelope } from './submission-status.js';
@@ -44,6 +44,7 @@ export const contentApi = {
   async floatingCta() { return okEnv(enabledSorted(FLOATING_CTA)); },
   async page(id) { return okEnv(PAGES[id] || null); },
   async seo() { return okEnv(SEO); },
+  async booking() { return okEnv(BOOKING); },
 
   async doctors() { return okEnv(published(DOCTORS)); },
   async doctor(slug) { return okEnv(findSlug(published(DOCTORS), slug)); },
@@ -81,6 +82,10 @@ export const contentApi = {
   },
   async submitFeedback(payload) {
     console.info('[content-api] feedback NOT saved — no write backend configured', redactForLog(payload));
+    return unavailableEnvelope();
+  },
+  async submitBooking(payload) {
+    console.info('[content-api] booking NOT saved — no write backend configured', redactForLog(payload));
     return unavailableEnvelope();
   }
 };

@@ -394,6 +394,76 @@ collections:
           - name: concern_categories
             label: Concern categories
             widget: list
+      - name: booking
+        label: Booking & payments
+        file: content/settings/booking.json
+        format: json
+        fields:
+          - name: mode
+            label: Booking system
+            widget: select
+            options:
+              - { label: 'Partner (PWeNS) — current', value: partner }
+              - { label: 'Our own booking form', value: own }
+            default: partner
+          - name: own_booking_enabled
+            label: 'Enable our own booking form (master switch — keep OFF until approved)'
+            widget: boolean
+            default: false
+          - name: partner
+            label: Partner booking
+            widget: object
+            collapsed: true
+            fields:
+              - { name: name, label: Partner name, widget: string }
+              - { name: button_label, label: Button label, widget: string }
+          - name: own
+            label: Our own booking form
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: Heading, widget: string }
+              - { name: intro, label: Intro text, widget: text }
+              - { name: days_ahead, label: Days bookable ahead, widget: number, value_type: int, min: 1, max: 60, default: 14 }
+              - { name: closed_weekdays, label: Closed days, widget: select, multiple: true, options: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday] }
+              - { name: slots, label: 'Time slots (24h, e.g. 10:30)', widget: list, hint: 'One slot per item. Past slots are hidden automatically on the current day.' }
+              - { name: consultation_modes, label: Consultation options, widget: list }
+              - { name: visit_types, label: Visit types, widget: list }
+              - { name: consultation_fee, label: 'Fee — new consultation (₹)', widget: number, value_type: int, required: false }
+              - { name: followup_fee, label: 'Fee — follow-up (₹)', widget: number, value_type: int, required: false }
+              - { name: currency, label: Currency, widget: string, default: INR }
+              - { name: fee_note, label: Fee note, widget: text, required: false }
+              - { name: collect_email, label: Ask for email, widget: boolean, default: true }
+              - { name: notes_placeholder, label: Note field hint, widget: string, required: false }
+              - { name: success_title, label: After submit — title, widget: string }
+              - { name: success_message, label: After submit — message, widget: text }
+              - { name: whatsapp_handoff, label: 'Show "Send details on WhatsApp" button', widget: boolean, default: true }
+              - { name: terms_text, label: Consent checkbox text, widget: text }
+          - name: payments
+            label: Payments
+            widget: object
+            collapsed: true
+            fields:
+              - { name: enabled, label: 'Show payment step after booking (master switch)', widget: boolean, default: false }
+              - { name: title, label: Payment step — heading, widget: string }
+              - { name: intro, label: Payment step — text, widget: text }
+              - { name: require_before_confirmation, label: Slot confirmed only after payment, widget: boolean, default: false }
+              - name: methods
+                label: Payment methods
+                widget: list
+                summary: '{{fields.label}} ({{fields.type}})'
+                hint: 'UPI = your UPI ID (GPay/PhonePe/Paytm/BHIM open automatically). QR = upload your QR image. Link = any hosted payment page URL (Razorpay, PhonePe, Paytm, Cashfree, Stripe…).'
+                fields:
+                  - { name: id, label: ID, widget: string, hint: 'Short unique id, e.g. upi, qr, razorpay' }
+                  - { name: type, label: Type, widget: select, options: [{ label: 'UPI ID (deep link)', value: upi }, { label: 'QR code image', value: qr }, { label: 'Payment link (URL)', value: link }] }
+                  - { name: label, label: Button / label text, widget: string }
+                  - { name: upi_id, label: 'UPI ID (for type UPI), e.g. clinic@okaxis', widget: string, required: false }
+                  - { name: payee_name, label: 'Payee name (for type UPI)', widget: string, required: false }
+                  - { name: image, label: 'QR image (for type QR)', widget: image, required: false }
+                  - { name: url, label: 'Payment page URL (for type Link)', widget: string, required: false }
+                  - { name: enabled, label: Enabled, widget: boolean, default: false }
+                  - { name: order, label: Order, widget: number, value_type: int, default: 1 }
+
       - name: seo
         label: SEO defaults & verification
         file: content/settings/seo.json

@@ -55,6 +55,27 @@ var EmailService = {
     EmailService._logEmail('callback_new', record.callback_id, 'sent', '');
   },
 
+  notifyNewBooking: function (record) {
+    if (!EmailService._hasQuota()) { EmailService._logEmail('booking_new', record.booking_id, 'skipped_quota', ''); return; }
+    var subject = 'New appointment request · ' + record.patient_name + ' · ' + record.appointment_date + ' ' + record.appointment_slot;
+    var body = [
+      'A new appointment request was made on the website (own booking form).',
+      '',
+      'Reference: ' + record.reference,
+      'Name: ' + record.patient_name,
+      'Mobile: ' + record.mobile_number,
+      'When: ' + record.appointment_date + ' at ' + record.appointment_slot,
+      'Type: ' + record.visit_type + ' · ' + record.consultation_mode,
+      'Doctor: ' + record.doctor,
+      'Fee: ' + record.fee + ' · Payment: ' + record.payment_status,
+      'Note: ' + record.notes,
+      '',
+      'Confirm with the patient on WhatsApp / phone and update the Appointment_Requests sheet.'
+    ].join('\n');
+    MailApp.sendEmail(EmailService._supportEmail(), subject, body);
+    EmailService._logEmail('booking_new', record.booking_id, 'sent', '');
+  },
+
   notifyNewLab: function (record) {
     if (!EmailService._hasQuota()) { EmailService._logEmail('lab_new', record.lab_request_id, 'skipped_quota', ''); return; }
     var subject = 'New lab home collection request · ' + record.name;

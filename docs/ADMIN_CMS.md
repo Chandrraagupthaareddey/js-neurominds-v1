@@ -90,6 +90,29 @@ Troubleshooting:
 - Admin sees "Your role (admin) cannot change …" → that file is super-admin-only by design.
 - `https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/healthz` should return `{"ok":true}`; `https://jsnm-admin-gateway.tcgr-8553665381.workers.dev/api/me` shows your session/role after login.
 
+## Own booking system & payments (built in, switched OFF until you approve)
+
+Admin → **Site Settings → Booking & payments**:
+
+1. **Booking system**: `Partner (PWeNS)` (today) or `Our own booking form`. Then turn on
+   **Enable our own booking form**. The Booking page then shows the clinic's own form: name, mobile,
+   date (next *N* days, closed weekdays skipped), time slot (your configured slots; past slots hidden),
+   visit type, consultation mode, doctor, note, consent.
+2. **Our own booking form**: edit slots, closed days, fees (new / follow-up), texts.
+3. **Payments** → **Show payment step after booking**: after the form, the patient sees the enabled methods:
+   - **UPI ID** → one tap opens GPay / PhonePe / Paytm / BHIM with amount + reference pre-filled (plus "Copy UPI ID" for desktop).
+   - **QR code** → upload your UPI QR image.
+   - **Payment link** → any hosted payment page URL (Razorpay Payment Link / Page, PhonePe, Paytm, Cashfree, Stripe…).
+   Add as many methods as you like; each has its own Enabled switch and order.
+4. The patient taps **"I have paid — send details on WhatsApp"** (or just **Send details on WhatsApp**): a
+   pre-filled WhatsApp message with reference, date/time, type, fee and payment reference goes to the clinic
+   number. The clinic confirms the slot manually. No card data ever touches the website.
+5. If `VITE_PUBLIC_API_URL` (Apps Script forms backend) is set and `gas-public-api` has been re-deployed
+   (`npm run deploy:gas:public`), every request is also saved to a new **Appointment_Requests** tab in the
+   Operations sheet and emailed to the clinic — otherwise WhatsApp is the record.
+
+Everything is free: no payment gateway account is needed for UPI/QR; a Razorpay/PhonePe link is optional.
+
 ## Install as an app (free, no App Store)
 
 Both the website and the admin are installable web apps (PWA):

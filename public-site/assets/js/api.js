@@ -34,7 +34,8 @@ export const api = {
   ...contentApi,
   submitCallback: write('submitCallback'),
   submitLabRequest: write('submitLabRequest'),
-  submitFeedback: write('submitFeedback')
+  submitFeedback: write('submitFeedback'),
+  submitBooking: write('submitBooking')
 };
 
 /**

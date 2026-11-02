@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0 — 2026-11-02 — Own booking + payments (disabled by default), single CTA, compact footer
+- **Own appointment booking** (Admin → Site Settings → Booking & payments): configurable slots, closed days,
+  fees, texts; WhatsApp hand-off always works; optional save to Sheet + email via Apps Script `submitBooking`.
+- **Payment step** with pluggable methods: UPI ID deep link (GPay/PhonePe/Paytm/BHIM), QR image, any hosted
+  payment link (Razorpay/PhonePe/Paytm/Cashfree/Stripe…). Master switches keep both OFF until approved.
+- Booking CTA only in header + home; compact 3-column footer; booking anchor offset; centred booking page;
+  mobile doctor card layout; gateway redirects UI hits on workers.dev to admin.neurominds.in.
+
 ## 2.1.0 — 2026-11-02 — Installable apps (PWA), Google sign-in gateway, performance
 - **Installable web apps**: public site (`site.webmanifest`, `sw.js`, offline page, install hint, iOS tags,
   maskable icons, app shortcuts) and admin (`admin/manifest.webmanifest`, separate icon). Free, no store.

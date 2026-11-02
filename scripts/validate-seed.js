@@ -17,7 +17,7 @@ import {
 } from '../shared/constants.js';
 import { ROLES } from '../shared/permissions.js';
 import { yes, faqList, list } from '../shared/content-normalize.js';
-import { FAQS, TESTIMONIALS, SOCIAL_LINKS, NAVIGATION, FEATURE_FLAGS, PAGES } from '../shared/content.js';
+import { FAQS, TESTIMONIALS, SOCIAL_LINKS, NAVIGATION, FEATURE_FLAGS, PAGES, BOOKING } from '../shared/content.js';
 
 let errors = 0;
 const fail = (m) => { errors++; console.error('  ✗', m); };
@@ -78,6 +78,15 @@ SOCIAL_LINKS.forEach((s) => { if (yes(s.is_enabled) && !s.url) fail(`Social link
 NAVIGATION.forEach((n) => { if (!n.label || !n.route || !n.route.startsWith('/')) fail(`Navigation: bad entry ${JSON.stringify(n)}`); });
 Object.entries(PAGES).forEach(([id, p]) => { if (!p.seo_title || !p.seo_description) fail(`Pages: ${id}.json needs seo_title and seo_description`); });
 Object.values(FEATURE_FLAGS).forEach((v, i) => { if (typeof v !== 'boolean') fail(`Feature flags: value #${i} must be true/false`); });
+// Booking & payments settings.
+if (!['partner', 'own'].includes(BOOKING.mode)) fail('Booking: mode must be partner or own');
+(BOOKING.own.slots || []).forEach((s) => { if (!/^\d{2}:\d{2}$/.test(s)) fail(`Booking: slot "${s}" must be HH:MM (24h)`); });
+(BOOKING.payments.methods || []).forEach((m) => {
+  if (!['upi', 'qr', 'link'].includes(m.type)) fail(`Booking: payment method ${m.id} has unknown type ${m.type}`);
+  if (m.enabled && m.type === 'upi' && !/^[\w.-]+@[\w-]+$/.test(m.upi_id || '')) fail(`Booking: UPI method ${m.id} is enabled but upi_id is not a valid UPI ID`);
+  if (m.enabled && m.type === 'link' && !/^https:\/\//.test(m.url || '')) fail(`Booking: link method ${m.id} is enabled but url is not https`);
+  if (m.enabled && m.type === 'qr' && !m.image) fail(`Booking: QR method ${m.id} is enabled but has no image`);
+});
 
 console.log('');
 if (errors) {

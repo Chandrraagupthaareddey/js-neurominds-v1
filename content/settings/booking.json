@@ -1,0 +1,60 @@
+{
+  "mode": "partner",
+  "own_booking_enabled": false,
+  "partner": {
+    "name": "PWeNS",
+    "button_label": "Check availability & book"
+  },
+  "own": {
+    "title": "Book your appointment",
+    "intro": "Choose a date and time that suits you. We will confirm your slot on WhatsApp or by phone.",
+    "days_ahead": 14,
+    "closed_weekdays": ["Sunday"],
+    "slots": ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00"],
+    "consultation_modes": ["Clinic visit", "Online (video)"],
+    "visit_types": ["New consultation", "Follow-up"],
+    "consultation_fee": 800,
+    "followup_fee": 500,
+    "currency": "INR",
+    "fee_note": "Fees are indicative. Your slot is confirmed once payment is received or the clinic confirms on WhatsApp.",
+    "collect_email": true,
+    "notes_placeholder": "Anything you would like us to know before the visit (optional, no medical details needed).",
+    "success_title": "Request received",
+    "success_message": "Thank you. Our team will confirm your appointment shortly. You can also send the details to us on WhatsApp right now.",
+    "whatsapp_handoff": true,
+    "terms_text": "I agree to be contacted by the clinic to confirm this appointment and accept the privacy policy."
+  },
+  "payments": {
+    "enabled": false,
+    "title": "Pay to confirm your slot",
+    "intro": "Choose any option below. After paying, tap “I have paid” so we can match your payment to your booking.",
+    "require_before_confirmation": false,
+    "methods": [
+      {
+        "id": "upi",
+        "type": "upi",
+        "label": "Pay with UPI (GPay, PhonePe, Paytm, BHIM)",
+        "upi_id": "",
+        "payee_name": "JS Neurominds and Diagnostic Center",
+        "enabled": false,
+        "order": 1
+      },
+      {
+        "id": "qr",
+        "type": "qr",
+        "label": "Scan QR code to pay",
+        "image": "",
+        "enabled": false,
+        "order": 2
+      },
+      {
+        "id": "razorpay",
+        "type": "link",
+        "label": "Pay securely online (Razorpay)",
+        "url": "",
+        "enabled": false,
+        "order": 3
+      }
+    ]
+  }
+}

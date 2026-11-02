@@ -39,6 +39,17 @@
           </div>
         </div>
 
+        <!-- The clinic's own booking + payment step. Shown only when Admin → Site Settings → "Booking & payments"
+             has mode = own and own_booking_enabled = true; the partner (PWeNS) card above is hidden then. -->
+        <section id="own-booking" hidden data-reveal style="max-width:640px; margin:0 auto">
+          <div class="section-head section-head--center">
+            <p class="eyebrow eyebrow--center">Appointment</p>
+            <h2 id="own-booking-title">Book your appointment</h2>
+            <p class="lede" id="own-booking-intro" style="margin-inline:auto"></p>
+          </div>
+          <div class="card" style="box-shadow:var(--shadow-md)"><div id="own-booking-mount"></div></div>
+        </section>
+
         <!-- Clinic callback request (shown only when public_callback_enabled is on in Settings → Feature flags) -->
         <section id="callback" hidden style="max-width:640px; margin:var(--sp-8) auto 0">
           <div class="section-head section-head--center" data-reveal>
@@ -60,6 +71,7 @@
   <script type="module">
     import { mountShell } from '/assets/js/app.js';
     import { wireConfirmedBooking, renderCallbackForm } from '/assets/js/booking.js';
+    import { api } from '/assets/js/api.js';
     import { applyPageCopy } from '/assets/js/pages.js';
     import '/assets/js/feedback.js';
     (async () => {
@@ -68,6 +80,24 @@
       await applyPageCopy('booking');
       wireConfirmedBooking('#confirmed-btn', { doctorId: 'doc_jayapriya', pwensUrl: cfg.pwens_booking_url });
       wireConfirmedBooking('#sticky-confirmed', { doctorId: 'doc_jayapriya', pwensUrl: cfg.pwens_booking_url });
+      // Own booking system (configurable + switchable in the admin). Replaces the partner card when enabled.
+      const bookingRes = await api.booking();
+      const settings = (bookingRes && bookingRes.data) || {};
+      if (settings.mode === 'own' && settings.own_booking_enabled === true) {
+        const partnerCard = document.getElementById('confirmed');
+        if (partnerCard && partnerCard.parentElement) partnerCard.parentElement.hidden = true;
+        const sticky = document.getElementById('sticky-confirmed');
+        if (sticky) { sticky.textContent = 'Book appointment'; sticky.onclick = (e) => { e.preventDefault(); document.getElementById('own-booking').scrollIntoView({ behavior: 'smooth' }); }; }
+        const own = document.getElementById('own-booking');
+        own.hidden = false;
+        document.getElementById('own-booking-title').textContent = settings.own.title || 'Book your appointment';
+        document.getElementById('own-booking-intro').textContent = settings.own.intro || '';
+        const { renderOwnBooking } = await import('/assets/js/own-booking.js');
+        const docs = await api.doctors();
+        await renderOwnBooking('#own-booking-mount', { settings, cfg, doctors: (docs && docs.data) || [] });
+      } else if (settings.partner && settings.partner.button_label) {
+        const b = document.getElementById('confirmed-btn'); if (b && !b.dataset.copyApplied) b.textContent = settings.partner.button_label;
+      }
       const flags = (window.__JSNM__ && window.__JSNM__.flags) || {};
       const cb = document.getElementById('callback');
       if (cb && flags.public_callback_enabled === true) { cb.hidden = false; await renderCallbackForm('#callback-mount'); }

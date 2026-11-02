@@ -26,6 +26,7 @@ import FLOATING_CTA_JSON from '../content/settings/floating_cta.json' with { typ
 import GOOGLE_REVIEWS_JSON from '../content/settings/google_reviews.json' with { type: 'json' };
 import CALLBACK_OPTIONS from '../content/settings/callback_options.json' with { type: 'json' };
 import SEO from '../content/settings/seo.json' with { type: 'json' };
+import BOOKING from '../content/settings/booking.json' with { type: 'json' };
 
 import PAGE_HOME from '../content/pages/home.json' with { type: 'json' };
 import PAGE_ABOUT from '../content/pages/about.json' with { type: 'json' };
@@ -50,7 +51,7 @@ export const SOCIAL_LINKS = items(SOCIAL_LINKS_JSON);
 export {
   CLINIC_CONFIG, DOCTORS, CONDITIONS, TREATMENTS, SERVICES,
   LAB_PACKAGES, BLOGS, FAQS, TESTIMONIALS,
-  FEATURE_FLAGS, CALLBACK_OPTIONS, SEO
+  FEATURE_FLAGS, CALLBACK_OPTIONS, SEO, BOOKING
 };
 
 // Floating CTA buttons (call / WhatsApp / enquire).
