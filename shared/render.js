@@ -56,6 +56,9 @@ export function doctorAvatar(d, size = 84) {
 }
 
 export function ctaPair(flags) {
+  // Booking is offered once, in the header ("Book now") and on the home page — no repeated buttons.
+  return '';
+  // eslint-disable-next-line no-unreachable
   flags = flags || {};
   const callback = yes(flags.public_callback_enabled)
     ? `<a class="btn btn--ghost" href="${ROUTES.booking}#callback">Request Clinic Callback</a>`

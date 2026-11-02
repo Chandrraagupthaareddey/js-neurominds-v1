@@ -100,7 +100,7 @@ export function footerHtml(cfg, social, flags) {
   const testimonialsLink = flags.public_testimonials_enabled === false ? '' : `<li><a href="${ROUTES.testimonials}">Testimonials</a></li>`;
   const callbackOn = yes(flags.public_callback_enabled);
   return `
-    <footer class="site-footer" data-prerendered="1">
+    <footer class="site-footer site-footer--compact" data-prerendered="1">
       <div class="container">
         <div class="footer-grid">
           <div>
@@ -110,6 +110,7 @@ export function footerHtml(cfg, social, flags) {
             <p class="footer-contact">${cfg.address}</p>
             <p class="footer-contact">Phone: <a href="${cfg.call_link}">${cfg.display_phone}</a></p>
             ${cfg.opening_hours_text ? `<p class="footer-contact">Hours: ${cfg.opening_hours_text}</p>` : ''}
+            <p class="footer-contact"><a class="footer-map" href="${cfg.maps_url}" target="_blank" rel="noopener" data-map-link>📍 Get directions on Google Maps</a></p>
             ${cfg.email_support ? `<!--email_off--><p class="footer-contact">Email: <a href="mailto:${cfg.email_support}">${cfg.email_support}</a></p><!--/email_off-->` : ''}
             ${renderFooterSocial(social)}
           </div>
@@ -133,15 +134,6 @@ export function footerHtml(cfg, social, flags) {
               <li><a href="${ROUTES.faq}">FAQ</a></li>
               <li><a href="${ROUTES.emergency}">Emergency help</a></li>
             </ul>
-          </div>
-          <div>
-            <p class="footer-heading">Get started</p>
-            <p class="footer-contact">${callbackOn ? 'Request a clinic callback or book a confirmed appointment online.' : 'Book a confirmed appointment online in minutes.'}</p>
-            <div class="footer-cta">
-              ${callbackOn ? `<a class="btn btn--ghost btn--block footer-cta__ghost" href="${ROUTES.booking}#callback">Request Clinic Callback</a>` : ''}
-              <a class="btn btn--primary btn--block" href="${ROUTES.booking}#confirmed">Book Confirmed Appointment</a>
-            </div>
-            <a class="footer-map" href="${cfg.maps_url}" target="_blank" rel="noopener" data-map-link>📍 Get directions on Google Maps</a>
           </div>
         </div>
         <div class="footer-legal">

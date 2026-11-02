@@ -379,3 +379,10 @@ select{appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='h
 .btn--sm{padding:.5rem .9rem; min-height:36px; font-size:var(--fs-xs);}
 @media (min-width:720px){.install-banner{left:auto; right:24px; max-width:460px;}}
 body.footer-in-view .install-banner{transform:translateY(120%); opacity:0;}
+
+/* Anchored targets (e.g. /booking#confirmed) land below the sticky header + emergency bar */
+[id]{scroll-margin-top:calc(var(--header-h) + 72px);}
+.site-footer--compact{padding-block:var(--sp-7) var(--sp-5); margin-top:var(--sp-8);}
+.site-footer--compact .footer-grid{grid-template-columns:1.6fr 1fr 1fr; gap:var(--sp-6);}
+@media (max-width:720px){.site-footer--compact .footer-grid{grid-template-columns:1fr 1fr;} .site-footer--compact .footer-grid > div:first-child{grid-column:1 / -1;}}
+.section--centered{min-height:calc(100vh - var(--header-h) - 160px); display:flex; flex-direction:column; justify-content:center;}
