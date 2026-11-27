@@ -1,22 +1,46 @@
 {
   "page": "home",
-  "seo_title": "JS Neurominds and Diagnostic Center | Psychiatrist in Tirupati & Chandragiri",
-  "seo_description": "Compassionate, evidence-based psychiatry and mental health care in Chandragiri and Tirupati. Consult Dr. Jayapriya T, MD (Psychiatry) in clinic or online. Book a confirmed appointment.",
+  "seo_title": "JS Neurominds Hospital | Psychiatrist in Tirupati",
+  "seo_description": "Compassionate, Evidence-based mental health care in Chandragiri and Tirupati. Consult Dr. Jayapriya Timmapuram, MD (Psychiatry) in clinic or online. Book a confirmed appointment.",
   "hero_eyebrow": "Psychiatry & mental health · Chandragiri · Tirupati",
   "hero_title": "Calm, capable care for <em>your peace of mind</em>.",
   "hero_lede": "JS Neurominds and Diagnostic Center offers compassionate, evidence-based mental health care for individuals and families — in clinic and online, with privacy you can trust.",
   "hero_cta_label": "Book confirmed appointment",
   "trust_items": [
-    { "value": "10+", "label": "Years of care" },
-    { "value": "All ages", "label": "Child to senior" },
-    { "value": "Private", "label": "Judgement-free" },
-    { "value": "Online", "label": "& in-clinic" }
+    {
+      "value": "10+",
+      "label": "Years of Experience"
+    },
+    {
+      "value": "All ages",
+      "label": "Child to Elderly"
+    },
+    {
+      "value": "Private",
+      "label": "Judgement-free"
+    },
+    {
+      "value": "Online",
+      "label": "& in-clinic"
+    }
   ],
   "assurance_items": [
-    { "icon": "🔒", "text": "Confidential & private" },
-    { "icon": "🩺", "text": "Led by Dr. Jayapriya T, MD" },
-    { "icon": "💬", "text": "Telugu · Tamil · English · Hindi" },
-    { "icon": "🏠", "text": "Home lab sample collection" }
+    {
+      "icon": "🔒",
+      "text": "Confidential & private"
+    },
+    {
+      "icon": "🩺",
+      "text": "Led by Dr. Jayapriya T, MD"
+    },
+    {
+      "icon": "💬",
+      "text": "Telugu · Tamil · English · Hindi"
+    },
+    {
+      "icon": "🏠",
+      "text": "Home lab sample collection"
+    }
   ],
   "conditions_eyebrow": "How we help",
   "conditions_title": "Conditions we support",
